@@ -5,6 +5,8 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.StorePromotionDto;
 import com.sales.wholesaler.services.WholesalePromotionsService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("wholesale/promotions")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Promotion Management", description = "APIs for managing item promotions for wholesalers")
 public class WholesalePromotionController  {
 
     private final WholesalePromotionsService wholesalePromotionsService;
@@ -30,6 +33,7 @@ public class WholesalePromotionController  {
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('wholesale.promoted.item.add')")
+    @Operation(summary = "Insert promoted item", description = "Adds a new promoted item for the wholesaler store")
     public ResponseEntity<Map<String,Object>> insertPromotedItem(Authentication authentication, HttpServletRequest request, @ModelAttribute StorePromotionDto storePromotionDto){
         logger.debug("Starting insertPromotedItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

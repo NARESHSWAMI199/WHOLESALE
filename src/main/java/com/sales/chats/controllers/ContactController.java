@@ -7,6 +7,8 @@ import com.sales.dto.ContactDto;
 import com.sales.entities.Contact;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,12 +25,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("contacts")
 @RequiredArgsConstructor
+@Tag(name = "Contacts Management", description = "APIs for managing user contacts")
 public class ContactController  {
 
     private final ContactsService contactService;
     private static final Logger logger = LoggerFactory.getLogger(ContactController.class);
 
     @GetMapping("all")
+    @Operation(summary = "Get all contacts", description = "Retrieves all contacts for the authenticated user")
     public ResponseEntity<List<User>> getAllContactsByUserId(Authentication authentication,HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Fetching all contacts for logged user: {}", loggedUser.getId());
@@ -37,6 +41,7 @@ public class ContactController  {
     }
 
     @PostMapping("add")
+    @Operation(summary = "Add new contact", description = "Adds a new contact to the user's contact list")
     public ResponseEntity<Map<String,Object>> addNewContactInContactList(Authentication authentication,@RequestBody ContactDto contactDto, HttpServletRequest request){
         Map<String,Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

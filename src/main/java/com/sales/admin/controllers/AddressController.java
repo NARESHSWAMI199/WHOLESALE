@@ -3,6 +3,8 @@ package com.sales.admin.controllers;
 import com.sales.admin.services.AddressService;
 import com.sales.entities.City;
 import com.sales.entities.State;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/address")
 @RequiredArgsConstructor
+@Tag(name = "Address Management", description = "APIs for managing addresses")
 public class AddressController  {
 
 
@@ -25,6 +28,7 @@ public class AddressController  {
     private static final Logger logger = LoggerFactory.getLogger(AddressController.class);
 
     @GetMapping("/city/{stateId}")
+    @Operation(summary = "Get cities by state", description = "Retrieves the list of cities for a given state ID")
     public ResponseEntity<List<City>> getCityList(@PathVariable Integer stateId) {
         logger.debug("Fetching city list for stateId: {}", stateId);
         List<City> cityList = addressService.getCityList(stateId);
@@ -32,6 +36,7 @@ public class AddressController  {
     }
 
     @GetMapping("/state")
+    @Operation(summary = "Get all states", description = "Retrieves the list of all states")
     public ResponseEntity<List<State>> getStateList() {
         logger.debug("Fetching state list");
         List<State> stateList = addressService.getStateList();

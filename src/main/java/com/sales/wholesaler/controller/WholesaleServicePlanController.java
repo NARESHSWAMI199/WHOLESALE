@@ -11,6 +11,8 @@ import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.services.WholesaleServicePlanService;
 import com.sales.wholesaler.services.WholesaleUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("wholesale/plan")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Service Plan Management", description = "APIs for managing service plans for wholesalers")
 public class WholesaleServicePlanController  {
 
     private final WholesaleServicePlanService wholesaleServicePlanService;
@@ -38,6 +41,7 @@ public class WholesaleServicePlanController  {
     private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanController.class);
 
     @GetMapping("/all")
+    @Operation(summary = "Get all service plans", description = "Retrieves a list of all available service plans")
     public ResponseEntity<List<ServicePlan>> getAllPlans() {
         logger.debug("Starting getAllPlans method");
         ResponseEntity<List<ServicePlan>> response = new ResponseEntity<>(wholesaleServicePlanService.getAllServicePlan(), HttpStatusCode.valueOf(200));
@@ -48,6 +52,7 @@ public class WholesaleServicePlanController  {
 
     @GetMapping("detail/{slug}")
     @PreAuthorize("hasAuthority('wholesale.plan.detail')")
+    @Operation(summary = "Get plan details by slug", description = "Retrieves detailed information for a specific service plan using its slug")
     public ResponseEntity<ServicePlan> getPlanDetailBySlug(@PathVariable String slug) {
         logger.debug("Starting getPlanDetailBySlug method");
         ResponseEntity<ServicePlan> response = new ResponseEntity<>(wholesaleServicePlanService.findBySlug(slug), HttpStatusCode.valueOf(200));
@@ -56,6 +61,7 @@ public class WholesaleServicePlanController  {
     }
 
     @PostMapping("/my-plans")
+    @Operation(summary = "Get my plans", description = "Retrieves a paginated list of all plans associated with the authenticated wholesaler")
     public ResponseEntity<Page<WholesalerPlans>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanDto searchFilters) {
         logger.debug("Starting getMyAllPlans method");
         AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
@@ -66,6 +72,7 @@ public class WholesaleServicePlanController  {
 
     @GetMapping("is-active")
 //    @PreAuthorize("hasAuthority('wholesale.plan.active')")
+    @Operation(summary = "Check if user plan is active", description = "Checks whether the authenticated wholesaler's current plan is active")
     public ResponseEntity<Map<String,Object>> isUserPlanActive(HttpServletRequest request){
         logger.debug("Starting isUserPlanActive method");
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
@@ -79,6 +86,7 @@ public class WholesaleServicePlanController  {
 
     @GetMapping("activate/{planSlug}")
 //    @PreAuthorize("hasAuthority('wholesale.my.current.plan')")
+    @Operation(summary = "Activate user plan", description = "Activates a specific service plan for the authenticated wholesaler")
     public ResponseEntity<Map<String,Object>> updateMyCurrentPlan(HttpServletRequest request , @PathVariable String planSlug){
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
         Map<String,Object> result = new HashMap<>();

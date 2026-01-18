@@ -16,8 +16,10 @@ import com.sales.utils.Utils;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import com.sales.wholesaler.services.WholesaleUserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("wholesale/auth")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale User Authentication and Management", description = "APIs for wholesaler user authentication, profile management, and user operations")
 public class WholesaleUserController  {
 
     private final WholesaleUserService wholesaleUserService;
@@ -64,6 +67,7 @@ public class WholesaleUserController  {
                     """
     )))
     @PostMapping("/login")
+    @Operation(summary = "Login wholesaler", description = "Authenticates a wholesaler user with email and password credentials")
     public ResponseEntity<Map<String, Object>> loginWholesaler(@RequestBody Map<String,String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting loginWholesaler method");
         Map<String, Object> responseObj = new HashMap<>();
@@ -96,6 +100,7 @@ public class WholesaleUserController  {
 
 
     @PostMapping("/login/otp")
+    @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
     public ResponseEntity<Map<String, Object>> loginUserViaOtp (@RequestBody UserDto userDetails) {
         logger.debug("Starting loginUserViaOtp method");
         Map<String, Object> responseObj = new HashMap<>();
@@ -132,6 +137,7 @@ public class WholesaleUserController  {
     )))
 
     @PostMapping("validate-otp")
+    @Operation(summary = "Validate OTP", description = "Validates the OTP for user authentication")
     public ResponseEntity<Map<String, Object>> validateUserOtp(@RequestBody UserDto userDetails) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting validateUserOtp method");
         Map<String, Object> responseObj = new HashMap<>();
@@ -160,6 +166,7 @@ public class WholesaleUserController  {
 
 
     @PostMapping("sendOtp")
+    @Operation(summary = "Send OTP", description = "Sends an OTP to the user's email for verification")
     public ResponseEntity<Map<String,Object>> sendOtp(HttpServletRequest request, @RequestBody UserDto userDto){
         logger.debug("Starting sendOtp method");
         Map<String,Object> responseObj = new HashMap<>();
@@ -188,6 +195,7 @@ public class WholesaleUserController  {
             """)
             ))
     @PostMapping(value = {"/update"})
+    @Operation(summary = "Update user profile", description = "Updates the profile information of the authenticated wholesaler user")
     public ResponseEntity<Map<String, Object>> updateAuth(Authentication authentication,HttpServletRequest request, @RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateAuth method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -198,6 +206,7 @@ public class WholesaleUserController  {
     }
 
     @GetMapping(value = {"/detail","/detail/{slug}"})
+    @Operation(summary = "Get user details", description = "Retrieves detailed information for the authenticated user or a specific user by slug")
     public ResponseEntity<Map<String, Object>> getDetailUser(@PathVariable(required = false) String slug, HttpServletRequest request) {
         logger.debug("Starting getDetailUser method");
         Map<String,Object> responseObj = new HashMap<>();
@@ -222,6 +231,7 @@ public class WholesaleUserController  {
     @Transactional
     @PostMapping("/password")
     @PreAuthorize("hasAuthority('wholesale.password.reset')")
+    @Operation(summary = "Reset user password", description = "Resets the password for the authenticated wholesaler user")
     public ResponseEntity<Map<String, Object>> resetUserPasswordBySlug(Authentication authentication,HttpServletRequest request ,@RequestBody PasswordDto passwordDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting resetUserPasswordBySlug method");
         Map<String,Object> responseObj = new HashMap<>();
@@ -238,6 +248,7 @@ public class WholesaleUserController  {
 
     @PostMapping("/update_profile")
     @PreAuthorize("hasAnyAuthority('wholesale.profile.update','wholesale.profile.edit')")
+    @Operation(summary = "Update profile image", description = "Updates the profile image of the authenticated wholesaler user")
     public ResponseEntity<Map<String, Object>> updateProfileImage(Authentication authentication,HttpServletRequest request, @RequestPart MultipartFile profileImage) throws IOException {
         logger.debug("Starting updateProfileImage method");
         Map<String,Object> responseObj = new HashMap<>();
@@ -260,6 +271,7 @@ public class WholesaleUserController  {
     String filePath;
 
     @GetMapping("/profile/{slug}/{filename}")
+    @Operation(summary = "Get profile image", description = "Retrieves the profile image file for a specific user")
     public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename , @PathVariable String slug) throws MalformedURLException {
         Path filePathFolder = Paths.get(filePath);
         Path userSlug = filePathFolder.resolve(slug).normalize();
@@ -282,6 +294,7 @@ public class WholesaleUserController  {
             """)
     ))
     @PostMapping(value = {"add","register"})
+    @Operation(summary = "Add new user", description = "Creates a new wholesaler user account")
     public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewUser method");
         Map<String,Object> result = new HashMap<>();
@@ -295,6 +308,7 @@ public class WholesaleUserController  {
 
 
     @GetMapping("last-seen")
+    @Operation(summary = "Update last seen", description = "Updates the last seen timestamp for the authenticated user")
     public ResponseEntity<Map<String,Object>> updateUserLastSeen(Authentication authentication,HttpServletRequest request){
         logger.debug("Starting updateUserLastSeen method");
         Map<String,Object> result = new HashMap<>();
@@ -322,6 +336,7 @@ public class WholesaleUserController  {
     /** Returning a list of users where users are retailer and wholesaler only for chat purpose.*/
 
     @PostMapping("chat/users")
+    @Operation(summary = "Get chat users", description = "Retrieves a list of users (retailers and wholesalers) for chat functionality")
     public ResponseEntity<Page<User>> getAllChatUser(Authentication authentication,HttpServletRequest request, @RequestBody UserSearchFilters userSearchFilters){
         logger.debug("Starting getAllChatUser method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

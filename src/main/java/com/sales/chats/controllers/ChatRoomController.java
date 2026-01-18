@@ -6,6 +6,8 @@ import com.sales.claims.SalesUser;
 import com.sales.dto.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.global.ConstantResponseKeys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,17 +24,20 @@ import java.util.Map;
 @RestController
 @RequestMapping("chat_room")
 @RequiredArgsConstructor
+@Tag(name = "Chat Rooms", description = "APIs for managing chat rooms")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
     @GetMapping("all")
+    @Operation(summary = "Get all chat rooms", description = "Retrieves all available chat rooms")
     public ResponseEntity<List<ChatRoom>> getAllCharRooms() {
         List<ChatRoom> chatRooms = chatRoomService.getAllChatRoom();
         return new ResponseEntity<>(chatRooms, HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("add")
+    @Operation(summary = "Add new chat room", description = "Creates a new chat room")
     public ResponseEntity<Map<String,String>> addNewChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
         Map<String,String> result = new HashMap<>();
         ChatRoom chatRoom = chatRoomService.createRoom(chatRoomDto);
@@ -41,6 +46,7 @@ public class ChatRoomController {
     }
 
     @PostMapping("update")
+    @Operation(summary = "Update chat room", description = "Updates an existing chat room")
     public ResponseEntity<Map<String, Object>> updateChatRoom(Authentication authentication, @RequestBody ChatRoomDto chatRoomDto, HttpServletRequest request) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String,Object> result = new HashMap<>();

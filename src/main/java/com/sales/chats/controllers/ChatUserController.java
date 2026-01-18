@@ -10,6 +10,8 @@ import com.sales.entities.ChatUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.utils.Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("chat-users")
 @RequiredArgsConstructor
+@Tag(name = "Chat Users", description = "APIs for managing chat users and contacts")
 public class ChatUserController  {
 
     
@@ -33,6 +36,7 @@ public class ChatUserController  {
     private final ChatUserService chatUserService;
 
     @GetMapping("all")
+    @Operation(summary = "Get all chat users", description = "Retrieves all users available for chat with the authenticated user")
     public ResponseEntity<List<User>> getAllChatUsers(Authentication authentication,HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Fetching all chat users for logged user: {}", loggedUser.getId());
@@ -42,6 +46,7 @@ public class ChatUserController  {
 
 
     @GetMapping("is-accepted/{receiver}")
+    @Operation(summary = "Check if chat request accepted", description = "Checks if the chat request has been accepted by the logged user")
     public ResponseEntity<String> isChatRequestAcceptedByLoggedUser(Authentication authentication,@PathVariable String receiver, HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Fetching isChatRequestAcceptedByLoggedUser for logged user: {}", loggedUser.getId());

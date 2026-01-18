@@ -6,6 +6,8 @@ import com.sales.claims.SalesUser;
 import com.sales.dto.UserPaginationDto;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.services.WholesalePaginationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +23,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/wholesale/pagination/")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Pagination Management", description = "APIs for managing pagination settings for wholesalers")
 public class WholesalePaginationController  {
 
     private final WholesalePaginationService wholesalePaginationService;
 
     @GetMapping("all")
     @PreAuthorize("hasAuthority('wholesale.pagination.all')")
+    @Operation(summary = "Get user pagination settings", description = "Retrieves all pagination settings for the authenticated wholesaler user")
     public ResponseEntity<Map<String,Object>> findUserPaginationSetting(Authentication authentication,HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String,Object> allUserPaginations = wholesalePaginationService.findUserPaginationsByUserId(loggedUser);
@@ -36,6 +40,7 @@ public class WholesalePaginationController  {
 
     @PostMapping("update")
     @PreAuthorize("hasAnyAuthority('wholesale.pagination.edit','wholesale.pagination.update')")
+    @Operation(summary = "Update pagination row number", description = "Updates the number of rows per page for pagination settings for the wholesaler")
     public ResponseEntity<Map<String,Object>> updatePaginationRowNumber(Authentication authentication, HttpServletRequest request, @RequestBody UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

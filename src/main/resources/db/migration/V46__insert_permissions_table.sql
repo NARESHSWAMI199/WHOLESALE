@@ -36,6 +36,7 @@ INSERT IGNORE INTO `permissions` (`permission`, `display_name`, `permission_for`
 
 -- Pagination (usually internal but still can be permission controlled)
 ('pagination.all',                 'Manage Pagination Settings',          'Pagination'),
+('pagination.edit',                 'Update pagination Setting',          'Pagination'),
 
 -- User Plans & Service Plans
 ('user.plan.detail',               'View User Plan Details',              'User Plan'),

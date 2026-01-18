@@ -6,6 +6,8 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.UserPaginationDto;
 import com.sales.global.ConstantResponseKeys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +23,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/pagination/")
 @RequiredArgsConstructor
+@Tag(name = "Pagination Settings", description = "APIs for managing user pagination settings")
 public class PaginationController  {
 
     private final PaginationService paginationService;
 
     @GetMapping("all")
     @PreAuthorize("hasAuthority('pagination.all')")
+    @Operation(summary = "Get all user paginations", description = "Retrieves all pagination settings for the logged-in user")
     public ResponseEntity<Map<String,Object>> findAllUserPaginations(Authentication authentication, HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String,Object> allUserPaginations = paginationService.findUserPaginationsByUserId(loggedUser);
@@ -36,6 +40,7 @@ public class PaginationController  {
 
     @PostMapping("update")
     @PreAuthorize("hasAnyAuthority('pagination.update','pagination.edit')")
+    @Operation(summary = "Update pagination settings", description = "Updates the pagination row number settings for the user")
     public ResponseEntity<Map<String,Object>> updatePaginationRowNumber(Authentication authentication,HttpServletRequest request, @RequestBody UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
