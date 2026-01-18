@@ -7,6 +7,8 @@ import com.sales.entities.BlockedUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.services.WholesaleUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Block List Management", description = "APIs for managing blocked users in chat")
 public class BlockListController  {
 
   
@@ -31,6 +34,7 @@ public class BlockListController  {
     private final WholesaleUserService wholesaleUserService;
 
     @GetMapping("/block/{recipient}")
+    @Operation(summary = "Block user", description = "Blocks a user from chatting with the authenticated user")
     public ResponseEntity<Map<String,Object>> addUserInBlockList(Authentication authentication,@PathVariable String recipient, HttpServletRequest request){
         logger.debug("Blocking user: {}", recipient);
         Map<String,Object> result = new HashMap<>();

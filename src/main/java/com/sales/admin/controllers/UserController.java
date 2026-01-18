@@ -10,8 +10,10 @@ import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.jwtUtils.JwtToken;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin/auth")
 @RequiredArgsConstructor
+@Tag(name = "User Management", description = "APIs for user authentication, management, and related operations")
 public class UserController  {
 
     private final AuthenticationManager authenticationManager;
@@ -52,6 +55,7 @@ public class UserController  {
 
     @PreAuthorize("hasAuthority('user.all')")
     @PostMapping("/{userType}/all")
+    @Operation(summary = "Get all users by type", description = "Retrieves a paginated list of users based on user type with optional search filters")
     public ResponseEntity<Page<User>> getAllUsers(Authentication authentication,HttpServletRequest request,@RequestBody UserSearchFilters searchFilters, @PathVariable(required = true) String userType) {
         logger.info("authentication  authorities : {}",authentication.getAuthorities());
         logger.debug("Fetching all users of type: {}", userType);
@@ -72,6 +76,7 @@ public class UserController  {
                     """)
     ))
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token along with user details")
     public ResponseEntity<Map<String, Object>> login(@RequestBody UserDto userDetails) {
         logger.debug("Admin login attempt with email: {}", userDetails.getEmail());
         Authentication authentication = authenticationManager.authenticate(

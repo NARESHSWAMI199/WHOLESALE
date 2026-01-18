@@ -3,6 +3,8 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.global.GlobalConstant;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
@@ -36,6 +38,7 @@ import java.util.Objects;
 @RequestMapping("removebg")
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Background Removal", description = "APIs for uploading images and removing backgrounds")
 public class RemoveBg {
 
   
@@ -49,6 +52,7 @@ public class RemoveBg {
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('remove.bg.image.upload')")
+    @Operation(summary = "Upload image for background removal", description = "Uploads an image and processes it to remove the background")
     public ResponseEntity<Map<String,String>> uploadImage(Authentication authentication,HttpServletRequest request, @RequestParam("image") MultipartFile file) throws IOException {
         logger.debug("Starting uploadImage method");
         AuthUser user = (SalesUser) authentication.getPrincipal();
@@ -107,6 +111,7 @@ public class RemoveBg {
 
     @GetMapping("/{filename}")
     @PreAuthorize("hasAuthority('remove.bg.image.download')")
+    @Operation(summary = "Download processed image", description = "Retrieves the processed image after background removal")
     public ResponseEntity<Resource> getFile(Authentication authentication,HttpServletRequest request, @PathVariable(required = true) String filename) throws MalformedURLException {
         logger.debug("Starting getFile method");
           AuthUser user = (SalesUser) authentication.getPrincipal();

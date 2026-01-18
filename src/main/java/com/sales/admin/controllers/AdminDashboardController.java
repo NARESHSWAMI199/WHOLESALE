@@ -4,6 +4,8 @@ import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
 import com.sales.dto.GraphDto;
 import com.sales.global.ConstantResponseKeys;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("admin/dashboard")
 @RequiredArgsConstructor
+@Tag(name = "Admin Dashboard", description = "APIs for admin dashboard data")
 public class AdminDashboardController  {
 
     private final UserService userService;
@@ -26,6 +29,7 @@ public class AdminDashboardController  {
 
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('dashboard.count')")
+    @Operation(summary = "Get dashboard counts", description = "Retrieves counts for users, retailers, wholesalers, staffs, and admins")
     public ResponseEntity<Map<String, Object>> getAllDashboardCount() {
         logger.debug("Fetching all dashboard counts");
         Map<String, Object> responseObj = new HashMap<>();
@@ -41,6 +45,7 @@ public class AdminDashboardController  {
 
     @PreAuthorize("hasAuthority('dashboard.count')")
     @PostMapping("graph/months/")
+    @Operation(summary = "Get graph data by months", description = "Retrieves graph data for store counts by months based on filters")
     public ResponseEntity<Map<String, Object>> getAllGraphData(@RequestBody GraphDto graphDto) {
         logger.debug("Fetching graph data for months with filters: {}", graphDto);
         Map<String, Object> responseObj = new HashMap<>();

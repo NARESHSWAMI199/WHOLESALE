@@ -12,8 +12,10 @@ import com.sales.global.GlobalConstant;
 import com.sales.utils.ReadExcel;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -42,6 +44,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = {"admin/item"})
 @RequiredArgsConstructor
+@Tag(name = "Item Management", description = "APIs for managing items, categories, subcategories, and related operations")
 public class ItemController  {
 
 
@@ -54,6 +57,7 @@ public class ItemController  {
 
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
+    @Operation(summary = "Get all items", description = "Retrieves a paginated list of all items with optional search filters")
     public ResponseEntity<Page<Item>> getAllItem(Authentication authentication, @RequestBody ItemSearchFields searchFilters, HttpServletRequest request) {
         logger.debug("Fetching all items with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -63,6 +67,7 @@ public class ItemController  {
 
     @GetMapping("/detail/{slug}")
     @PreAuthorize("hasAuthority('item.detail')")
+    @Operation(summary = "Get item details", description = "Retrieves detailed information about a specific item by its slug")
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable String slug) {
         logger.debug("Fetching item details for slug: {}", slug);
         Map<String, Object> responseObj = new HashMap<>();
@@ -102,6 +107,7 @@ public class ItemController  {
 
     @PostMapping(value = {"/add", "/update"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyAuthority('item.add','item.update','item.edit')")
+    @Operation(summary = "Add or update item", description = "Creates a new item or updates an existing item with the provided data and images")
     public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemDto itemDto) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Adding or updating item: {}", itemDto);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -114,6 +120,7 @@ public class ItemController  {
 
     @PostMapping(value = {"/importExcel/{wholesaleSlug}"})
     @PreAuthorize("hasAuthority('item.import')")
+    @Operation(summary = "Import items from Excel", description = "Imports items from an Excel sheet for a specific wholesale store")
     public ResponseEntity<Object> importItemsFromExcelSheet(Authentication authentication,HttpServletRequest request, @RequestParam("excelfile") MultipartFile excelSheet, @PathVariable(value = "wholesaleSlug") String wholesaleSlug) {
         logger.debug("Importing items from Excel sheet for wholesaleSlug: {}", wholesaleSlug);
         Map<String,Object> responseObj = new HashMap<>();
@@ -155,6 +162,7 @@ public class ItemController  {
 
     @PostMapping(value = {"/exportExcel/{wholesaleSlug}","exportExcel"})
     @PreAuthorize("hasAuthority('item.export')")
+    @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
     public ResponseEntity<Object> exportItemsFromExcel(Authentication authentication,@PathVariable(required = false) String wholesaleSlug, @RequestBody ItemSearchFields searchFilters,HttpServletRequest request) {
         logger.debug("Exporting items to Excel for wholesaleSlug: {}", wholesaleSlug);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -192,6 +200,7 @@ public class ItemController  {
 
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('item.delete')")
+    @Operation(summary = "Delete item", description = "Deletes an item by its slug")
     public ResponseEntity<Map<String, Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting item with slug: {}", deleteDto);
         Map<String,Object> responseObj = new HashMap<>();
@@ -221,6 +230,7 @@ public class ItemController  {
     ))
     @PostMapping("/stock")
     @PreAuthorize("hasAuthority('item.stock')")
+    @Operation(summary = "Update item stock", description = "Updates the stock status of an item")
     public ResponseEntity<Map<String, Object>> updateItemStock(@RequestBody Map<String, String> params) {
         logger.debug("Updating stock for item with slug: {}", params.get("slug"));
         Map<String,Object> responseObj = new HashMap<>();
@@ -238,6 +248,7 @@ public class ItemController  {
 
     @PostMapping("/status")
     @PreAuthorize("hasAuthority('item.status')")
+    @Operation(summary = "Update item status", description = "Updates the status of an item")
     public ResponseEntity<Map<String, Object>> updateItemStatus(Authentication authentication,HttpServletRequest request ,@RequestBody StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Updating status for item with statusDto: {}", statusDto);
         Map<String,Object> responseObj = new HashMap<>();
@@ -258,6 +269,7 @@ public class ItemController  {
     String filePath;
 
     @GetMapping("/image/{slug}/{filename}")
+    @Operation(summary = "Get item image", description = "Retrieves an image file for a specific item")
     public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename, @PathVariable("slug") String slug ) throws Exception {
         logger.debug("Fetching image file: {} for slug: {}", filename,slug);
         Path filePathObj = Paths.get(filePath);
@@ -274,6 +286,7 @@ public class ItemController  {
 
     @PostMapping("category")
     @PreAuthorize("hasAuthority('item.category')")
+    @Operation(summary = "Get all item categories", description = "Retrieves a list of all item categories with optional search filters")
     public ResponseEntity<List<ItemCategory>> getAllCategory(@RequestBody  SearchFilters searchFilters) {
         logger.debug("Fetching all item categories with filters: {}", searchFilters);
         List<ItemCategory> itemCategories = itemService.getAllCategory(searchFilters);
@@ -282,6 +295,7 @@ public class ItemController  {
 
     @PostMapping(value = {"category/add","category/update"})
     @PreAuthorize("hasAnyAuthority('item.category.add','item.category.update','item.category.edit')")
+    @Operation(summary = "Add or update item category", description = "Creates or updates an item category")
     public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryDto categoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating item category: {}", categoryDto);
         Map<String,Object> result = new HashMap<>();
@@ -302,6 +316,7 @@ public class ItemController  {
 
     @PostMapping("category/delete")
     @PreAuthorize("hasAuthority('item.category.delete')")
+    @Operation(summary = "Delete item category", description = "Deletes an item category by ID")
     public ResponseEntity<Map<String,Object>> deleteItemCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting item category with id: {}", deleteDto);
         Map<String,Object> responseObj = new HashMap<>();
@@ -320,6 +335,7 @@ public class ItemController  {
 
     @GetMapping("category/{categoryId}")
     @PreAuthorize("hasAuthority('item.subcategory.detail')")
+    @Operation(summary = "Get item category by ID", description = "Retrieves details of a specific item category by its ID")
     public ResponseEntity<ItemCategory> getAllCategory(@PathVariable Integer categoryId) {
         logger.debug("Fetching item category with id: {}", categoryId);
         ItemCategory itemCategories = itemService.getItemCategoryById(categoryId);
@@ -332,6 +348,7 @@ public class ItemController  {
 
     @PostMapping("subcategory")
     @PreAuthorize("hasAnyAuthority('item.subcategory.all','item.subcategory')")
+    @Operation(summary = "Get all item subcategories", description = "Retrieves a list of all item subcategories with optional search filters")
     public ResponseEntity<List<ItemSubCategory>> getSubCategory(@RequestBody SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all item subcategories with filters: {}", searchFilters);
         List<ItemSubCategory> itemCategories = itemService.getAllItemsSubCategories(searchFilters);
@@ -340,6 +357,7 @@ public class ItemController  {
 
     @PostMapping(value = {"subcategory/add","subcategory/update"})
     @PreAuthorize("hasAnyAuthority('item.subcategory.add','item.subcategory.update','item.subcategory.edit')")
+    @Operation(summary = "Add or update item subcategory", description = "Creates or updates an item subcategory")
     public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryDto subCategoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating item subcategory: {}", subCategoryDto);
         Map<String,Object> result = new HashMap<>();
@@ -360,6 +378,7 @@ public class ItemController  {
 
     @PostMapping("subcategory/delete")
     @PreAuthorize("hasAuthority('item.subcategory.delete')")
+    @Operation(summary = "Delete item subcategory", description = "Deletes an item subcategory by ID")
     public ResponseEntity<Map<String,Object>> deleteItemSubCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting item subcategory with id: {}", deleteDto);
         Map<String,Object> responseObj = new HashMap<>();
@@ -377,6 +396,7 @@ public class ItemController  {
 
     @PreAuthorize("hasAuthority('item.measuring.unit')")
     @GetMapping("units")
+    @Operation(summary = "Get all measuring units", description = "Retrieves a list of all available measuring units")
     public ResponseEntity<List<MeasurementUnit>> getALlMeasuringUnitsBySubcategory() {
         logger.debug("Fetching all measuring units by subcategory");
         List<MeasurementUnit> itemMeasurementUnitList = itemService.getAllMeasurementUnit();
@@ -391,6 +411,7 @@ public class ItemController  {
 
 
     @GetMapping(value = {"download/update/template"})
+    @Operation(summary = "Download update template", description = "Downloads the Excel template for updating items")
     public ResponseEntity<Object> downloadExcelUpdateTemplate() throws IOException {
         logger.debug("Download excel sheet template for update items" );
         Path path = Paths.get(updateItemTemplate);
@@ -408,6 +429,7 @@ public class ItemController  {
 
 
     @GetMapping(value = {"notUpdated/{wholesaleSlug}/{filename}"})
+    @Operation(summary = "Download not updated items Excel", description = "Downloads the Excel file containing items that were not updated during import")
     public ResponseEntity<Object> downloadExcelUpdateTemplate(@PathVariable String wholesaleSlug ,@PathVariable String filename) throws IOException {
         logger.debug("Download excel sheet template for not updated items : {}  : {}",excelNotUpdateItemsFolderPath,filename);
         Path filePathObj = Paths.get(excelNotUpdateItemsFolderPath);

@@ -7,6 +7,8 @@ import com.sales.dto.GraphDto;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.services.WholesaleItemService;
 import com.sales.wholesaler.services.WholesaleStoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("wholesale/dashboard")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Dashboard", description = "APIs for wholesale dashboard data")
 public class WholesaleDashboardController  {
 
 
@@ -32,6 +35,7 @@ public class WholesaleDashboardController  {
 
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('wholesale.dashboard.count')")
+    @Operation(summary = "Get dashboard counts", description = "Retrieves counts for items, new items, old items, in stock, and out of stock for the wholesale store")
     public ResponseEntity<Map<String, Object>> getAllDashboardCount(Authentication authentication,HttpServletRequest request) {
         logger.debug("Starting getAllDashboardCount method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -49,6 +53,7 @@ public class WholesaleDashboardController  {
 
     @PostMapping("graph/months/")
     @PreAuthorize("hasAuthority('wallet.dashboard.graph')")
+    @Operation(summary = "Get graph data by months", description = "Retrieves graph data for item counts by months based on filters for the wholesale store")
     public ResponseEntity<Map<String, Object>> getAllGraphData(Authentication authentication, HttpServletRequest request, @RequestBody GraphDto graphDto) {
         logger.debug("Starting getAllGraphData method");
         Map<String,Object> responseObj = new HashMap<>();

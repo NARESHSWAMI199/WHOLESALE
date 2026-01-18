@@ -8,6 +8,8 @@ import com.sales.entities.WalletTransaction;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.wholesaler.services.WalletTransactionService;
 import com.sales.wholesaler.services.WholesaleUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("wholesale/wallet/transactions/")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Wallet Transaction Management", description = "APIs for managing wallet transactions for wholesalers")
 public class WalletTransactionController  {
 
 
@@ -31,6 +34,7 @@ public class WalletTransactionController  {
 
     @PostMapping("all")
     @PreAuthorize("hasAuthority('wallet.transactiona.all')")
+    @Operation(summary = "Get all wallet transactions", description = "Retrieves a paginated list of all wallet transactions for the authenticated wholesaler")
     public ResponseEntity<Page<WalletTransaction>> getAllWalletTransactionsByUserId(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters){
         //AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

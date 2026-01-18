@@ -10,6 +10,8 @@ import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.wholesaler.services.WholesaleUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -29,9 +31,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Chat Management", description = "APIs for managing chat messages and conversations")
 public class ChatController  {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
@@ -42,6 +44,7 @@ public class ChatController  {
 
 
     @PostMapping("/chats/all")
+    @Operation(summary = "Get all chats", description = "Retrieves all chat messages for the authenticated user")
     public ResponseEntity<Map<String, List<Chat>>> getALlUsers(Authentication authentication,@RequestBody MessageDto message , HttpServletRequest request){
         logger.debug("Fetching all users for message: {}", message);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();

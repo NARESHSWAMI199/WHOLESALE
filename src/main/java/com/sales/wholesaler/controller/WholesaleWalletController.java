@@ -8,6 +8,8 @@ import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.services.WholesaleUserService;
 import com.sales.wholesaler.services.WholesaleWalletService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("wholesale/wallet")
 @RequiredArgsConstructor
+@Tag(name = "Wholesale Wallet Management", description = "APIs for managing wallet operations for wholesalers")
 public class WholesaleWalletController  {
 
     private final JwtToken jwtToken;
@@ -30,6 +33,7 @@ public class WholesaleWalletController  {
     private final WholesaleWalletService wholesaleWalletService;
 
     @GetMapping("/")
+    @Operation(summary = "Get wallet details", description = "Retrieves the wallet details for the authenticated wholesaler user")
     public ResponseEntity<Wallet> getWalletDetail(HttpServletRequest request){
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
         Wallet walletDetail = wholesaleWalletService.getWalletDetail(loggedUser.getId());
@@ -39,6 +43,7 @@ public class WholesaleWalletController  {
 
     @GetMapping("pay/{servicePlanSlug}")
 //    @PreAuthorize("hasAuthority('wholesale.wallet.pay')")
+    @Operation(summary = "Pay using wallet", description = "Makes a payment for a service plan using the wholesaler's wallet balance")
     public ResponseEntity<Map<String,Object>> payUsingWallet(@PathVariable String servicePlanSlug,HttpServletRequest request) {
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
         Map<String,Object> result = new HashMap<>();

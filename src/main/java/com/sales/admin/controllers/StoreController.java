@@ -9,8 +9,10 @@ import com.sales.entities.StoreCategory;
 import com.sales.entities.StoreSubCategory;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("admin/store")
 @RequiredArgsConstructor
+@Tag(name = "Store Management", description = "APIs for managing stores, categories, and related operations")
 public class StoreController {
 
     private final StoreService storeService;
@@ -48,6 +51,7 @@ public class StoreController {
 
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('store.all')")
+    @Operation(summary = "Get all stores", description = "Retrieves a paginated list of all stores with optional search filters")
     public ResponseEntity<Page<Store>> getAllStore(@RequestBody SearchFilters searchFilters){
         logger.debug("Fetching all stores with filters: {}", searchFilters);
         Page<Store> storePage =  storeService.getAllStore(searchFilters);
@@ -57,6 +61,7 @@ public class StoreController {
     @Transactional
     @PostMapping("delete")
     @PreAuthorize("hasAuthority('store.delete')")
+    @Operation(summary = "Delete store", description = "Deletes a store by its slug")
     public ResponseEntity<Map<String,Object>> deleteStore(Authentication authentication,HttpServletRequest request, @RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store with slug: {}", deleteDto.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
@@ -76,6 +81,7 @@ public class StoreController {
 
     @GetMapping("/detail/{slug}")
     @PreAuthorize("hasAuthority('store.detail')")
+    @Operation(summary = "Get store details", description = "Retrieves detailed information about a store by its slug")
     public ResponseEntity<Map<String,Object>> getStoreDetailBySlug(@PathVariable String slug) {
         logger.debug("Fetching store details for params: {}", slug);
         Map<String,Object> responseObj = new HashMap<>();
@@ -93,6 +99,7 @@ public class StoreController {
 
     @GetMapping("/detailbyuser/{userSLug}")
     @PreAuthorize("hasAuthority('store.user')")
+    @Operation(summary = "Get store details by user slug", description = "Retrieves store details associated with a user by user slug")
     public ResponseEntity<Map<String,Object>> getUserDetailByUserSlug(@PathVariable("userSLug") String slug) {
         logger.debug("Fetching store details for user slug: {}", slug);
         Map<String,Object> responseObj = new HashMap<>();
@@ -131,6 +138,7 @@ public class StoreController {
     @Transactional
     @PostMapping(value = {"/add","/update"})
     @PreAuthorize("hasAnyAuthority('store.add','store.update','store.edit')")
+    @Operation(summary = "Add or update store", description = "Creates a new store or updates an existing store based on the provided data")
     public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request,  @ModelAttribute StoreDto storeDto) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Adding or updating store with details: {}", storeDto);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
@@ -144,6 +152,7 @@ public class StoreController {
     @Transactional
     @PostMapping("profile/{slug}")
     @PreAuthorize("hasAnyAuthority('store.profile.update','store.profile.edit')")
+    @Operation(summary = "Upload store image", description = "Uploads and updates the profile image for a store")
     public ResponseEntity<Map<String,Object>> uploadStoreImage(HttpServletRequest request, @RequestPart MultipartFile storeImage , @PathVariable String slug) {
         logger.debug("Uploading store image for slug: {}",slug);
         Map<String,Object> responseObj = new HashMap<>();
@@ -172,6 +181,7 @@ public class StoreController {
     @Transactional
     @PostMapping("/status")
     @PreAuthorize("hasAuthority('store.status')")
+    @Operation(summary = "Update store status", description = "Updates the status of a store (active/inactive)")
     public ResponseEntity<Map<String,Object>> updateStoreStatus (@RequestBody StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Updating store status for slug: {}", statusDto.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
@@ -192,6 +202,7 @@ public class StoreController {
     String filePath;
 
     @GetMapping("/image/{slug}/{filename}")
+    @Operation(summary = "Get store image", description = "Retrieves the profile image of a store")
     public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename , @PathVariable String slug) throws Exception {
         logger.debug("Fetching store image: {} for slug: {}",filename, slug);
         Path filePathObj = Paths.get(filePath);
@@ -204,6 +215,7 @@ public class StoreController {
 
     @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
     @PostMapping("category")
+    @Operation(summary = "Get all store categories", description = "Retrieves a list of all store categories with optional filters")
     public ResponseEntity<List<StoreCategory>> getAllStoreCategory(@RequestBody SearchFilters searchFilters) {
         logger.debug("Fetching all store categories with filters: {}", searchFilters);
         List<StoreCategory> storeCategories = storeService.getAllStoreCategory(searchFilters);
@@ -212,6 +224,7 @@ public class StoreController {
 
     @PreAuthorize("hasAnyAuthority('store.category.add','store.category.update','store.category.edit')")
     @PostMapping(value = {"category/add","category/update"})
+    @Operation(summary = "Add or update store category", description = "Creates a new store category or updates an existing one")
     public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryDto categoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating store category with details: {}", categoryDto);
         Map<String,Object> result = new HashMap<>();
@@ -231,6 +244,7 @@ public class StoreController {
 
     @PreAuthorize("hasAnyAuthority('store.category.detail')")
     @GetMapping("category/{categoryId}")
+    @Operation(summary = "Get store category details", description = "Retrieves details of a specific store category by ID")
     public ResponseEntity<StoreCategory> getAllCategory(@PathVariable Integer categoryId) {
         logger.debug("Fetching store category with ID: {}", categoryId);
         StoreCategory storeCategory = storeService.getStoreCategoryById(categoryId);
@@ -240,6 +254,7 @@ public class StoreController {
 
     @PostMapping("category/delete")
     @PreAuthorize("hasAuthority('store.category.delete')")
+    @Operation(summary = "Delete store category", description = "Deletes a store category by its slug")
     public ResponseEntity<Map<String,Object>> deleteItemCategoryById(Authentication authentication,HttpServletRequest request ,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store category with slug: {}", deleteDto.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
@@ -258,6 +273,7 @@ public class StoreController {
 
     @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
     @PostMapping("subcategory")
+    @Operation(summary = "Get all store subcategories", description = "Retrieves a list of all store subcategories with optional filters")
     public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@RequestBody SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all store subcategories with filters: {}", searchFilters);
         List<StoreSubCategory> storeSubCategories = storeService.getAllStoreSubCategories(searchFilters);
@@ -267,6 +283,7 @@ public class StoreController {
 
     @PostMapping("subcategory/delete")
     @PreAuthorize("hasAuthority('store.subcategory.delete')")
+    @Operation(summary = "Delete store subcategory", description = "Deletes a store subcategory by its slug")
     public ResponseEntity<Map<String,Object>> deleteItemSubCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store subcategory with slug: {}", deleteDto.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
