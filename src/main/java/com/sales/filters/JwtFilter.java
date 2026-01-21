@@ -1,7 +1,5 @@
 package com.sales.filters;
 
-import com.sales.admin.repositories.GroupRepository;
-import com.sales.admin.repositories.PermissionRepository;
 import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.cachemanager.services.UserCacheService;
@@ -24,13 +22,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -41,8 +37,59 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final StorePermissionsRepository storePermissionsRepository;
     private final UserCacheService userCacheService;
-    private final PermissionRepository permissionRepository;
-    private final GroupRepository groupRepository;
+
+
+    /* Paths which no need to authenticate */
+    String [] unAuthorizePaths = {"/admin/auth/login",
+            "/admin/auth/login/otp",
+            "/admin/auth/sendOtp",
+            "/admin/auth/register",
+            "/wholesale/auth/login",
+            "/wholesale/auth/register",
+            "/wholesale/auth/login/otp",
+            "/wholesale/auth/sendOtp",
+            "/wholesale/auth/register",
+            "/webjars/**",
+            "/admin/auth/profile/**",
+            "/wholesale/auth/profile/**",
+            "/admin/store/image/**",
+            "/admin/item/image/**",
+            "/pg/callback/**",
+            "/cashfree/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api-docs/**",
+            "/plans/**",
+            "/wholesale/address/state",
+            "/wholesale/address/city/**",
+            "/wholesale/store/category/**",
+            "/wholesale/store/subcategory/**",
+            "/wholesale/auth/validate-otp",
+            "/wholesale/plan/all",
+            "/admin/auth/profile/**",
+            "/index",
+            "/chat2",
+            "/chat/images/**",
+            "/js/**",
+            "/css/**",
+            "/images/**",
+            /* Paths which need to be authenticated but don't need to check in Interceptor due to some different conditions */
+            "/wholesale/plan/my-plans",
+            "/wholesale/plan/is-active",
+            "/pg/pay/**",
+            "/wholesale/store/add",
+            "/wholesale/auth/detail",
+            "/future/plans/**",
+            "/wholesale/wallet/**"
+    };
+    private final AntPathMatcher matcher = new AntPathMatcher();
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return Arrays.stream(unAuthorizePaths)
+                .anyMatch(pattern -> matcher.match(pattern, path));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
