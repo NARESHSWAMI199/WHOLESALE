@@ -20,7 +20,7 @@ public class PaginationHbRepository {
         String hql = """
                 update UserPagination 
                 set rowsNumber =:rowsNumber
-                where userId = :userId and paginationId = :paginationId
+                where userId = :userId and pagination.id = :paginationId
                 """;
         Query query = entityManager.createQuery(hql);
         query.setParameter("rowsNumber", userPaginationDto.getRowsNumber());

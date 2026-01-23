@@ -25,7 +25,7 @@ public class WholesalerFuturePlan implements Serializable {
     @Column(name = "slug" , nullable = false)
     String slug;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id",nullable = false)
     ServicePlan servicePlan;
 

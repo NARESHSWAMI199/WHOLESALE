@@ -31,7 +31,7 @@ public class ItemReviews implements Serializable {
     @Column(name = "slug")
     String slug;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
 

@@ -23,7 +23,7 @@ public class Contact implements Serializable {
     @Column(name = "user_id")
     Integer userId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contact_id")
     User contactUser;
 

@@ -9,7 +9,6 @@ import com.sales.dto.UserPaginationDto;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
 import com.sales.entities.UserPagination;
-import com.sales.exceptions.NotFoundException;
 import com.sales.specifications.PaginationSpecification;
 import com.sales.utils.Utils;
 import jakarta.transaction.Transactional;
@@ -39,7 +38,7 @@ public class PaginationService {
         List<UserPagination> userPaginations = userPaginationsRepository.getUserPaginationByUserId(loggedUser.getId());
         Map<String,Object> result = new LinkedHashMap<>();
         for(UserPagination userPagination : userPaginations) {
-            Pagination pagination = paginationRepository.findById(userPagination.getPaginationId()).orElseThrow(() -> new NotFoundException("Pagination not found."));
+            Pagination pagination = userPagination.getPagination();
             String key = pagination.getFieldFor();
             // remove all whitespaces and changed with uppercase like:
             // abc d → ABCD
@@ -71,7 +70,7 @@ public class PaginationService {
     public UserPagination insertUserPagination(Pagination pagination,AuthUser loggedUser,Integer rowNumbers) {
         UserPagination userPagination = new UserPagination();
         Pagination savedPagination = paginationRepository.save(pagination);
-        userPagination.setPaginationId(savedPagination.getId());
+        userPagination.setPagination(savedPagination);
         userPagination.setUserId(loggedUser.getId());
         userPagination.setRowsNumber(rowNumbers);
         return userPaginationsRepository.save(userPagination);

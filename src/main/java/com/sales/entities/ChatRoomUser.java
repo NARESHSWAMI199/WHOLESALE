@@ -23,7 +23,7 @@ public class ChatRoomUser implements Serializable {
     @Column(name = "room_id", nullable = false)
     long roomId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
 

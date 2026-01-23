@@ -35,7 +35,7 @@ public class StoreNotifications implements Serializable {
     @Column(name = "created_at")
     Long createAt;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by",referencedColumnName = "user_id")
     User createdBy;
 

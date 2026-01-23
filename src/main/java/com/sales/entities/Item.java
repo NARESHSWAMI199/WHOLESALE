@@ -66,11 +66,11 @@ public class Item implements Serializable {
     Integer wholesaleId;
 
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category", referencedColumnName = "id")
     ItemCategory itemCategory;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory", referencedColumnName = "id")
     ItemSubCategory itemSubCategory;
 

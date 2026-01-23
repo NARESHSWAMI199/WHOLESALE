@@ -24,8 +24,9 @@ public class UserPagination implements Serializable {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name="pagination_id")
-    private Integer paginationId;
+    @ManyToOne
+    @JoinColumn(name="pagination_id")
+    private Pagination pagination;
 
     @Column(name="rows_number")
     private Integer rowsNumber;
