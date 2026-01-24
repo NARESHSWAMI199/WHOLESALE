@@ -4,14 +4,15 @@ import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.DeleteDto;
-import com.sales.dto.ItemDto;
 import com.sales.dto.ItemSearchFields;
+import com.sales.dto.WholesaleItemDto;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.ItemSubCategory;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.helpers.ExcelHelper;
+import com.sales.requests.ItemRequest;
 import com.sales.utils.ReadExcel;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
@@ -61,11 +62,11 @@ public class WholesaleItemController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('wholesale.item.all')")
     @Operation(summary = "Get all items for wholesaler", description = "Retrieves a paginated list of all items associated with the authenticated wholesaler's store based on search filters")
-    public ResponseEntity<Page<Item>> getAllItem(Authentication authentication,HttpServletRequest request,@RequestBody ItemSearchFields searchFilters) {
+    public ResponseEntity<Page<WholesaleItemDto>> getAllItem(Authentication authentication, HttpServletRequest request, @RequestBody ItemSearchFields searchFilters) {
         logger.debug("Starting getAllItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        Page<Item> alItems = wholesaleItemService.getAllItems(searchFilters,storeId);
+        Page<WholesaleItemDto> alItems = wholesaleItemService.getAllItems(searchFilters,storeId);
         logger.debug("Completed getAllItem method");
         return new ResponseEntity<>(alItems, HttpStatus.OK);
     }
@@ -112,11 +113,11 @@ public class WholesaleItemController  {
     @PostMapping(value = {"/add", "/update"})
     @PreAuthorize("hasAnyAuthority('wholesale.item.add','wholesale.item.update','wholesale.item.edit')")
     @Operation(summary = "Add or update item", description = "Creates a new item or updates an existing item for the wholesaler based on the provided item data")
-    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemDto itemDto) throws Exception {
+    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemRequest itemRequest) throws Exception {
         logger.debug("Starting addOrUpdateItems method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
-        Map<String,Object> responseObj = wholesaleItemService.createOrUpdateItem(itemDto, loggedUser,path);
+        Map<String,Object> responseObj = wholesaleItemService.createOrUpdateItem(itemRequest, loggedUser,path);
         logger.debug("Completed addOrUpdateItems method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }

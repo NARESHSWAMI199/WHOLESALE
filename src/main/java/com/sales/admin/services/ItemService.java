@@ -11,6 +11,7 @@ import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
@@ -134,10 +135,10 @@ public class ItemService {
 
 
 
-    public void validateRequiredFields(ItemDto itemDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering validateRequiredFields with itemDto: {}", itemDto);
+    public void validateRequiredFields(ItemRequest itemRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering validateRequiredFields with itemRequest: {}", itemRequest);
         // if there is any required field null, then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(itemDto,List.of(
+        Utils.checkRequiredFields(itemRequest,List.of(
                 "name",
                 "price",
                 "discount",
@@ -149,11 +150,11 @@ public class ItemService {
         logger.debug("Exiting validateRequiredFields");
     }
 
-    public void validateRequiredFieldsBeforeCreateItem(ItemDto itemDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering validateRequiredFieldsBeforeCreateItem with itemDto: {}", itemDto);
+    public void validateRequiredFieldsBeforeCreateItem(ItemRequest itemRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering validateRequiredFieldsBeforeCreateItem with itemRequest: {}", itemRequest);
         /** @Note during creation, we are checking only extra required params  */
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(itemDto,List.of(
+        Utils.checkRequiredFields(itemRequest,List.of(
                 "wholesaleSlug",
                 "rating",
                 "inStock",
@@ -164,39 +165,39 @@ public class ItemService {
     }
 
     @Transactional(rollbackOn = {MyException.class,IllegalArgumentException.class,RuntimeException.class,})
-    public Map<String, Object> createOrUpdateItem(ItemDto itemDto, AuthUser loggedUser,String path) throws InvocationTargetException, NoSuchMethodException, IOException, IllegalAccessException {
-        logger.debug("Entering createOrUpdateItem with itemDto: {}, loggedUser: {}, path: {}", itemDto, loggedUser, path);
+    public Map<String, Object> createOrUpdateItem(ItemRequest itemRequest, AuthUser loggedUser, String path) throws InvocationTargetException, NoSuchMethodException, IOException, IllegalAccessException {
+        logger.debug("Entering createOrUpdateItem with itemRequest: {}, loggedUser: {}, path: {}", itemRequest, loggedUser, path);
         // if there is any required field null, then this will throw IllegalArgumentException
-        validateRequiredFields(itemDto);
+        validateRequiredFields(itemRequest);
 
         // Validate inStock
-        if (!(itemDto.getInStock().equals("N") || itemDto.getInStock().equals("Y"))) throw new IllegalArgumentException("inStock must be 'Y' or 'N'.");
+        if (!(itemRequest.getInStock().equals("N") || itemRequest.getInStock().equals("Y"))) throw new IllegalArgumentException("inStock must be 'Y' or 'N'.");
         // Validate label
-        if (!(itemDto.getLabel().equals("N") || itemDto.getLabel().equals("O"))) throw new IllegalArgumentException("label must be 'O' or 'N'.");
+        if (!(itemRequest.getLabel().equals("N") || itemRequest.getLabel().equals("O"))) throw new IllegalArgumentException("label must be 'O' or 'N'.");
         // Validate price and discount
-        if(itemDto.getPrice() < itemDto.getDiscount() || itemDto.getDiscount() < 0) throw new IllegalArgumentException("Discount can't be greater then price and can't be less then 0.");
+        if(itemRequest.getPrice() < itemRequest.getDiscount() || itemRequest.getDiscount() < 0) throw new IllegalArgumentException("Discount can't be greater then price and can't be less then 0.");
 
         // Verify item name syntax
-        String itemName = Utils.isValidName( itemDto.getName(),"item");
-        itemDto.setName(itemName);
+        String itemName = Utils.isValidName( itemRequest.getName(),"item");
+        itemRequest.setName(itemName);
 
         // retrieve category and subcategory
-        ItemCategory itemCategory = itemCategoryRepository.findById(itemDto.getCategoryId()).orElseThrow(() -> new NotFoundException("Item category not found."));
-        ItemSubCategory itemSubCategory = itemSubCategoryRepository.findById(itemDto.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Item subcategory not found."));
-        itemDto.setItemCategory(itemCategory);
-        itemDto.setItemSubCategory(itemSubCategory);
+        ItemCategory itemCategory = itemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Item category not found."));
+        ItemSubCategory itemSubCategory = itemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Item subcategory not found."));
+        itemRequest.setItemCategory(itemCategory);
+        itemRequest.setItemSubCategory(itemSubCategory);
 
         Map<String, Object> responseObj = new HashMap<>();
 
         // Going to update item
-        if (!Utils.isEmpty(itemDto.getSlug()) || path.contains("update")) {
+        if (!Utils.isEmpty(itemRequest.getSlug()) || path.contains("update")) {
             logger.debug("We are going to update the item.");
             // if there is any required field null, then this will throw IllegalArgumentException
-            Utils.checkRequiredFields(itemDto,List.of("slug"));
+            Utils.checkRequiredFields(itemRequest,List.of("slug"));
 
-            int isUpdated = updateItem(itemDto, loggedUser);
+            int isUpdated = updateItem(itemRequest, loggedUser);
             // updating item images
-            updateStoreImage(itemDto.getPreviousItemImages(),itemDto.getNewItemImages(),itemDto.getSlug(),"update");
+            updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(),"update");
             if (isUpdated > 0) {
                 responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -207,8 +208,8 @@ public class ItemService {
         } else { // Going to create item
             logger.debug("We are going to create the item.");
             // if there is any required field null, then this will throw IllegalArgumentException
-            validateRequiredFieldsBeforeCreateItem(itemDto);
-            Item createdItem = createItem(itemDto, loggedUser);
+            validateRequiredFieldsBeforeCreateItem(itemRequest);
+            Item createdItem = createItem(itemRequest, loggedUser);
             responseObj.put(ConstantResponseKeys.RES, createdItem);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully inserted.");
             responseObj.put(ConstantResponseKeys.STATUS, 201);
@@ -220,29 +221,29 @@ public class ItemService {
 
 
     @Transactional
-    public Item createItem (ItemDto itemDto, AuthUser loggedUser) throws IOException {
-        logger.debug("Entering createItem with itemDto: {}, loggedUser: {}", itemDto, loggedUser);
+    public Item createItem (ItemRequest itemRequest, AuthUser loggedUser) throws IOException {
+        logger.debug("Entering createItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = new Item();
-        Store store = storeRepository.findStoreBySlug(itemDto.getWholesaleSlug());
+        Store store = storeRepository.findStoreBySlug(itemRequest.getWholesaleSlug());
         if (store == null) throw new IllegalArgumentException("Not a valid store.");
         String slug = UUID.randomUUID().toString();
         item.setWholesaleId(store.getId());
-        item.setName(itemDto.getName());
-        item.setPrice(itemDto.getPrice());
-        item.setDiscount(itemDto.getDiscount());
-        item.setRating(itemDto.getRating());
-        item.setDescription(itemDto.getDescription());
-        item.setInStock(itemDto.getInStock());
+        item.setName(itemRequest.getName());
+        item.setPrice(itemRequest.getPrice());
+        item.setDiscount(itemRequest.getDiscount());
+        item.setRating(itemRequest.getRating());
+        item.setDescription(itemRequest.getDescription());
+        item.setInStock(itemRequest.getInStock());
         item.setUpdatedAt(Utils.getCurrentMillis());
         item.setCreatedAt(Utils.getCurrentMillis());
-        item.setCreatedBy(loggedUser.getId());
+        item.setCreatedBy((User) loggedUser);
         item.setUpdatedBy(loggedUser.getId());
-        item.setLabel(itemDto.getLabel());
-        item.setCapacity(itemDto.getCapacity());
+        item.setLabel(itemRequest.getLabel());
+        item.setCapacity(itemRequest.getCapacity());
         item.setSlug(slug);
-        item.setItemCategory(itemDto.getItemCategory());
-        item.setItemSubCategory(itemDto.getItemSubCategory());
-        item.setAvtars(updateStoreImage("",itemDto.getNewItemImages(),slug,"create"));
+        item.setItemCategory(itemRequest.getItemCategory());
+        item.setItemSubCategory(itemRequest.getItemSubCategory());
+        item.setAvtars(updateStoreImage("", itemRequest.getNewItemImages(),slug,"create"));
         Item result = itemRepository.save(item);
         logger.debug("Exiting createItem");
         return result;
@@ -251,15 +252,15 @@ public class ItemService {
 
 
     @Transactional
-    public int updateItem(ItemDto itemDto, AuthUser loggedUser) {
-        logger.debug("Entering updateItem with itemDto: {}, loggedUser: {}", itemDto, loggedUser);
-        Item item = findItemBySLug(itemDto.getSlug());
+    public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
+        logger.debug("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
+        Item item = findItemBySLug(itemRequest.getSlug());
         String title = "Item " + item.getName() + " updated.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " updated by admin previous data was "+
                 item.toString()
                 +". If you have any issue please contact to administrator.";
         sendNotification(title,messageBody,item.getWholesaleId(),loggedUser);
-        int result = itemHbRepository.updateItems(itemDto,loggedUser);
+        int result = itemHbRepository.updateItems(itemRequest,loggedUser);
         logger.debug("Exiting updateItem");
         return result;
     }
@@ -394,17 +395,17 @@ public class ItemService {
                     Float price = priceList.get(i).isEmpty() ? 0f : Float.parseFloat(priceList.get(i));
                     if (price < discount) throw new MyException("Price can't be less then discount.");
 
-                    // creating itemDto object for update action
-                    ItemDto itemDto = new ItemDto();
-                    itemDto.setName(name);
-                    itemDto.setLabel(label);
-                    itemDto.setInStock(inStock);
-                    itemDto.setCapacity(capacity);
-                    itemDto.setPrice(price);
-                    itemDto.setDiscount(discount);
-                    itemDto.setSlug(slugList.get(i));
+                    // creating itemRequest object for update action
+                    ItemRequest itemRequest = new ItemRequest();
+                    itemRequest.setName(name);
+                    itemRequest.setLabel(label);
+                    itemRequest.setInStock(inStock);
+                    itemRequest.setCapacity(capacity);
+                    itemRequest.setPrice(price);
+                    itemRequest.setDiscount(discount);
+                    itemRequest.setSlug(slugList.get(i));
 
-                    int updated = itemHbRepository.updateExcelSheetItems(itemDto,userId,wholesaleId);
+                    int updated = itemHbRepository.updateExcelSheetItems(itemRequest,userId,wholesaleId);
                     if(updated < 1){
                         itemUpdateError.setItemRowDetail(itemStringDetail);
                         itemUpdateError.setErrorMessage("Item not found.");

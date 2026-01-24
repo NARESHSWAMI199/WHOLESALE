@@ -51,8 +51,9 @@ public class Item implements Serializable {
     String isDeleted="N";
     @Column(name = "created_at")
     Long createdAt;
-    @Column(name = "created_by")
-    Integer createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    User createdBy;
     @Column(name = "updated_at")
     Long updatedAt;
     @Column(name = "updated_by")

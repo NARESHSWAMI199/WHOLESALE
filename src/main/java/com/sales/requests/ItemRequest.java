@@ -1,4 +1,4 @@
-package com.sales.dto;
+package com.sales.requests;
 
 
 import com.sales.entities.ItemCategory;
@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class ItemDto {
+public class ItemRequest {
     private String name;
     private String wholesaleSlug;
     private Float price;

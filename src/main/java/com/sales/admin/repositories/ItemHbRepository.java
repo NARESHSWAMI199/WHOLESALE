@@ -2,7 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.ItemDto;
+import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -24,7 +24,7 @@ public class ItemHbRepository{
 
     private final EntityManager entityManager;
 
-    public int updateItems(ItemDto itemDto, AuthUser loggedUser){
+    public int updateItems(ItemRequest itemRequest, AuthUser loggedUser){
         String hqQuery = "update Item set " +
                 "name =:name," +
                 "capacity =:capacity," +
@@ -37,16 +37,16 @@ public class ItemHbRepository{
                 "updatedBy =:updatedBy " +
                 "where slug =:slug ";
         Query query = entityManager.createQuery(hqQuery);
-        query.setParameter("name" , itemDto.getName());
-        query.setParameter("capacity" , itemDto.getCapacity());
-        query.setParameter("description" , itemDto.getDescription());
-        query.setParameter("price" , itemDto.getPrice());
-        query.setParameter("discount" , itemDto.getDiscount());
-        query.setParameter("itemCategory" , itemDto.getItemCategory());
-        query.setParameter("itemSubCategory" , itemDto.getItemSubCategory());
+        query.setParameter("name" , itemRequest.getName());
+        query.setParameter("capacity" , itemRequest.getCapacity());
+        query.setParameter("description" , itemRequest.getDescription());
+        query.setParameter("price" , itemRequest.getPrice());
+        query.setParameter("discount" , itemRequest.getDiscount());
+        query.setParameter("itemCategory" , itemRequest.getItemCategory());
+        query.setParameter("itemSubCategory" , itemRequest.getItemSubCategory());
         query.setParameter("updatedAt" , Utils.getCurrentMillis());
         query.setParameter("updatedBy" , loggedUser.getId());
-        query.setParameter("slug",itemDto.getSlug());
+        query.setParameter("slug", itemRequest.getSlug());
         return  query.executeUpdate();
     }
 
@@ -145,7 +145,7 @@ public class ItemHbRepository{
     }
 
 
-    public int updateExcelSheetItems(ItemDto itemDto,Integer userId,Integer wholesaleId){
+    public int updateExcelSheetItems(ItemRequest itemRequest, Integer userId, Integer wholesaleId){
         String hql = """
            update Item set name=:name,
                 label=:label,
@@ -158,15 +158,15 @@ public class ItemHbRepository{
            where slug=:slug and wholesaleId=:wholesaleId
         """;
         Query query = entityManager.createQuery(hql);
-        query.setParameter("name", itemDto.getName())
-                .setParameter("label", itemDto.getLabel())
-                .setParameter("capacity", itemDto.getCapacity())
-                .setParameter("price", itemDto.getPrice())
-                .setParameter("discount", itemDto.getDiscount())
-                .setParameter("inStock", itemDto.getInStock())
+        query.setParameter("name", itemRequest.getName())
+                .setParameter("label", itemRequest.getLabel())
+                .setParameter("capacity", itemRequest.getCapacity())
+                .setParameter("price", itemRequest.getPrice())
+                .setParameter("discount", itemRequest.getDiscount())
+                .setParameter("inStock", itemRequest.getInStock())
                 .setParameter("updatedAt", Utils.getCurrentMillis())
                 .setParameter("updatedBy", userId)
-                .setParameter("slug", itemDto.getSlug())
+                .setParameter("slug", itemRequest.getSlug())
                 .setParameter("wholesaleId",wholesaleId);
         return query.executeUpdate();
     }

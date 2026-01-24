@@ -9,6 +9,7 @@ import com.sales.dto.*;
 import com.sales.entities.*;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.requests.ItemRequest;
 import com.sales.utils.ReadExcel;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
@@ -108,12 +109,12 @@ public class ItemController  {
     @PostMapping(value = {"/add", "/update"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyAuthority('item.add','item.update','item.edit')")
     @Operation(summary = "Add or update item", description = "Creates a new item or updates an existing item with the provided data and images")
-    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemDto itemDto) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Adding or updating item: {}", itemDto);
+    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemRequest itemRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Adding or updating item: {}", itemRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
-        logger.error(itemDto.toString());
-        Map<String,Object> responseObj = itemService.createOrUpdateItem(itemDto, loggedUser,path);
+        logger.error(itemRequest.toString());
+        Map<String,Object> responseObj = itemService.createOrUpdateItem(itemRequest, loggedUser,path);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 

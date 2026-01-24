@@ -2,6 +2,7 @@ package sales.application.sales.wholesaler.services;
 
 import com.sales.SalesApplication;
 import com.sales.dto.ItemSearchFields;
+import com.sales.dto.WholesaleItemDto;
 import com.sales.entities.Item;
 import com.sales.entities.Store;
 import com.sales.wholesaler.services.WholesaleItemService;
@@ -30,7 +31,7 @@ public class WholesaleItemServiceTest extends TestUtil {
         Store store = createStore();
         ItemSearchFields searchFilters = new ItemSearchFields();
         searchFilters.setStoreId(store.getId());
-        Page<Item> items = wholesaleItemService.getAllItems(searchFilters, store.getId());
+        Page<WholesaleItemDto> items = wholesaleItemService.getAllItems(searchFilters, store.getId());
         assertNotNull(items);
     }
 
