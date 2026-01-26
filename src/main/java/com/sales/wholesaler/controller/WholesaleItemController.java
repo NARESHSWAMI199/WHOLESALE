@@ -5,8 +5,6 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.DeleteDto;
 import com.sales.dto.ItemSearchFields;
-import com.sales.dto.WholesaleItemDto;
-import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.ItemSubCategory;
 import com.sales.global.ConstantResponseKeys;
@@ -16,6 +14,8 @@ import com.sales.requests.ItemRequest;
 import com.sales.utils.ReadExcel;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
+import com.sales.wholesaler.dto.WholesaleItemDto;
+import com.sales.wholesaler.dto.WholesaleItemListDto;
 import com.sales.wholesaler.services.WholesaleItemService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,11 +62,11 @@ public class WholesaleItemController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('wholesale.item.all')")
     @Operation(summary = "Get all items for wholesaler", description = "Retrieves a paginated list of all items associated with the authenticated wholesaler's store based on search filters")
-    public ResponseEntity<Page<WholesaleItemDto>> getAllItem(Authentication authentication, HttpServletRequest request, @RequestBody ItemSearchFields searchFilters) {
+    public ResponseEntity<Page<WholesaleItemListDto>> getAllItem(Authentication authentication, HttpServletRequest request, @RequestBody ItemSearchFields searchFilters) {
         logger.debug("Starting getAllItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        Page<WholesaleItemDto> alItems = wholesaleItemService.getAllItems(searchFilters,storeId);
+        Page<WholesaleItemListDto> alItems = wholesaleItemService.getAllItems(searchFilters,storeId);
         logger.debug("Completed getAllItem method");
         return new ResponseEntity<>(alItems, HttpStatus.OK);
     }
@@ -77,7 +77,7 @@ public class WholesaleItemController  {
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable String slug) {
         logger.debug("Starting getItem method");
         Map<String, Object> responseObj = new HashMap<>();
-        Item alItems = wholesaleItemService.findItemBySLug(slug);
+        WholesaleItemDto alItems = wholesaleItemService.findItemBySLug(slug);
         if (alItems != null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put(ConstantResponseKeys.RES, alItems);

@@ -1,4 +1,5 @@
 package com.sales.commons.repositories;
 
-public class ItemCommonRepository {
+public interface ItemCommonRepository {
+
 }

@@ -3,10 +3,10 @@ package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
 import com.sales.commons.repositories.CommonHbRepository;
-import com.sales.dto.WholesaleItemDto;
 import com.sales.entities.*;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleItemListDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -36,18 +36,18 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
     private final EntityManager entityManager;
 
     // find with pageable and specs.
-    public Page<WholesaleItemDto> findAll(Specification<Item> spec, Pageable pageable){
+    public Page<WholesaleItemListDto> findAll(Specification<Item> spec, Pageable pageable){
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         Long itemsCounts = getCounts(entityManager,criteriaBuilder, spec,Item.class);
         if (itemsCounts == 0) {
             return new PageImpl<>(List.of(), pageable, 0L);
         }
-        List<WholesaleItemDto> content = getAllFilteredItems(criteriaBuilder,spec, pageable);
+        List<WholesaleItemListDto> content = getAllFilteredItems(criteriaBuilder,spec, pageable);
         return new PageImpl<>(content, pageable, itemsCounts);
     }
 
-    public List<WholesaleItemDto> getAllFilteredItems(CriteriaBuilder criteriaBuilder, Specification<Item> spec, Pageable pageable) {
-        CriteriaQuery<WholesaleItemDto> criteriaQuery = criteriaBuilder.createQuery(WholesaleItemDto.class);
+    public List<WholesaleItemListDto> getAllFilteredItems(CriteriaBuilder criteriaBuilder, Specification<Item> spec, Pageable pageable) {
+        CriteriaQuery<WholesaleItemListDto> criteriaQuery = criteriaBuilder.createQuery(WholesaleItemListDto.class);
         Root<Item> root = criteriaQuery.from(Item.class);
         criteriaQuery.multiselect(
                 root.get(Item_.id),
@@ -77,7 +77,7 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
         }
         // Sorting
         applySorting(criteriaBuilder, criteriaQuery, root, pageable.getSort());
-        TypedQuery<WholesaleItemDto> query = entityManager.createQuery(criteriaQuery);
+        TypedQuery<WholesaleItemListDto> query = entityManager.createQuery(criteriaQuery);
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
 

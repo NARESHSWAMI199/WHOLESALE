@@ -7,7 +7,6 @@ import com.sales.claims.AuthUser;
 import com.sales.dto.DeleteDto;
 import com.sales.dto.GraphDto;
 import com.sales.dto.ItemSearchFields;
-import com.sales.dto.WholesaleItemDto;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.ItemSubCategory;
@@ -21,6 +20,9 @@ import com.sales.utils.DateUtils;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
+import com.sales.wholesaler.dto.WholesaleItemDto;
+import com.sales.wholesaler.dto.WholesaleItemListDto;
+import com.sales.wholesaler.mapper.WholesaleItemMapper;
 import com.sales.wholesaler.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -56,12 +58,13 @@ public class WholesaleItemService  {
     private final WholesaleItemCategoryRepository wholesaleItemCategoryRepository;
     private final WholesaleStoreRepository wholesaleStoreRepository;
     private final WriteExcelUtil writeExcel;
+    private final WholesaleItemMapper wholesaleItemMapper;
 
     @Value("${item.absolute}")
     String itemImagePath;
 
 
-    public Page<WholesaleItemDto> getAllItems(ItemSearchFields searchFilters, Integer storeId) {
+    public Page<WholesaleItemListDto> getAllItems(ItemSearchFields searchFilters, Integer storeId) {
         logger.debug("Starting getAllItems method with searchFilters: {}, storeId: {}", searchFilters, storeId);
         Sort sort = searchFilters.getOrder().equalsIgnoreCase("asc") ?
                 Sort.by(searchFilters.getOrderBy()).ascending() :
@@ -77,7 +80,7 @@ public class WholesaleItemService  {
                         .and(lessThanOrEqualToToDate(searchFilters.getToDate()))
         );
         Pageable pageable = PageRequest.of(searchFilters.getPageNumber(), searchFilters.getSize(), sort);
-        Page<WholesaleItemDto> items = wholesaleItemHbRepository.findAll(specification, pageable);
+        Page<WholesaleItemListDto> items = wholesaleItemHbRepository.findAll(specification, pageable);
         logger.debug("Completed getAllItems method");
         return items;
     }
@@ -144,11 +147,11 @@ public class WholesaleItemService  {
 
 
 
-    public Item findItemBySLug(String slug) {
+    public WholesaleItemDto findItemBySLug(String slug) {
         logger.debug("Starting findItemBySLug method with slug: {}", slug);
         Item item = wholesaleItemRepository.findItemBySlug(slug);
         logger.debug("Completed findItemBySLug method");
-        return item;
+        return wholesaleItemMapper.toDto(item) ;
     }
 
 

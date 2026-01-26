@@ -12,6 +12,8 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleStoreDto;
+import com.sales.wholesaler.mapper.WholesaleStoreMapper;
 import com.sales.wholesaler.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ public class WholesaleStoreService  {
     private final WholesaleStoreRepository wholesaleStoreRepository;
     private final AddressRepository addressRepository;
     private final WholesaleNotificationRepository wholesaleNotificationRepository;
+    private final WholesaleStoreMapper wholesaleStoreMapper;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
 
     @Value("${store.absolute}")
@@ -118,14 +121,6 @@ public class WholesaleStoreService  {
         return isUpdatedStore;
     }
 
-    @Transactional
-    public Store getStoreDetails(String slug) {
-        logger.debug("Starting getStoreDetails method with slug: {}", slug);
-        Store store = wholesaleStoreRepository.findStoreBySlug(slug);
-        logger.debug("Completed getStoreDetails method");
-        return store;
-    }
-
     public Store getStoreByUserSlug(Integer userId) {
         logger.debug("Starting getStoreByUserSlug method with userId: {}", userId);
         Store store = wholesaleStoreRepository.findStoreByUserId(userId);
@@ -138,6 +133,13 @@ public class WholesaleStoreService  {
         Store store = wholesaleStoreRepository.findStoreByUserId(userId);
         logger.debug("Completed getStoreByUserId method");
         return store;
+    }
+
+    public WholesaleStoreDto getStoreDtoByUserId(Integer userId) {
+        logger.debug("Starting getStoreDtoByUserId method with userId: {}", userId);
+        Store store = wholesaleStoreRepository.findStoreByUserId(userId);
+        logger.debug("Completed getStoreDtoByUserId method");
+        return wholesaleStoreMapper.toDto(store);
     }
 
     public Integer getStoreIdByUserSlug(Integer userId) {

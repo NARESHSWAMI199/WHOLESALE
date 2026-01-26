@@ -13,6 +13,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleStoreDto;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import com.sales.wholesaler.services.WholesaleUserService;
@@ -82,7 +83,7 @@ public class WholesaleUserController  {
         }else if (user.getStatus().equalsIgnoreCase("A")) {
             message = ConstantResponseKeys.SUCCESS;
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
-            Store storeDetails = wholesaleStoreService.getStoreByUserId(user.getId());
+            WholesaleStoreDto storeDetails = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String,Object> paginationsObj = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
             responseObj.put("user", user);
             responseObj.put(ConstantResponseKeys.STORE, storeDetails);
@@ -110,7 +111,7 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
-            Store store = wholesaleStoreService.getStoreByUserId(user.getId());
+            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String,Object> paginations = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put("user", user);
@@ -146,7 +147,7 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
-            Store store = wholesaleStoreService.getStoreByUserId(user.getId());
+            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String,Object> paginations = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
