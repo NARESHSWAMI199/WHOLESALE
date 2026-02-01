@@ -121,12 +121,15 @@ public class WholesaleStoreService  {
         return isUpdatedStore;
     }
 
-    public Store getStoreByUserSlug(Integer userId) {
+
+    @Transactional
+    public WholesaleStoreDto getStoreDtoByUserSlug(Integer userId) {
         logger.debug("Starting getStoreByUserSlug method with userId: {}", userId);
         Store store = wholesaleStoreRepository.findStoreByUserId(userId);
         logger.debug("Completed getStoreByUserSlug method");
-        return store;
+        return wholesaleStoreMapper.toDto(store);
     }
+
 
     public Store getStoreByUserId(Integer userId) {
         logger.debug("Starting getStoreByUserId method with userId: {}", userId);
@@ -135,6 +138,8 @@ public class WholesaleStoreService  {
         return store;
     }
 
+
+    @Transactional
     public WholesaleStoreDto getStoreDtoByUserId(Integer userId) {
         logger.debug("Starting getStoreDtoByUserId method with userId: {}", userId);
         Store store = wholesaleStoreRepository.findStoreByUserId(userId);
@@ -224,8 +229,14 @@ public class WholesaleStoreService  {
             .slug(UUID.randomUUID().toString())
             .street(addressDto.getStreet())
             .zipCode(addressDto.getZipCode())
-            .city(addressDto.getCity())
-            .state(addressDto.getState())
+            .city(City.builder()
+                    .id(addressDto.getCity())
+                    .build()
+            )
+            .state(State.builder()
+                    .id(addressDto.getState())
+                    .build()
+            )
             .latitude(addressDto.getLatitude())
             .altitude(addressDto.getAltitude())
             .createdAt(getCurrentMillis())

@@ -4,7 +4,11 @@ import com.sales.dto.SearchFilters;
 import com.sales.dto.WalletTransactionDto;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
+import com.sales.entities.WalletTransaction_;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleWalletTransactionDto;
+import com.sales.wholesaler.mapper.WholesaleWalletTransactionMapper;
+import com.sales.wholesaler.repository.WalletTransactionHbRepository;
 import com.sales.wholesaler.repository.WalletTransactionRepository;
 import com.sales.wholesaler.repository.WholesaleWalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +30,13 @@ public class WalletTransactionService {
 
     
     private static final Logger logger = LoggerFactory.getLogger(WalletTransactionService.class);
+    private final WalletTransactionHbRepository WalletTransactionHbRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final WholesaleWalletRepository wholesaleWalletRepository;
 
 
 
-    public Page<WalletTransaction> getAllWalletTransactionByUserId(SearchFilters searchFilters,Integer userId){
+    public Page<WholesaleWalletTransactionDto> getAllWalletTransactionByUserId(SearchFilters searchFilters, Integer userId){
         Specification<WalletTransaction> specification = Specification.allOf(
             hasSlug(searchFilters.getSlug())
             .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
@@ -39,7 +44,7 @@ public class WalletTransactionService {
             .and(hasUserId(userId))
         ));
         Pageable pageable = getPageable(logger,searchFilters);
-        return walletTransactionRepository.findAll(specification,pageable);
+        return WalletTransactionHbRepository.findAll(specification, pageable);
     }
 
 

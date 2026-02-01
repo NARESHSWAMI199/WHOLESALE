@@ -5,6 +5,7 @@ import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.PasswordDto;
+import com.sales.dto.StoreDto;
 import com.sales.dto.UserDto;
 import com.sales.dto.UserSearchFilters;
 import com.sales.entities.Store;
@@ -59,6 +60,8 @@ public class WholesaleUserController  {
     private static final Logger logger = LoggerFactory.getLogger(WholesaleUserController.class);
     private final UserCacheService userCacheService;
 
+
+    // TODO : Make sure we using dto
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
                     {
@@ -100,6 +103,7 @@ public class WholesaleUserController  {
 
 
 
+    // TODO : Make sure we using dto
     @PostMapping("/login/otp")
     @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
     public ResponseEntity<Map<String, Object>> loginUserViaOtp (@RequestBody UserDto userDetails) {
@@ -137,6 +141,8 @@ public class WholesaleUserController  {
                     """
     )))
 
+
+    // TODO : Make sure we using dto
     @PostMapping("validate-otp")
     @Operation(summary = "Validate OTP", description = "Validates the OTP for user authentication")
     public ResponseEntity<Map<String, Object>> validateUserOtp(@RequestBody UserDto userDetails) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -206,6 +212,7 @@ public class WholesaleUserController  {
 
     }
 
+    // TODO : Make sure we using dto
     @GetMapping(value = {"/detail","/detail/{slug}"})
     @Operation(summary = "Get user details", description = "Retrieves detailed information for the authenticated user or a specific user by slug")
     public ResponseEntity<Map<String, Object>> getDetailUser(@PathVariable(required = false) String slug, HttpServletRequest request) {
@@ -218,7 +225,7 @@ public class WholesaleUserController  {
             user = new SalesUser(wholesaleUserService.findUserBySlug(slug));
         }
         if(slug == null){
-            Store store = wholesaleStoreService.getStoreByUserSlug(user.getId());
+            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.getId());
             responseObj.put(ConstantResponseKeys.STORE, store);
         }
         responseObj.put("user", user);
@@ -294,6 +301,7 @@ public class WholesaleUserController  {
                 }
             """)
     ))
+    // TODO : Make sure we using dto
     @PostMapping(value = {"add","register"})
     @Operation(summary = "Add new user", description = "Creates a new wholesaler user account")
     public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -335,6 +343,8 @@ public class WholesaleUserController  {
 
 
     /** Returning a list of users where users are retailer and wholesaler only for chat purpose.*/
+
+    // TODO : Make sure we using dto
 
     @PostMapping("chat/users")
     @Operation(summary = "Get chat users", description = "Retrieves a list of users (retailers and wholesalers) for chat functionality")

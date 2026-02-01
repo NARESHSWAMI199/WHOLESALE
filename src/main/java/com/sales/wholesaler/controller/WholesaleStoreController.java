@@ -79,6 +79,7 @@ public class WholesaleStoreController  {
     }
 
 
+    // TODO : Make sure we using dto
     @Transactional
     @PostMapping(value = {"notifications"})
     @PreAuthorize("hasAuthority('wholesale.store.notifications')")
@@ -112,6 +113,7 @@ public class WholesaleStoreController  {
     }
 
 
+    // TODO : Make sure we using dto
     @GetMapping("category")
     @Operation(summary = "Get all store categories", description = "Retrieves a list of all available store categories")
     public ResponseEntity<List<StoreCategory>> getAllStoreCategory() {
@@ -122,6 +124,7 @@ public class WholesaleStoreController  {
     }
 
 
+    // TODO : Make sure we using dto
     @GetMapping("subcategory/{categoryId}")
     @Operation(summary = "Get store subcategories", description = "Retrieves all subcategories for a specific store category ID")
     public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@PathVariable(required = true) int categoryId) {

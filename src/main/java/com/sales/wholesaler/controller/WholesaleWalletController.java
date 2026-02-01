@@ -32,6 +32,7 @@ public class WholesaleWalletController  {
     private final WholesaleUserService wholesaleUserService;
     private final WholesaleWalletService wholesaleWalletService;
 
+    // TODO : Make sure we using dto
     @GetMapping("/")
     @Operation(summary = "Get wallet details", description = "Retrieves the wallet details for the authenticated wholesaler user")
     public ResponseEntity<Wallet> getWalletDetail(HttpServletRequest request){

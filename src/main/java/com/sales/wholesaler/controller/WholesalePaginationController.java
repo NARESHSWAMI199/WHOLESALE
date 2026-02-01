@@ -28,6 +28,7 @@ public class WholesalePaginationController  {
 
     private final WholesalePaginationService wholesalePaginationService;
 
+    // TODO : Make sure we using dto
     @GetMapping("all")
     @PreAuthorize("hasAuthority('wholesale.pagination.all')")
     @Operation(summary = "Get user pagination settings", description = "Retrieves all pagination settings for the authenticated wholesaler user")

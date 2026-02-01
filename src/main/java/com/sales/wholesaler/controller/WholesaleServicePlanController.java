@@ -40,6 +40,7 @@ public class WholesaleServicePlanController  {
     private final UserCacheService userCacheService;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanController.class);
 
+    // TODO : Make sure we using dto
     @GetMapping("/all")
     @Operation(summary = "Get all service plans", description = "Retrieves a list of all available service plans")
     public ResponseEntity<List<ServicePlan>> getAllPlans() {
@@ -49,7 +50,7 @@ public class WholesaleServicePlanController  {
         return response;
     }
 
-
+    // TODO : Make sure we using dto
     @GetMapping("detail/{slug}")
     @PreAuthorize("hasAuthority('wholesale.plan.detail')")
     @Operation(summary = "Get plan details by slug", description = "Retrieves detailed information for a specific service plan using its slug")
@@ -60,6 +61,7 @@ public class WholesaleServicePlanController  {
         return response;
     }
 
+    // TODO : Make sure we using dto
     @PostMapping("/my-plans")
     @Operation(summary = "Get my plans", description = "Retrieves a paginated list of all plans associated with the authenticated wholesaler")
     public ResponseEntity<Page<WholesalerPlans>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanDto searchFilters) {

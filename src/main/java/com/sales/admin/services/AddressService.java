@@ -35,8 +35,16 @@ public class AddressService {
 
         address.setStreet(addressDto.getStreet());
         address.setZipCode(addressDto.getZipCode());
-        address.setCity(addressDto.getCity());
-        address.setState(addressDto.getState());
+
+        address.setCity(City.builder()
+                .id(addressDto.getCity())
+                .build()
+        );
+        address.setState(State.builder()
+                .id(addressDto.getState())
+                .build()
+        );
+
         address.setLatitude(addressDto.getLatitude());
         address.setAltitude(addressDto.getAltitude());
 

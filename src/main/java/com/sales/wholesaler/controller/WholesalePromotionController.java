@@ -31,6 +31,7 @@ public class WholesalePromotionController  {
     private final WholesalePromotionsService wholesalePromotionsService;
     private static final Logger logger = LoggerFactory.getLogger(WholesalePromotionController.class);
 
+    // TODO : Make sure we using dto
     @PostMapping("/")
     @PreAuthorize("hasAuthority('wholesale.promoted.item.add')")
     @Operation(summary = "Insert promoted item", description = "Adds a new promoted item for the wholesaler store")

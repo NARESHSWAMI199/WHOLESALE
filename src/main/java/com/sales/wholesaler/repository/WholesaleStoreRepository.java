@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WholesaleStoreRepository extends JpaRepository<Store, Integer> {
 
-    @EntityGraph(attributePaths = {Store_.STORE_CATEGORY,Store_.STORE_SUB_CATEGORY,Store_.ADDRESS})
     Store findStoreByUserId(int userId);
 
     @Query(value = "select id as id from Store s where s.user.id=:userId")

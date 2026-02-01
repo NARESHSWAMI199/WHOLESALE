@@ -59,6 +59,7 @@ public class WholesaleItemController  {
     private final ReadExcel readExcel;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemController.class);
 
+    // TODO : Make sure we using dto
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('wholesale.item.all')")
     @Operation(summary = "Get all items for wholesaler", description = "Retrieves a paginated list of all items associated with the authenticated wholesaler's store based on search filters")
@@ -71,6 +72,7 @@ public class WholesaleItemController  {
         return new ResponseEntity<>(alItems, HttpStatus.OK);
     }
 
+    // TODO : Make sure we using dto
     @GetMapping("/detail/{slug}")
     @PreAuthorize("hasAuthority('wholesale.item.detail')")
     @Operation(summary = "Get item details by slug", description = "Retrieves detailed information for a specific item using its unique slug identifier")
@@ -170,6 +172,7 @@ public class WholesaleItemController  {
         return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
+    // TODO : Make sure we using dto
     @GetMapping("category")
     @Operation(summary = "Get all item categories", description = "Retrieves a list of all available item categories for wholesale items")
     public ResponseEntity<List<ItemCategory>> getAllCategory() {
@@ -179,6 +182,7 @@ public class WholesaleItemController  {
         return new ResponseEntity<>(itemCategories, HttpStatus.OK);
     }
 
+    // TODO : Make sure we using dto
     @GetMapping("subcategory/{categoryId}")
     @Operation(summary = "Get subcategories by category ID", description = "Retrieves all subcategories for a specific category ID")
     public ResponseEntity<List<ItemSubCategory>> getSubCategory(@PathVariable(required = true) int categoryId) {

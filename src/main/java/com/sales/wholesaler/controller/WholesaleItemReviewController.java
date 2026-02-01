@@ -31,6 +31,7 @@ public class WholesaleItemReviewController  {
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewController.class);
 
 
+    // TODO : Make sure we using dto
     @PostMapping("all")
     @PreAuthorize("hasAuthority('wholesale.review.all')")
     @Operation(summary = "Get all item reviews", description = "Retrieves a paginated list of all item reviews for the wholesaler based on filter criteria")

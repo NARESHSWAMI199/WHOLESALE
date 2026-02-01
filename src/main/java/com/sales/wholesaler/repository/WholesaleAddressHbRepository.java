@@ -22,14 +22,16 @@ public class WholesaleAddressHbRepository {
     private final EntityManager entityManager;
 
     public int updateAddress(AddressDto addressDto, AuthUser loggedUser){
-        String hqQuery ="update Address set " +
-                "city =:city,"+
-                "state =:state," +
-                "latitude =:latitude," +
-                "altitude =:altitude, " +
-                "updatedAt =:updatedAt, " +
-                "updatedBy =:updatedBy " +
-                "where id =:id ";
+        String hqQuery ="""
+                UPDATE Address SET
+                    city.id =:city,
+                    state.id =:state,
+                    latitude =:latitude,
+                    altitude =:altitude,
+                    updatedAt =:updatedAt,
+                    updatedBy =:updatedBy
+                WHERE id =:id 
+            """;
         Query query = entityManager.createQuery(hqQuery);
         query.setParameter("city",addressDto.getCity());
         query.setParameter("state",addressDto.getState());
