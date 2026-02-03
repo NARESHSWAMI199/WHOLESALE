@@ -342,8 +342,8 @@ public class StoreControllerTest extends TestUtil {
 
         List categoryList = extractCategoryListFromResponse(result);
         if(!categoryList.isEmpty()) {
-            Map<String, Object> categoryDto = (Map<String, Object>) categoryList.get(0);
-            Integer categoryId = (Integer) categoryDto.get("id");
+            Map<String, Object> categoryRequest = (Map<String, Object>) categoryList.get(0);
+            Integer categoryId = (Integer) categoryRequest.get("id");
 
             // Getting subcategories also
             headers.set(GlobalConstant.AUTHORIZATION, token);

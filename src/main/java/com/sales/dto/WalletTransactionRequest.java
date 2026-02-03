@@ -10,7 +10,7 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class WalletTransactionDto {
+public class WalletTransactionRequest {
 
     String slug;
     String status;

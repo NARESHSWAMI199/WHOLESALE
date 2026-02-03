@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CashfreeDto {
+public class CashfreeRequest {
     String userSlug;
     String servicePlanSlug;
     String orderId;

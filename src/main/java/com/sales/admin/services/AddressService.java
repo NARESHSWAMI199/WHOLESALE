@@ -3,7 +3,7 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.AddressHbRepository;
 import com.sales.admin.repositories.AddressRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressDto;
+import com.sales.dto.AddressRequest;
 import com.sales.entities.Address;
 import com.sales.entities.City;
 import com.sales.entities.State;
@@ -28,25 +28,25 @@ public class AddressService {
     private static final Logger logger = LoggerFactory.getLogger(AddressService.class);
 
     @Transactional
-    public Address insertAddress(AddressDto addressDto, AuthUser loggedUser) {
-        logger.debug("Entering insertAddress with addressDto: {}, loggedUser: {}", addressDto, loggedUser);
+    public Address insertAddress(AddressRequest addressRequest, AuthUser loggedUser) {
+        logger.debug("Entering insertAddress with addressRequest: {}, loggedUser: {}", addressRequest, loggedUser);
         Address address = new Address();
         address.setSlug(UUID.randomUUID().toString());
 
-        address.setStreet(addressDto.getStreet());
-        address.setZipCode(addressDto.getZipCode());
+        address.setStreet(addressRequest.getStreet());
+        address.setZipCode(addressRequest.getZipCode());
 
         address.setCity(City.builder()
-                .id(addressDto.getCity())
+                .id(addressRequest.getCity())
                 .build()
         );
         address.setState(State.builder()
-                .id(addressDto.getState())
+                .id(addressRequest.getState())
                 .build()
         );
 
-        address.setLatitude(addressDto.getLatitude());
-        address.setAltitude(addressDto.getAltitude());
+        address.setLatitude(addressRequest.getLatitude());
+        address.setAltitude(addressRequest.getAltitude());
 
         address.setCreatedAt(getCurrentMillis());
         address.setCreatedBy(loggedUser.getId());

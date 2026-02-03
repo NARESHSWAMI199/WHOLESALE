@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ItemReviewDto {
+public class ItemReviewRequest {
 
     Long id;
     String username;

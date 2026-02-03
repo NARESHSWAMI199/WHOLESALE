@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class UserPlanDto extends SearchFilters {
+public class UserPlanRequest extends SearchFilters {
     Long createdFromDate;
     Long createdToDate;
     Long expiredFromDate;

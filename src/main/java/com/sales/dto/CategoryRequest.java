@@ -6,10 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SubCategoryDto {
+public class CategoryRequest {
     Integer id;
-    Integer categoryId;
-    String subcategory;
+    String category;
     String icon;
-    String unit;
 }

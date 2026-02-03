@@ -71,10 +71,10 @@ public class UserService {
         return userRepository.findByEmailAndPassword(email,password).orElseThrow(() -> new UsernameNotFoundException("User not fond."));
     }
 
-    public User findUserByOtpAndEmail(UserDto userDto) {
-        logger.debug("Finding user by OTP and email: {}", userDto.getEmail());
+    public User findUserByOtpAndEmail(UserRequest userRequest) {
+        logger.debug("Finding user by OTP and email: {}", userRequest.getEmail());
         // Here password key has otp
-        return  userRepository.findUserByOtpAndEmail(userDto.getEmail(),userDto.getPassword());
+        return  userRepository.findUserByOtpAndEmail(userRequest.getEmail(),userRequest.getPassword());
     }
 
 
@@ -89,10 +89,10 @@ public class UserService {
     }
 
 
-    public boolean sendOtp(UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Sending OTP to email: {}", userDto.getEmail());
+    public boolean sendOtp(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Sending OTP to email: {}", userRequest.getEmail());
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(userDto,List.of("email"));
+        Utils.checkRequiredFields(userRequest,List.of("email"));
 
         boolean sent = false;
         Properties props = new Properties();
@@ -100,8 +100,8 @@ public class UserService {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
 
-        User user = userRepository.findUserByEmail(userDto.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        if(user == null) throw new IllegalArgumentException("We are unable to send mail on this mail id "+userDto.getEmail());
+        User user = userRepository.findUserByEmail(userRequest.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(user == null) throw new IllegalArgumentException("We are unable to send mail on this mail id "+userRequest.getEmail());
         
         String recipient = user.getEmail();
         SupportEmail supportEmail =  supportEmailsRepository.findSupportEmailBySupportType("SUPPORT");
@@ -230,28 +230,28 @@ public class UserService {
 
 
 
-    public StoreDto userDtoToStoreDto(UserDto userDto){
-        logger.debug("Converting UserDto to StoreDto: {}", userDto);
-        StoreDto storeDto = new StoreDto();
-        storeDto.setStreet(userDto.getStreet());
-        storeDto.setZipCode(userDto.getZipCode());
-        storeDto.setStoreName(userDto.getStoreName());
-        storeDto.setStoreEmail(userDto.getStoreEmail());
-        storeDto.setDescription(userDto.getDescription());
-        storeDto.setCity(userDto.getCity());
-        storeDto.setState(userDto.getState());
-        storeDto.setStorePhone(userDto.getStorePhone());
-/*        storeDto.setStoreSlug(userDto.getStoreSlug());*/
-        storeDto.setSubCategoryId(userDto.getSubCategoryId());
-        storeDto.setCategoryId(userDto.getCategoryId());
-        return storeDto;
+    public StoreRequest userDtoToStoreDto(UserRequest userRequest){
+        logger.debug("Converting UserRequest to StoreRequest: {}", userRequest);
+        StoreRequest storeRequest = new StoreRequest();
+        storeRequest.setStreet(userRequest.getStreet());
+        storeRequest.setZipCode(userRequest.getZipCode());
+        storeRequest.setStoreName(userRequest.getStoreName());
+        storeRequest.setStoreEmail(userRequest.getStoreEmail());
+        storeRequest.setDescription(userRequest.getDescription());
+        storeRequest.setCity(userRequest.getCity());
+        storeRequest.setState(userRequest.getState());
+        storeRequest.setStorePhone(userRequest.getStorePhone());
+/*        storeRequest.setStoreSlug(userRequest.getStoreSlug());*/
+        storeRequest.setSubCategoryId(userRequest.getSubCategoryId());
+        storeRequest.setCategoryId(userRequest.getCategoryId());
+        return storeRequest;
     }
 
 
-    public void validateRequiredFieldsBeforeCreateUser(UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Validating required fields before creating user: {}", userDto);
+    public void validateRequiredFieldsBeforeCreateUser(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Validating required fields before creating user: {}", userRequest);
         List<String> requiredFields = new ArrayList<>(List.of("username", "contact", "email", "userType"));
-        switch (userDto.getUserType()) {
+        switch (userRequest.getUserType()) {
             case "R":
                 break;
             case "S", "SA":
@@ -273,18 +273,18 @@ public class UserService {
                 ));
                 break;
             default :
-                throw new IllegalStateException("Unexpected value: " + userDto.getUserType());
+                throw new IllegalStateException("Unexpected value: " + userRequest.getUserType());
         };
 
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(userDto,requiredFields);
+        Utils.checkRequiredFields(userRequest,requiredFields);
     }
 
-    public void validateRequiredFieldsBeforeUpdateUser(UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Validating required fields before updating user: {}", userDto);
+    public void validateRequiredFieldsBeforeUpdateUser(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Validating required fields before updating user: {}", userRequest);
         List<String> requiredFields = new ArrayList<>(List.of("username", "contact", "email","slug"));
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(userDto,requiredFields);
+        Utils.checkRequiredFields(userRequest,requiredFields);
     }
 
 
@@ -292,48 +292,48 @@ public class UserService {
         @Important : There are two types of user @loggedUser and @requestUser both are different
      */
     @Transactional(rollbackOn = {MyException.class, RuntimeException.class})
-    public Map<String, Object> createOrUpdateUser(UserDto userDto, AuthUser loggedUser,String path) throws MyException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Creating or updating user: {}", userDto);
+    public Map<String, Object> createOrUpdateUser(UserRequest userRequest, AuthUser loggedUser,String path) throws MyException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Creating or updating user: {}", userRequest);
         Map<String, Object> responseObj = new HashMap<>();
-        StoreDto storeDto;
+        StoreRequest storeRequest;
         // condition for create or update superuser
         if((loggedUser.getId() !=GlobalConstant.suId &&
-                userDto.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) &&
-                !loggedUser.getSlug().equals(userDto.getSlug())
+                userRequest.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) &&
+                !loggedUser.getSlug().equals(userRequest.getSlug())
         )) throw new PermissionDeniedDataAccessException("You don't have permissions to create a admin contact to administrator.",new Exception());
 
         Utils.mobileAndEmailValidation(
-                userDto.getEmail(),
-                userDto.getContact(),
+                userRequest.getEmail(),
+                userRequest.getContact(),
                 "Not a valid user's _ recheck your and user's _."
         );
         // condition who can update a staff
-        Utils.canUpdateAStaff(userDto.getSlug(),
-                userDto.getUserType(),
+        Utils.canUpdateAStaff(userRequest.getSlug(),
+                userRequest.getUserType(),
                 loggedUser
         );
 
-        String username = Utils.isValidName(userDto.getUsername(),"user");
-        userDto.setUsername(username);
+        String username = Utils.isValidName(userRequest.getUsername(),"user");
+        userRequest.setUsername(username);
 
         // Updating existing user
-        if (!Utils.isEmpty(userDto.getSlug()) || path.contains("update")) {
+        if (!Utils.isEmpty(userRequest.getSlug()) || path.contains("update")) {
             logger.debug("We are going to update the user.");
             // Verify required fields before create user
-            validateRequiredFieldsBeforeUpdateUser(userDto);
-            int isUpdated = updateUser(userDto, loggedUser);
-             Integer userId = userRepository.getUserIdBySlug(userDto.getSlug());
-             userDto.setUserId(userId);
+            validateRequiredFieldsBeforeUpdateUser(userRequest);
+            int isUpdated = updateUser(userRequest, loggedUser);
+             Integer userId = userRepository.getUserIdBySlug(userRequest.getSlug());
+             userRequest.setUserId(userId);
 
              // if request user is a Wholesaler
-            if (userDto.getUserType().equals(USER_TYPES.WHOLESALER.getType())){
-                storeDto =  userDtoToStoreDto(userDto);
-                storeDto.setUserSlug(userDto.getSlug());
-                storeService.createOrUpdateStore(storeDto, loggedUser,path);
+            if (userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType())){
+                storeRequest =  userDtoToStoreDto(userRequest);
+                storeRequest.setUserSlug(userRequest.getSlug());
+                storeService.createOrUpdateStore(storeRequest, loggedUser,path);
             }
             if (isUpdated > 0) {
                 // Evict updated user from redis
-                userCacheService.deleteCacheUser(userDto.getSlug());
+                userCacheService.deleteCacheUser(userRequest.getSlug());
                 responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully updated.");
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
@@ -344,29 +344,29 @@ public class UserService {
         } else {    // Creating new user
             logger.debug("We are going to create the user.");
             // Verify required fields before create user
-            validateRequiredFieldsBeforeCreateUser(userDto);
+            validateRequiredFieldsBeforeCreateUser(userRequest);
 
-            User updatedUser = createUser(userDto, loggedUser);
-            userDto.setUserId(updatedUser.getId());
-            logger.debug("{} : {}", userDto.getUserType(), userDto.getUserSlug());
+            User updatedUser = createUser(userRequest, loggedUser);
+            userRequest.setUserId(updatedUser.getId());
+            logger.debug("{} : {}", userRequest.getUserType(), userRequest.getUserSlug());
 
             // if logged user not same to request user and make sure request user must be Wholesaler
-            if((userDto.getUserId() != loggedUser.getId()) &&  userDto.getUserType().equals(USER_TYPES.WHOLESALER.getType()))
+            if((userRequest.getUserId() != loggedUser.getId()) &&  userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType()))
             {
-                storeDto =  userDtoToStoreDto(userDto);
-                storeDto.setUserSlug(updatedUser.getSlug());
-                storeService.createOrUpdateStore(storeDto,loggedUser,path);
+                storeRequest =  userDtoToStoreDto(userRequest);
+                storeRequest.setUserSlug(updatedUser.getSlug());
+                storeService.createOrUpdateStore(storeRequest,loggedUser,path);
 
                 // Providing default permissions to wholesaler
                 List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();
-                int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(userDto.getUserId(),defaultPermissions);
+                int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(userRequest.getUserId(),defaultPermissions);
                 if (isAssigned < 1)
                     throw new MyException("Something went wrong during update wholesaler's permissions. please contact to administrator.");
             }
 
-            if(!Utils.isEmpty(userDto.getUserType()) &&
-                    (userDto.getUserType().equals(USER_TYPES.STAFF.getType()) ||
-                            userDto.getUserType().equals(USER_TYPES.WHOLESALER.getType()))) {
+            if(!Utils.isEmpty(userRequest.getUserType()) &&
+                    (userRequest.getUserType().equals(USER_TYPES.STAFF.getType()) ||
+                            userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType()))) {
                 // updating default pagination settings also for both kind of user "W" and "S"
                 paginationService.setUserDefaultPaginationForSettings(updatedUser);
             }
@@ -383,10 +383,10 @@ public class UserService {
 
         /** going to update user's groups ------------> only for staffs and super admin has group permissions */
         if (
-            (userDto.getUserId() != loggedUser.getId()) && // Logged user can't change self groups
-            (userDto.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || userDto.getUserType().equals(USER_TYPES.STAFF.getType()))  // Make sure user must be Super Admin or Staff
+            (userRequest.getUserId() != loggedUser.getId()) && // Logged user can't change self groups
+            (userRequest.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || userRequest.getUserType().equals(USER_TYPES.STAFF.getType()))  // Make sure user must be Super Admin or Staff
         ) {
-            int isAssigned = permissionHbRepository.assignGroupsToUser(userDto.getUserId(), userDto.getGroupList(),loggedUser);
+            int isAssigned = permissionHbRepository.assignGroupsToUser(userRequest.getUserId(), userRequest.getGroupList(),loggedUser);
             if (isAssigned < 1)
                 throw new MyException("Something went wrong during update user's groups. please contact to administrator.");
         }
@@ -395,22 +395,22 @@ public class UserService {
 
 
     @Transactional
-    public User createUser(UserDto userDto, AuthUser loggedUser) {
-        logger.debug("Creating user: {}", userDto);
+    public User createUser(UserRequest userRequest, AuthUser loggedUser) {
+        logger.debug("Creating user: {}", userRequest);
         User user = new User(loggedUser);
-        user.setUsername(userDto.getUsername());
+        user.setUsername(userRequest.getUsername());
         user.setSlug(UUID.randomUUID().toString());
-        user.setContact(userDto.getContact());
-        user.setEmail(userDto.getEmail());
-        user.setUserType(userDto.getUserType());
+        user.setContact(userRequest.getContact());
+        user.setEmail(userRequest.getEmail());
+        user.setUserType(userRequest.getUserType());
         user.setPassword(password);
         return userRepository.save(user);
     }
 
     @Transactional
-    public int updateUser(UserDto userDto, AuthUser loggedUser) {
-        logger.debug("Updating user: {}", userDto);
-        return userHbRepository.updateUser(userDto,loggedUser);
+    public int updateUser(UserRequest userRequest, AuthUser loggedUser) {
+        logger.debug("Updating user: {}", userRequest);
+        return userHbRepository.updateUser(userRequest,loggedUser);
     }
 
     public User getUserDetail(String slug ,AuthUser loggedUser){
@@ -560,20 +560,20 @@ public class UserService {
 
 
     @Transactional(rollbackOn = {MyException.class,RuntimeException.class})
-    public Map<String,Object> updateWholesalerPermissions(UserDto userDto) throws MyException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating wholesaler permissions for user with slug: {}", userDto.getSlug());
+    public Map<String,Object> updateWholesalerPermissions(UserRequest userRequest) throws MyException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating wholesaler permissions for user with slug: {}", userRequest.getSlug());
         // Validating required field is there is any null field this will throw Exception
-        Utils.checkRequiredFields(userDto,List.of("slug","userType","storePermissions"));
+        Utils.checkRequiredFields(userRequest,List.of("slug","userType","storePermissions"));
 
         Map<String,Object> responseObject = new HashMap<>();
-        if (Utils.isEmpty(userDto.getSlug()) ||
-                !userDto.getUserType().equals(USER_TYPES.WHOLESALER.getType())) throw  new MyException("There is nothing to update.");
-        User user = getUserDetail(userDto.getSlug());
+        if (Utils.isEmpty(userRequest.getSlug()) ||
+                !userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType())) throw  new MyException("There is nothing to update.");
+        User user = getUserDetail(userRequest.getSlug());
         if (user == null) throw new NotFoundException("User not found.");
-        int isUpdated = permissionHbRepository.assignPermissionsToWholesaler(user.getId(), userDto.getStorePermissions());
+        int isUpdated = permissionHbRepository.assignPermissionsToWholesaler(user.getId(), userRequest.getStorePermissions());
         if (isUpdated > 0) {
             // Evict wholesaler from redis
-            userCacheService.deleteCacheUser(userDto.getSlug());
+            userCacheService.deleteCacheUser(userRequest.getSlug());
             responseObject.put(ConstantResponseKeys.MESSAGE, "All permissions have been updated successfully.");
             responseObject.put(ConstantResponseKeys.STATUS, 200);
         } else {

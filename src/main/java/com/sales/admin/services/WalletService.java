@@ -7,7 +7,7 @@ import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.dto.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.StoreNotifications;
 import com.sales.entities.User;
@@ -64,7 +64,7 @@ public class WalletService {
         float walletAmount = wallet != null ? wallet.getAmount() : 0;
 
         // Preparing wallet transaction.
-        WalletTransactionDto walletTransactionDto = WalletTransactionDto.builder()
+        WalletTransactionRequest walletTransactionDto = WalletTransactionRequest.builder()
                 .amount(planPrice.floatValue())
                 .transactionType("DR")
                 .status("F") // Default assuming it failed.

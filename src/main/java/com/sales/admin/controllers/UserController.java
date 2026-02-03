@@ -77,7 +77,7 @@ public class UserController  {
     ))
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token along with user details")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDto userDetails) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserRequest userDetails) {
         logger.debug("Admin login attempt with email: {}", userDetails.getEmail());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDetails.getEmail(),userDetails.getPassword()
@@ -111,7 +111,7 @@ public class UserController  {
                 """)
     ))
     @PostMapping("/login/otp")
-    public ResponseEntity<Map<String, Object>> findUserByOtp(@RequestBody UserDto userDetails) {
+    public ResponseEntity<Map<String, Object>> findUserByOtp(@RequestBody UserRequest userDetails) {
         logger.debug("Admin OTP login attempt with email: {}", userDetails.getEmail());
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser user = userService.findUserByOtpAndEmail(userDetails);
@@ -143,16 +143,16 @@ public class UserController  {
             """)
     ))
     @PostMapping("sendOtp")
-    public ResponseEntity<Map<String,Object>> sendOtp(@RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Sending OTP to email: {}", userDto.getEmail());
+    public ResponseEntity<Map<String,Object>> sendOtp(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Sending OTP to email: {}", userRequest.getEmail());
         Map<String,Object> responseObj = new HashMap<>();
-        boolean sendOtp = userService.sendOtp(userDto);
+        boolean sendOtp = userService.sendOtp(userRequest);
         if(sendOtp)  {
             responseObj.put(ConstantResponseKeys.STATUS,200);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Otp sent successfully");
         }else {
             responseObj.put(ConstantResponseKeys.STATUS,400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userDto.getEmail());
+            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userRequest.getEmail());
         }
         return  new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
@@ -186,11 +186,11 @@ public class UserController  {
     @PreAuthorize("hasAnyAuthority('user.add','user.edit','user.update')")
     @Transactional
     @PostMapping(value = {"/add", "/update"})
-    public ResponseEntity<Map<String, Object>> register(Authentication authentication,HttpServletRequest request, @RequestBody UserDto userDto) throws Exception {
-        logger.debug("Registering or updating user with email: {}", userDto.getEmail());
+    public ResponseEntity<Map<String, Object>> register(Authentication authentication,HttpServletRequest request, @RequestBody UserRequest userRequest) throws Exception {
+        logger.debug("Registering or updating user with email: {}", userRequest.getEmail());
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
-        Map<String,Object> responseObj = userService.createOrUpdateUser(userDto, loggedUser,path);
+        Map<String,Object> responseObj = userService.createOrUpdateUser(userRequest, loggedUser,path);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
 
     }
@@ -358,9 +358,9 @@ public class UserController  {
     @Transactional
     @PreAuthorize("hasAuthority('wholesaler.permission.update')")
     @PostMapping("wholesaler/permissions/update")
-    public ResponseEntity<Map<String,Object>> updateWholesalerPermissions(Authentication authentication,HttpServletRequest request, @RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating permissions for wholesaler with slug: {}", userDto.getSlug());
-        Map<String,Object> response= userService.updateWholesalerPermissions(userDto);
+    public ResponseEntity<Map<String,Object>> updateWholesalerPermissions(Authentication authentication,HttpServletRequest request, @RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating permissions for wholesaler with slug: {}", userRequest.getSlug());
+        Map<String,Object> response= userService.updateWholesalerPermissions(userRequest);
         return new ResponseEntity<>(response, HttpStatus.valueOf((Integer) response.get(ConstantResponseKeys.STATUS )));
     }
 

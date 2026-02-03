@@ -2,7 +2,7 @@ package com.sales.wholesaler.repository;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressDto;
+import com.sales.dto.AddressRequest;
 import com.sales.entities.City;
 import com.sales.entities.State;
 import com.sales.utils.Utils;
@@ -21,7 +21,7 @@ public class WholesaleAddressHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateAddress(AddressDto addressDto, AuthUser loggedUser){
+    public int updateAddress(AddressRequest addressRequest, AuthUser loggedUser){
         String hqQuery ="""
                 UPDATE Address SET
                     city.id =:city,
@@ -33,13 +33,13 @@ public class WholesaleAddressHbRepository {
                 WHERE id =:id 
             """;
         Query query = entityManager.createQuery(hqQuery);
-        query.setParameter("city",addressDto.getCity());
-        query.setParameter("state",addressDto.getState());
-        query.setParameter("latitude",addressDto.getLatitude());
-        query.setParameter("altitude",addressDto.getAltitude());
+        query.setParameter("city",addressRequest.getCity());
+        query.setParameter("state",addressRequest.getState());
+        query.setParameter("latitude",addressRequest.getLatitude());
+        query.setParameter("altitude",addressRequest.getAltitude());
         query.setParameter("updatedBy", loggedUser.getId());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
-        query.setParameter("id",addressDto.getAddressId());
+        query.setParameter("id",addressRequest.getAddressId());
         return  query.executeUpdate();
     }
 

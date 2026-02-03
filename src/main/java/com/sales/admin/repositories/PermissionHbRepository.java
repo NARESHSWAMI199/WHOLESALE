@@ -2,7 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.GroupDto;
+import com.sales.dto.GroupRequest;
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
 import jakarta.persistence.EntityManager;
@@ -24,17 +24,17 @@ public class PermissionHbRepository {
     private final EntityManager entityManager;
 
 
-    public int updateGroup(GroupDto groupDto,int groupId,boolean isSuperAdmin){
+    public int updateGroup(GroupRequest groupRequest,int groupId,boolean isSuperAdmin){
         // deleting all group's exists permissions
         deleteGroupPermissionByGroupId(groupId,isSuperAdmin);
 
         String hql = "update Group set name=:name where slug = :slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("name", groupDto.getName());
-        query.setParameter("slug",groupDto.getSlug());
+        query.setParameter("name", groupRequest.getName());
+        query.setParameter("slug",groupRequest.getSlug());
 
         // update permissions if there provided
-        List<Integer> permissions = groupDto.getPermissions();
+        List<Integer> permissions = groupRequest.getPermissions();
         if(permissions !=null && !permissions.isEmpty()) updatePermissions(groupId,permissions);
         return query.executeUpdate();
     }

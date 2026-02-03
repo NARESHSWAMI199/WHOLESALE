@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PaginationDto {
+public class PaginationRequest {
 
     int page = 0;
     int size = 10;

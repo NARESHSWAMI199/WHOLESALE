@@ -4,7 +4,7 @@ import com.sales.admin.repositories.StoreWalletTransactionRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
 import com.sales.dto.SearchFilters;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.dto.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
 import com.sales.exceptions.NotFoundException;
@@ -52,7 +52,7 @@ public class StoreWalletTransactionService {
 
 
 
-    public WalletTransaction addWalletTransaction(WalletTransactionDto walletTransactionDto,Integer userId) {
+    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto,Integer userId) {
         logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())

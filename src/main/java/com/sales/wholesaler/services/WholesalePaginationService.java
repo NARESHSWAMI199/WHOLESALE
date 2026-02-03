@@ -33,14 +33,14 @@ public class WholesalePaginationService {
     private final WholesalePaginationHbRepository wholesalePaginationHbRepository;
     private final PaginationRepository paginationRepository;
 
-    public List<UserPagination> findAllUserPaginations(){
+    public List<UserPagination> findAllUserPagination(){
         return wholesaleUserPaginationsRepository.findAll();
     }
 
-    public Map<String,Object> findUserPaginationsByUserId(AuthUser loggedUser){
-        List<UserPagination> userPaginations = wholesaleUserPaginationsRepository.getUserPaginationByUserId(loggedUser.getId());
+    public Map<String,Object> findUserPaginationByUserId(AuthUser loggedUser){
+        List<UserPagination> userPaginationList = wholesaleUserPaginationsRepository.getUserPaginationByUserId(loggedUser.getId());
         Map<String,Object> result = new LinkedHashMap<>();
-        for(UserPagination userPagination : userPaginations) {
+        for(UserPagination userPagination : userPaginationList) {
             Pagination pagination = userPagination.getPagination();
             String key = pagination.getFieldFor();
             // remove all whitespaces and changed with uppercase like:

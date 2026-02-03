@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPlanDto;
+import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
@@ -64,7 +64,7 @@ public class WholesaleServicePlanController  {
     // TODO : Make sure we using dto
     @PostMapping("/my-plans")
     @Operation(summary = "Get my plans", description = "Retrieves a paginated list of all plans associated with the authenticated wholesaler")
-    public ResponseEntity<Page<WholesalerPlans>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanDto searchFilters) {
+    public ResponseEntity<Page<WholesalerPlans>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanRequest searchFilters) {
         logger.debug("Starting getMyAllPlans method");
         AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
         Page<WholesalerPlans> allUserPlans = wholesaleServicePlanService.getAllUserPlans(loggedUser, searchFilters);

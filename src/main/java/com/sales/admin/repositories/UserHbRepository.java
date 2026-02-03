@@ -2,7 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserDto;
+import com.sales.dto.UserRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -17,7 +17,7 @@ public class UserHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateUser(UserDto userDto, AuthUser loggedUser) {
+    public int updateUser(UserRequest userRequest, AuthUser loggedUser) {
         String strQuery = "update User set " +
                 "username=:username , " +
                 "email=:email,"+
@@ -29,14 +29,14 @@ public class UserHbRepository {
                 "where slug =:slug";
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("username", userDto.getUsername());
-        query.setParameter("email", userDto.getEmail());
-        //query.setParameter("password", userDto.getPassword());
-        query.setParameter("contact", userDto.getContact());
-        //query.setParameter("userType", userDto.getUserType());
+        query.setParameter("username", userRequest.getUsername());
+        query.setParameter("email", userRequest.getEmail());
+        //query.setParameter("password", userRequest.getPassword());
+        query.setParameter("contact", userRequest.getContact());
+        //query.setParameter("userType", userRequest.getUserType());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", userDto.getSlug());
+        query.setParameter("slug", userRequest.getSlug());
         return query.executeUpdate();
     }
 

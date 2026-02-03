@@ -1,7 +1,7 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StoreDto;
+import com.sales.dto.StoreRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -16,7 +16,7 @@ public class WholesaleStoreHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateStore(StoreDto storeDto, AuthUser loggedUser){
+    public int updateStore(StoreRequest storeRequest, AuthUser loggedUser){
         String strQuery = "update Store set " +
                 "storeName=:name , " +
                 "email=:email, "+
@@ -30,16 +30,16 @@ public class WholesaleStoreHbRepository {
                 "where slug =:slug";
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("name", storeDto.getStoreName());
-        query.setParameter("email", storeDto.getStoreEmail());
-        query.setParameter("phone", storeDto.getStorePhone());
-        query.setParameter("storeCategory", storeDto.getStoreCategory());
-        query.setParameter("storeSubCategory", storeDto.getStoreSubCategory());
-        query.setParameter("avtar", storeDto.getStoreAvatar());
-        query.setParameter("description", storeDto.getDescription());
+        query.setParameter("name", storeRequest.getStoreName());
+        query.setParameter("email", storeRequest.getStoreEmail());
+        query.setParameter("phone", storeRequest.getStorePhone());
+        query.setParameter("storeCategory", storeRequest.getStoreCategory());
+        query.setParameter("storeSubCategory", storeRequest.getStoreSubCategory());
+        query.setParameter("avtar", storeRequest.getStoreAvatar());
+        query.setParameter("description", storeRequest.getDescription());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", storeDto.getStoreSlug());
+        query.setParameter("slug", storeRequest.getStoreSlug());
         return query.executeUpdate();
     }
 

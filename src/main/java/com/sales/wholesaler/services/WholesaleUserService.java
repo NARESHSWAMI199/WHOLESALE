@@ -11,6 +11,8 @@ import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleUserDto;
+import com.sales.wholesaler.mapper.WholesaleUserMapper;
 import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleSupportEmailsRepository;
 import com.sales.wholesaler.repository.WholesaleUserHbRepository;
@@ -50,7 +52,7 @@ public class WholesaleUserService  {
     private final WholesaleUserHbRepository wholesaleUserHbRepository;
     private final WholesaleSupportEmailsRepository wholesaleSupportEmailsRepository;
     private final WholesaleServicePlanRepository wholesaleServicePlanRepository;
-
+    private final WholesaleUserMapper wholesaleUserMapper;
     @Value("${profile.absolute}")
     String profilePath;
 
@@ -58,6 +60,8 @@ public class WholesaleUserService  {
     @Value("${default.password}")
     String password;
 
+
+    @Transactional
     public User findByEmailAndPassword(Map<String,String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting findByEmailAndPassword method with param: {}", param);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
@@ -70,18 +74,18 @@ public class WholesaleUserService  {
         return user;
     }
 
-    public User findUserByOtpAndSlug(UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting findUserByOtpAndSlug method with userDto: {}", userDto);
+    public User findUserByOtpAndSlug(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting findUserByOtpAndSlug method with userRequest: {}", userRequest);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
-        Utils.checkRequiredFields(userDto,List.of("slug","password"));
-        User user = wholesaleUserRepository.findUserByOtpAndSlug(userDto.getSlug(),userDto.getPassword());
+        Utils.checkRequiredFields(userRequest,List.of("slug","password"));
+        User user = wholesaleUserRepository.findUserByOtpAndSlug(userRequest.getSlug(),userRequest.getPassword());
         logger.debug("Completed findUserByOtpAndSlug method");
         return user;
     }
 
-    public User findUserByOtpAndEmail(UserDto userDto) {
-        logger.debug("Starting findUserByOtpAndEmail method with userDto: {}", userDto);
-        User user = wholesaleUserRepository.findUserByOtpAndEmail(userDto.getEmail(),userDto.getPassword());
+    public User findUserByOtpAndEmail(UserRequest userRequest) {
+        logger.debug("Starting findUserByOtpAndEmail method with userRequest: {}", userRequest);
+        User user = wholesaleUserRepository.findUserByOtpAndEmail(userRequest.getEmail(),userRequest.getPassword());
         logger.debug("Completed findUserByOtpAndEmail method");
         return user;
     }
@@ -92,18 +96,18 @@ public class WholesaleUserService  {
         logger.debug("Completed resetOtp method");
     }
 
-    public boolean sendOtp(UserDto userDto){
-        logger.debug("Starting sendOtp method with userDto: {}", userDto);
+    public boolean sendOtp(UserRequest userRequest){
+        logger.debug("Starting sendOtp method with userRequest: {}", userRequest);
         boolean sent = false;
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com"); // Replace it with your mail server
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         User user = null;
-        if(userDto.getEmail() == null){
-            user = wholesaleUserRepository.findUserBySlug(userDto.getSlug());
+        if(userRequest.getEmail() == null){
+            user = wholesaleUserRepository.findUserBySlug(userRequest.getSlug());
         }else{
-            user = wholesaleUserRepository.findUserByEmail(userDto.getEmail());
+            user = wholesaleUserRepository.findUserByEmail(userRequest.getEmail());
         }
         if (user == null) return  false;
 
@@ -166,35 +170,35 @@ public class WholesaleUserService  {
         return user;
     }
 
-    public StoreDto userDtoToStoreDto(UserDto userDto) {
-        logger.debug("Starting userDtoToStoreDto method with userDto: {}", userDto);
-        StoreDto storeDto = new StoreDto();
-        storeDto.setStoreName(userDto.getStoreName());
-        storeDto.setStoreEmail(userDto.getStoreEmail());
-        storeDto.setDescription(userDto.getDescription());
-        storeDto.setCity(userDto.getCity());
-        storeDto.setState(userDto.getState());
-        storeDto.setStorePhone(userDto.getStorePhone());
+    public StoreRequest userDtoToStoreDto(UserRequest userRequest) {
+        logger.debug("Starting userDtoToStoreDto method with userRequest: {}", userRequest);
+        StoreRequest storeRequest = new StoreRequest();
+        storeRequest.setStoreName(userRequest.getStoreName());
+        storeRequest.setStoreEmail(userRequest.getStoreEmail());
+        storeRequest.setDescription(userRequest.getDescription());
+        storeRequest.setCity(userRequest.getCity());
+        storeRequest.setState(userRequest.getState());
+        storeRequest.setStorePhone(userRequest.getStorePhone());
         logger.debug("Completed userDtoToStoreDto method");
-        return storeDto;
+        return storeRequest;
     }
 
-    public Map<String, Object> updateUserProfile(UserDto userDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting updateUserProfile method with userDto: {}, loggedUser: {}", userDto, loggedUser);
+    public Map<String, Object> updateUserProfile(UserRequest userRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting updateUserProfile method with userRequest: {}, loggedUser: {}", userRequest, loggedUser);
         // Validating required fields. If there we found any required field is null, this will throw an Exception
-        Utils.checkRequiredFields(userDto,List.of("slug","username","email","contact"));
+        Utils.checkRequiredFields(userRequest,List.of("slug","username","email","contact"));
 
         Map<String, Object> responseObj = new HashMap<>();
 
         Utils.mobileAndEmailValidation(
-                userDto.getEmail(),
-                userDto.getContact(),
+                userRequest.getEmail(),
+                userRequest.getContact(),
                 "Not a valid user's _ recheck your and user's _."
         );
 
-        String username = Utils.isValidName( userDto.getUsername(),"user");
-        userDto.setUsername(username);
-        int isUpdated = updateUser(userDto, loggedUser); // Update operation
+        String username = Utils.isValidName( userRequest.getUsername(),"user");
+        userRequest.setUsername(username);
+        int isUpdated = updateUser(userRequest, loggedUser); // Update operation
         if (isUpdated > 0) {
             //Evict wholesaler from redis
             userCacheService.deleteCacheUser(loggedUser.getSlug());
@@ -209,9 +213,9 @@ public class WholesaleUserService  {
     }
 
     @Transactional
-    public int updateUser(UserDto userDto, AuthUser loggedUser) {
-        logger.debug("Starting updateUser method with userDto: {}, loggedUser: {}", userDto, loggedUser);
-        int updateCount = wholesaleUserHbRepository.updateUser(userDto, loggedUser); // Update operation
+    public int updateUser(UserRequest userRequest, AuthUser loggedUser) {
+        logger.debug("Starting updateUser method with userRequest: {}, loggedUser: {}", userRequest, loggedUser);
+        int updateCount = wholesaleUserHbRepository.updateUser(userRequest, loggedUser); // Update operation
         logger.debug("Completed updateUser method");
         return updateCount;
     }
@@ -256,19 +260,19 @@ public class WholesaleUserService  {
         return null;
     }
 
-    public User addNewUser(UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting addNewUser method with userDto: {}", userDto);
+    public User addNewUser(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting addNewUser method with userRequest: {}", userRequest);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
-        Utils.checkRequiredFields(userDto,List.of("username","email","password","contact"));
+        Utils.checkRequiredFields(userRequest,List.of("username","email","password","contact"));
 
         // '_' replaced by actual error message in mobileAndEmailValidation
-        Utils.mobileAndEmailValidation(userDto.getEmail(), userDto.getContact(),"Not a valid _");
-        String username = Utils.isValidName(userDto.getUsername(),"user");
+        Utils.mobileAndEmailValidation(userRequest.getEmail(), userRequest.getContact(),"Not a valid _");
+        String username = Utils.isValidName(userRequest.getUsername(),"user");
         User user = User.builder()
             .username(username)
-            .email(userDto.getEmail())
-            .password(userDto.getPassword())
-            .contact(userDto.getContact())
+            .email(userRequest.getEmail())
+            .password(userRequest.getPassword())
+            .contact(userRequest.getContact())
             .slug(UUID.randomUUID().toString())
             .status("A")
             .isDeleted("N")
@@ -283,7 +287,7 @@ public class WholesaleUserService  {
             wholesaleServicePlanService.assignUserPlan(insertedUser.getId(), defaultServicePlan.getId());
         }
         // Sending mail to user for email validation.
-        if (!sendOtp(userDto)){
+        if (!sendOtp(userRequest)){
             throw new MyException("User was created successfully. but we facing issue some issue during sending otp. Make sure your email address was correct.");
         }
         logger.debug("Completed addNewUser method");

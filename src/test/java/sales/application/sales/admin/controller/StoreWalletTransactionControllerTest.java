@@ -41,7 +41,7 @@ public class StoreWalletTransactionControllerTest extends TestUtil {
         var user = createUser(slug, createRandomEmail(), "pw", "W");
 
         // add a transaction
-        WalletTransaction wt = storeWalletTransactionService.addWalletTransaction(com.sales.dto.WalletTransactionDto.builder().amount(100f).transactionType("CR").status("S").build(), user.getId());
+        WalletTransaction wt = storeWalletTransactionService.addWalletTransaction(com.sales.dto.WalletTransactionRequest.builder().amount(100f).transactionType("CR").status("S").build(), user.getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, token);

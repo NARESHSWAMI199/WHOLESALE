@@ -139,11 +139,11 @@ public class StoreController {
     @PostMapping(value = {"/add","/update"})
     @PreAuthorize("hasAnyAuthority('store.add','store.update','store.edit')")
     @Operation(summary = "Add or update store", description = "Creates a new store or updates an existing store based on the provided data")
-    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request,  @ModelAttribute StoreDto storeDto) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Adding or updating store with details: {}", storeDto);
+    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request,  @ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Adding or updating store with details: {}", storeRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI().toLowerCase();
-        Map<String,Object> responseObj = storeService.createOrUpdateStore(storeDto,loggedUser,path);
+        Map<String,Object> responseObj = storeService.createOrUpdateStore(storeRequest,loggedUser,path);
         return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
@@ -225,13 +225,13 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('store.category.add','store.category.update','store.category.edit')")
     @PostMapping(value = {"category/add","category/update"})
     @Operation(summary = "Add or update store category", description = "Creates a new store category or updates an existing one")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryDto categoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Saving or updating store category with details: {}", categoryDto);
+    public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Saving or updating store category with details: {}", categoryRequest);
         Map<String,Object> result = new HashMap<>();
-        StoreCategory updatedStoreCategory = storeService.saveOrUpdateStoreCategory(categoryDto);
+        StoreCategory updatedStoreCategory = storeService.saveOrUpdateStoreCategory(categoryRequest);
         if(updatedStoreCategory != null) {
              result.put(ConstantResponseKeys.RES,updatedStoreCategory);
-            if(categoryDto.getId() !=null && categoryDto.getId() != 0) {
+            if(categoryRequest.getId() !=null && categoryRequest.getId() != 0) {
                 result.put(ConstantResponseKeys.MESSAGE, "Category successfully updated.");
                 result.put(ConstantResponseKeys.STATUS, 200);
             }else {
@@ -302,13 +302,13 @@ public class StoreController {
 
     @PostMapping(value = {"subcategory/add","subcategory/update"})
     @PreAuthorize("hasAnyAuthority('store.subcategory.add','store.subcategory.update','store.subcategory.edit')")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryDto subCategoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Saving or updating store subcategory with details: {}", subCategoryDto);
+    public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Saving or updating store subcategory with details: {}", subCategoryRequest);
         Map<String,Object> result = new HashMap<>();
-        StoreSubCategory updatedStoreSubCategory = storeService.saveOrUpdateStoreSubCategory(subCategoryDto);
+        StoreSubCategory updatedStoreSubCategory = storeService.saveOrUpdateStoreSubCategory(subCategoryRequest);
         if(updatedStoreSubCategory != null) {
             result.put(ConstantResponseKeys.RES,updatedStoreSubCategory);
-            if(subCategoryDto.getId() != null) {
+            if(subCategoryRequest.getId() != null) {
                 result.put(ConstantResponseKeys.MESSAGE, "Subcategory successfully updated.");
                 result.put(ConstantResponseKeys.STATUS, 200);
             }else {

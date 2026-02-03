@@ -8,7 +8,7 @@ import com.sales.claims.SalesUser;
 import com.sales.dto.DeleteDto;
 import com.sales.dto.ServicePlanDto;
 import com.sales.dto.StatusDto;
-import com.sales.dto.UserPlanDto;
+import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
@@ -47,7 +47,7 @@ public class ServicePlanController  {
     @PostMapping(value = {"user-plans/{userSlug}","user-plans"})
     @PreAuthorize("hasAnyAuthority('user.plan.all','user.plan.detail')")
     @Operation(summary = "Get user plans", description = "Retrieves a paginated list of plans for a specific user or all users")
-    public ResponseEntity< Page<WholesalerPlans>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanDto searchFilters){
+    public ResponseEntity< Page<WholesalerPlans>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters){
         logger.debug("Fetching user plans for userSlug: {}", userSlug);
         Integer userId = userService.getUserIdBySlug(userSlug);
         Page<WholesalerPlans> allUserPlans = servicePlanService.getAllUserPlans(userId, searchFilters);

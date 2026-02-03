@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class StoreDto extends AddressDto {
+public class StoreRequest extends AddressRequest {
     private String storeEmail;
     private String userSlug;
     private String storeName;

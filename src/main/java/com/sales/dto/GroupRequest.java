@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupDto {
+public class GroupRequest {
     Integer groupId;
     String name;
     String slug;

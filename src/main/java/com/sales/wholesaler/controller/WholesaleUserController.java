@@ -5,16 +5,17 @@ import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.PasswordDto;
-import com.sales.dto.StoreDto;
-import com.sales.dto.UserDto;
+import com.sales.dto.UserRequest;
 import com.sales.dto.UserSearchFilters;
-import com.sales.entities.Store;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.global.STATUS;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleStoreDto;
+import com.sales.wholesaler.dto.WholesaleUserDto;
+import com.sales.wholesaler.mapper.WholesaleUserMapper;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import com.sales.wholesaler.services.WholesaleUserService;
@@ -59,9 +60,9 @@ public class WholesaleUserController  {
     private final JwtToken jwtToken;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleUserController.class);
     private final UserCacheService userCacheService;
+    private final WholesaleUserMapper wholesaleUserMapper;
 
 
-    // TODO : Make sure we using dto
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
                     {
@@ -83,14 +84,14 @@ public class WholesaleUserController  {
         }else if(!Utils.isEmpty(user.getOtp())) {
             message = "User exist but not verified. You can login via otp.";
             responseObj.put(ConstantResponseKeys.STATUS, 401);
-        }else if (user.getStatus().equalsIgnoreCase("A")) {
+        }else if (user.getStatus().equalsIgnoreCase(STATUS.ACTIVE.getStatus())) {
             message = ConstantResponseKeys.SUCCESS;
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
-            WholesaleStoreDto storeDetails = wholesaleStoreService.getStoreDtoByUserId(user.getId());
-            Map<String,Object> paginationsObj = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
-            responseObj.put("user", user);
+            WholesaleStoreDto storeDetails = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
+            Map<String,Object> paginationObj = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
             responseObj.put(ConstantResponseKeys.STORE, storeDetails);
-            responseObj.put(ConstantResponseKeys.PAGINATIONS,paginationsObj);
+            responseObj.put(ConstantResponseKeys.PAGINATIONS, paginationObj);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else {
             message = "You are blocked by admin.";
@@ -103,10 +104,9 @@ public class WholesaleUserController  {
 
 
 
-    // TODO : Make sure we using dto
     @PostMapping("/login/otp")
     @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
-    public ResponseEntity<Map<String, Object>> loginUserViaOtp (@RequestBody UserDto userDetails) {
+    public ResponseEntity<Map<String, Object>> loginUserViaOtp (@RequestBody UserRequest userDetails) {
         logger.debug("Starting loginUserViaOtp method");
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findUserByOtpAndEmail(userDetails);
@@ -116,11 +116,11 @@ public class WholesaleUserController  {
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
-            Map<String,Object> paginations = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
+            Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put("user", user);
+            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
             responseObj.put(ConstantResponseKeys.STORE, store);
-            responseObj.put(ConstantResponseKeys.PAGINATIONS,paginations);
+            responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             wholesaleUserService.resetOtp(user.getEmail());
         } else {
@@ -142,10 +142,9 @@ public class WholesaleUserController  {
     )))
 
 
-    // TODO : Make sure we using dto
     @PostMapping("validate-otp")
     @Operation(summary = "Validate OTP", description = "Validates the OTP for user authentication")
-    public ResponseEntity<Map<String, Object>> validateUserOtp(@RequestBody UserDto userDetails) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> validateUserOtp(@RequestBody UserRequest userDetails) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting validateUserOtp method");
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findUserByOtpAndSlug(userDetails);
@@ -154,12 +153,12 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
-            Map<String,Object> paginations = wholesalePaginationService.findUserPaginationsByUserId(new SalesUser(user));
+            Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put("user", user);
+            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
             responseObj.put(ConstantResponseKeys.STORE, store);
-            responseObj.put(ConstantResponseKeys.PAGINATIONS,paginations);
+            responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             // setting blank otp
             wholesaleUserService.resetOtp(user.getEmail());
@@ -174,16 +173,16 @@ public class WholesaleUserController  {
 
     @PostMapping("sendOtp")
     @Operation(summary = "Send OTP", description = "Sends an OTP to the user's email for verification")
-    public ResponseEntity<Map<String,Object>> sendOtp(HttpServletRequest request, @RequestBody UserDto userDto){
+    public ResponseEntity<Map<String,Object>> sendOtp(HttpServletRequest request, @RequestBody UserRequest userRequest){
         logger.debug("Starting sendOtp method");
         Map<String,Object> responseObj = new HashMap<>();
-        boolean sendOtp = wholesaleUserService.sendOtp(userDto);
+        boolean sendOtp = wholesaleUserService.sendOtp(userRequest);
         if(sendOtp)  {
             responseObj.put(ConstantResponseKeys.STATUS,200);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Otp sent successfully");
         }else {
             responseObj.put(ConstantResponseKeys.STATUS,400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userDto.getEmail());
+            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userRequest.getEmail());
         }
         logger.debug("Completed sendOtp method");
         return  new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -203,16 +202,15 @@ public class WholesaleUserController  {
             ))
     @PostMapping(value = {"/update"})
     @Operation(summary = "Update user profile", description = "Updates the profile information of the authenticated wholesaler user")
-    public ResponseEntity<Map<String, Object>> updateAuth(Authentication authentication,HttpServletRequest request, @RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> updateAuth(Authentication authentication,HttpServletRequest request, @RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateAuth method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> responseObj = wholesaleUserService.updateUserProfile(userDto, loggedUser);
+        Map<String,Object> responseObj = wholesaleUserService.updateUserProfile(userRequest, loggedUser);
         logger.debug("Completed updateAuth method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
 
     }
 
-    // TODO : Make sure we using dto
     @GetMapping(value = {"/detail","/detail/{slug}"})
     @Operation(summary = "Get user details", description = "Retrieves detailed information for the authenticated user or a specific user by slug")
     public ResponseEntity<Map<String, Object>> getDetailUser(@PathVariable(required = false) String slug, HttpServletRequest request) {
@@ -225,10 +223,10 @@ public class WholesaleUserController  {
             user = new SalesUser(wholesaleUserService.findUserBySlug(slug));
         }
         if(slug == null){
-            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.getId());
+            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
             responseObj.put(ConstantResponseKeys.STORE, store);
         }
-        responseObj.put("user", user);
+        responseObj.put(ConstantResponseKeys.USER, user);
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed getDetailUser method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -245,7 +243,7 @@ public class WholesaleUserController  {
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         User updatedUser = wholesaleUserService.resetPasswordByUserSlug(passwordDto,loggedUser);
-        responseObj.put(ConstantResponseKeys.RES,updatedUser);
+        responseObj.put(ConstantResponseKeys.RES,wholesaleUserMapper.toDto(updatedUser));
         responseObj.put(ConstantResponseKeys.MESSAGE, "User password has been successfully updated.");
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed resetUserPasswordBySlug method");
@@ -301,14 +299,13 @@ public class WholesaleUserController  {
                 }
             """)
     ))
-    // TODO : Make sure we using dto
     @PostMapping(value = {"add","register"})
     @Operation(summary = "Add new user", description = "Creates a new wholesaler user account")
-    public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserDto userDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewUser method");
         Map<String,Object> result = new HashMap<>();
-        User insertedUser = wholesaleUserService.addNewUser(userDto);
-        result.put("user",insertedUser);
+        User insertedUser = wholesaleUserService.addNewUser(userRequest);
+        result.put("user",wholesaleUserMapper.toDto(insertedUser));
         result.put(ConstantResponseKeys.MESSAGE, "User created successfully");
         result.put(ConstantResponseKeys.STATUS, 201);
         logger.debug("Completed addNewUser method");

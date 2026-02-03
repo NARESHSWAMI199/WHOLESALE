@@ -1,7 +1,7 @@
 package com.sales.wholesaler.services;
 
 import com.sales.dto.SearchFilters;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.dto.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
 import com.sales.entities.WalletTransaction_;
@@ -49,7 +49,7 @@ public class WalletTransactionService {
 
 
 
-    public WalletTransaction addWalletTransaction(WalletTransactionDto walletTransactionDto,Integer userId) {
+    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto,Integer userId) {
         logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())

@@ -2,7 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPlanDto;
+import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerFuturePlan;
 import com.sales.entities.WholesalerPlans;
@@ -148,7 +148,7 @@ public class WholesaleServicePlanService  {
     }
 
 
-    public Page<WholesalerPlans> getAllUserPlans(AuthUser loggedUser, UserPlanDto searchFilters) {
+    public Page<WholesalerPlans> getAllUserPlans(AuthUser loggedUser, UserPlanRequest searchFilters) {
         logger.debug("Starting getAllUserPlans method with loggedUser: {}, searchFilters: {}", loggedUser, searchFilters);
         Specification<WholesalerPlans> specification = Specification.allOf(
                 hasSlug(searchFilters.getSlug())

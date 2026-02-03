@@ -547,34 +547,34 @@ public class ItemService {
 
 
     @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
-    public ItemCategory saveOrUpdateItemCategory(CategoryDto categoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering saveOrUpdateItemCategory with categoryDto: {}", categoryDto);
+    public ItemCategory saveOrUpdateItemCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering saveOrUpdateItemCategory with categoryRequest: {}", categoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
-        Utils.checkRequiredFields(categoryDto,List.of("category","icon"));
+        Utils.checkRequiredFields(categoryRequest,List.of("category","icon"));
         ItemCategory itemCategory = new ItemCategory();
-        if(categoryDto.getId() != null && categoryDto.getId() !=0) // because we are using 0 for the other category.
-            itemCategory.setId(categoryDto.getId());
+        if(categoryRequest.getId() != null && categoryRequest.getId() !=0) // because we are using 0 for the other category.
+            itemCategory.setId(categoryRequest.getId());
         itemCategory.setSlug(UUID.randomUUID().toString());  // slug will also change after during update
-        itemCategory.setCategory(categoryDto.getCategory());
-        itemCategory.setIcon(categoryDto.getIcon());
+        itemCategory.setCategory(categoryRequest.getCategory());
+        itemCategory.setIcon(categoryRequest.getIcon());
         ItemCategory result = itemCategoryRepository.save(itemCategory);
         logger.debug("Exiting saveOrUpdateItemCategory with result: {}", result);
         return result;
     }
 
     @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
-    public ItemSubCategory saveOrUpdateItemSubCategory(SubCategoryDto subCategoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering saveOrUpdateItemSubCategory with subCategoryDto: {}", subCategoryDto);
+    public ItemSubCategory saveOrUpdateItemSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering saveOrUpdateItemSubCategory with subCategoryRequest: {}", subCategoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
-        Utils.checkRequiredFields(subCategoryDto,List.of("categoryId","subcategory","unit","icon"));
+        Utils.checkRequiredFields(subCategoryRequest,List.of("categoryId","subcategory","unit","icon"));
         ItemSubCategory itemSubCategory = new ItemSubCategory();
-        if(subCategoryDto.getId() != null && subCategoryDto.getId() != 0) // because we are using 0 for the other subcategory.
-            itemSubCategory.setId(subCategoryDto.getId());
+        if(subCategoryRequest.getId() != null && subCategoryRequest.getId() != 0) // because we are using 0 for the other subcategory.
+            itemSubCategory.setId(subCategoryRequest.getId());
         itemSubCategory.setSlug(UUID.randomUUID().toString()); // slug will also change after during update
-        itemSubCategory.setCategoryId(subCategoryDto.getCategoryId());
-        itemSubCategory.setSubcategory(subCategoryDto.getSubcategory());
-        itemSubCategory.setIcon(subCategoryDto.getIcon());
-        itemSubCategory.setUnit(subCategoryDto.getUnit());
+        itemSubCategory.setCategoryId(subCategoryRequest.getCategoryId());
+        itemSubCategory.setSubcategory(subCategoryRequest.getSubcategory());
+        itemSubCategory.setIcon(subCategoryRequest.getIcon());
+        itemSubCategory.setUnit(subCategoryRequest.getUnit());
         itemSubCategory.setUpdatedAt(Utils.getCurrentMillis());
         ItemSubCategory result = itemSubCategoryRepository.save(itemSubCategory);
         logger.debug("Exiting saveOrUpdateItemSubCategory with result: {}", result);

@@ -5,7 +5,7 @@ import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.DeleteDto;
-import com.sales.dto.GroupDto;
+import com.sales.dto.GroupRequest;
 import com.sales.dto.SearchFilters;
 import com.sales.entities.Group;
 import com.sales.global.ConstantResponseKeys;
@@ -59,11 +59,11 @@ public class GroupController  {
     @PostMapping(value = {"create", "update"})
     @PreAuthorize("hasAnyAuthority('group.permission.add','group.permission.update','group.permission.edit')")
     @Operation(summary = "Create or update group", description = "Creates a new group or updates an existing group based on the provided data")
-    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication,HttpServletRequest request, @RequestBody GroupDto groupDto) throws Exception {
-        logger.debug("Creating or updating group: {}", groupDto);
+    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication,HttpServletRequest request, @RequestBody GroupRequest groupRequest) throws Exception {
+        logger.debug("Creating or updating group: {}", groupRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
-        Map<String, Object> response = groupService.createOrUpdateGroup(groupDto, loggedUser, path);
+        Map<String, Object> response = groupService.createOrUpdateGroup(groupRequest, loggedUser, path);
         return new ResponseEntity<>(response, HttpStatus.valueOf((Integer) response.get(ConstantResponseKeys.STATUS)));
     }
 

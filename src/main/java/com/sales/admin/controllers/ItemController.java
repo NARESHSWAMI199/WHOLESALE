@@ -297,13 +297,13 @@ public class ItemController  {
     @PostMapping(value = {"category/add","category/update"})
     @PreAuthorize("hasAnyAuthority('item.category.add','item.category.update','item.category.edit')")
     @Operation(summary = "Add or update item category", description = "Creates or updates an item category")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryDto categoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Saving or updating item category: {}", categoryDto);
+    public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Saving or updating item category: {}", categoryRequest);
         Map<String,Object> result = new HashMap<>();
-        ItemCategory updatedItemCategory = itemService.saveOrUpdateItemCategory(categoryDto);
+        ItemCategory updatedItemCategory = itemService.saveOrUpdateItemCategory(categoryRequest);
         if(updatedItemCategory != null) {
             result.put(ConstantResponseKeys.RES,updatedItemCategory); // during update and inserted for both
-            if(categoryDto.getId() != null && categoryDto.getId() != 0) {
+            if(categoryRequest.getId() != null && categoryRequest.getId() != 0) {
                 result.put(ConstantResponseKeys.MESSAGE, "Category successfully updated.");
                 result.put(ConstantResponseKeys.STATUS, 200);
             }else {
@@ -359,13 +359,13 @@ public class ItemController  {
     @PostMapping(value = {"subcategory/add","subcategory/update"})
     @PreAuthorize("hasAnyAuthority('item.subcategory.add','item.subcategory.update','item.subcategory.edit')")
     @Operation(summary = "Add or update item subcategory", description = "Creates or updates an item subcategory")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryDto subCategoryDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Saving or updating item subcategory: {}", subCategoryDto);
+    public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Saving or updating item subcategory: {}", subCategoryRequest);
         Map<String,Object> result = new HashMap<>();
-        ItemSubCategory updateItemSubCategory = itemService.saveOrUpdateItemSubCategory(subCategoryDto);
+        ItemSubCategory updateItemSubCategory = itemService.saveOrUpdateItemSubCategory(subCategoryRequest);
         if(updateItemSubCategory != null) {
             result.put(ConstantResponseKeys.RES,updateItemSubCategory); // during update and inserted for both
-            if(subCategoryDto.getId() != null) {
+            if(subCategoryRequest.getId() != null) {
                 result.put(ConstantResponseKeys.MESSAGE, "Category successfully updated.");
                 result.put(ConstantResponseKeys.STATUS, 200);
             }else {

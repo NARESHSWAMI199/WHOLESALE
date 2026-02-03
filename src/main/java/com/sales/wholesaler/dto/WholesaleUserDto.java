@@ -6,6 +6,18 @@ import lombok.Builder;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record WholesaleUserDto () {
+public record WholesaleUserDto(
+        String slug,
+        String otp,
+        String avatar,
+        String username,
+        String password,
+        String email,
+        String contact,
+        String userType,
+        String status,
+        Integer activePlan,
+        Long lastSeen
+) {
 
 }

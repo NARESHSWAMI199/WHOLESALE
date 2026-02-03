@@ -34,7 +34,7 @@ public class WholesalePaginationController  {
     @Operation(summary = "Get user pagination settings", description = "Retrieves all pagination settings for the authenticated wholesaler user")
     public ResponseEntity<Map<String,Object>> findUserPaginationSetting(Authentication authentication,HttpServletRequest request){
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> allUserPaginations = wholesalePaginationService.findUserPaginationsByUserId(loggedUser);
+        Map<String,Object> allUserPaginations = wholesalePaginationService.findUserPaginationByUserId(loggedUser);
         return new ResponseEntity<>(allUserPaginations, HttpStatus.valueOf(200));
     }
 

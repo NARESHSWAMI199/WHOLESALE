@@ -8,7 +8,7 @@ import com.sales.claims.AuthUser;
 import com.sales.dto.DeleteDto;
 import com.sales.dto.ServicePlanDto;
 import com.sales.dto.StatusDto;
-import com.sales.dto.UserPlanDto;
+import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
@@ -78,7 +78,7 @@ public class ServicePlanService {
         return false;
     }
 
-    public Page<WholesalerPlans> getAllUserPlans(Integer userId , UserPlanDto searchFilters){
+    public Page<WholesalerPlans> getAllUserPlans(Integer userId , UserPlanRequest searchFilters){
         logger.debug("Entering getAllUserPlans with userId: {}, searchFilters: {}", userId, searchFilters);
         Specification<WholesalerPlans> specification = Specification.allOf(
                 PlansSpecifications.hasSlug(searchFilters.getSlug())
