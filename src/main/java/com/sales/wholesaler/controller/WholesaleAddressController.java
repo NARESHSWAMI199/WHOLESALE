@@ -27,7 +27,6 @@ public class WholesaleAddressController  {
     private final AddressService addressService;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleAddressController.class);
 
-    // TODO : Make sure we using dto
     @GetMapping("/city/{stateId}")
     @Operation(summary = "Get cities by state", description = "Retrieves the list of cities for a given state ID")
     public ResponseEntity<List<City>> getCityList(@PathVariable Integer stateId ) {
@@ -37,7 +36,6 @@ public class WholesaleAddressController  {
         return new ResponseEntity<>(cityList, HttpStatus.OK);
     }
 
-    // TODO : Make sure we using dto
     @GetMapping("/state")
     @Operation(summary = "Get all states", description = "Retrieves the list of all states")
     public ResponseEntity<List<State>> getStateList() {

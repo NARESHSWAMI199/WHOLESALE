@@ -6,6 +6,7 @@ import com.sales.entities.Wallet;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleWalletDto;
 import com.sales.wholesaler.services.WholesaleUserService;
 import com.sales.wholesaler.services.WholesaleWalletService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,12 +33,11 @@ public class WholesaleWalletController  {
     private final WholesaleUserService wholesaleUserService;
     private final WholesaleWalletService wholesaleWalletService;
 
-    // TODO : Make sure we using dto
     @GetMapping("/")
     @Operation(summary = "Get wallet details", description = "Retrieves the wallet details for the authenticated wholesaler user")
-    public ResponseEntity<Wallet> getWalletDetail(HttpServletRequest request){
+    public ResponseEntity<WholesaleWalletDto> getWalletDetail(HttpServletRequest request){
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        Wallet walletDetail = wholesaleWalletService.getWalletDetail(loggedUser.getId());
+        WholesaleWalletDto walletDetail = wholesaleWalletService.getWalletDetail(loggedUser.getId());
         return new ResponseEntity<>(walletDetail, HttpStatus.OK);
     }
 

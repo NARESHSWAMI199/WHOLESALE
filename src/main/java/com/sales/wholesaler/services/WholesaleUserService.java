@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.UserSpecifications.*;
@@ -313,7 +315,7 @@ public class WholesaleUserService  {
 
 
     /** Getting all retailers and wholesalers for chat purpose */
-    public Page<User> getAllUsers(UserSearchFilters filters, AuthUser loggedUser) {
+    public Page<WholesaleUserDto> getAllUsers(UserSearchFilters filters, AuthUser loggedUser) {
         logger.debug("Starting getAllUsers method with filters: {}, loggedUser: {}", filters, loggedUser);
         Specification<User> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()).or(containsEmail(filters.getSearchKey())))
@@ -323,9 +325,10 @@ public class WholesaleUserService  {
         );
 
         Pageable pageable = getPageable(logger,filters);
-        Page<User> users = wholesaleUserRepository.findAll(specification,pageable);
+        Page<User> usersPage = wholesaleUserRepository.findAll(specification,pageable);
+        List<WholesaleUserDto> wholesaleUserDtoList = usersPage.getContent().stream().map(wholesaleUserMapper::toDto).toList();
         logger.debug("Completed getAllUsers method");
-        return users;
+        return new PageImpl<>(wholesaleUserDtoList,pageable,usersPage.getTotalElements());
     }
 
 }

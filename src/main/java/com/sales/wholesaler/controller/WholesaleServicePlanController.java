@@ -9,6 +9,8 @@ import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleServicePlanDto;
+import com.sales.wholesaler.dto.WholesalerPlanDto;
 import com.sales.wholesaler.services.WholesaleServicePlanService;
 import com.sales.wholesaler.services.WholesaleUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,34 +42,32 @@ public class WholesaleServicePlanController  {
     private final UserCacheService userCacheService;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanController.class);
 
-    // TODO : Make sure we using dto
     @GetMapping("/all")
     @Operation(summary = "Get all service plans", description = "Retrieves a list of all available service plans")
-    public ResponseEntity<List<ServicePlan>> getAllPlans() {
+    public ResponseEntity<List<WholesaleServicePlanDto>> getAllPlans() {
         logger.debug("Starting getAllPlans method");
-        ResponseEntity<List<ServicePlan>> response = new ResponseEntity<>(wholesaleServicePlanService.getAllServicePlan(), HttpStatusCode.valueOf(200));
+        ResponseEntity<List<WholesaleServicePlanDto>> response = new ResponseEntity<>(wholesaleServicePlanService.getAllServicePlan(), HttpStatusCode.valueOf(200));
         logger.debug("Completed getAllPlans method");
         return response;
     }
 
-    // TODO : Make sure we using dto
     @GetMapping("detail/{slug}")
     @PreAuthorize("hasAuthority('wholesale.plan.detail')")
     @Operation(summary = "Get plan details by slug", description = "Retrieves detailed information for a specific service plan using its slug")
-    public ResponseEntity<ServicePlan> getPlanDetailBySlug(@PathVariable String slug) {
+    public ResponseEntity<WholesaleServicePlanDto> getPlanDetailBySlug(@PathVariable String slug) {
         logger.debug("Starting getPlanDetailBySlug method");
-        ResponseEntity<ServicePlan> response = new ResponseEntity<>(wholesaleServicePlanService.findBySlug(slug), HttpStatusCode.valueOf(200));
+        ResponseEntity<WholesaleServicePlanDto> response = new ResponseEntity<>(wholesaleServicePlanService.findBySlug(slug), HttpStatusCode.valueOf(200));
         logger.debug("Completed getPlanDetailBySlug method");
         return response;
     }
 
-    // TODO : Make sure we using dto
+
     @PostMapping("/my-plans")
     @Operation(summary = "Get my plans", description = "Retrieves a paginated list of all plans associated with the authenticated wholesaler")
-    public ResponseEntity<Page<WholesalerPlans>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanRequest searchFilters) {
+    public ResponseEntity<Page<WholesalerPlanDto>> getMyAllPlans(HttpServletRequest request, @RequestBody UserPlanRequest searchFilters) {
         logger.debug("Starting getMyAllPlans method");
         AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
-        Page<WholesalerPlans> allUserPlans = wholesaleServicePlanService.getAllUserPlans(loggedUser, searchFilters);
+        Page<WholesalerPlanDto> allUserPlans = wholesaleServicePlanService.getAllUserPlans(loggedUser, searchFilters);
         logger.debug("Completed getMyAllPlans method");
         return new ResponseEntity<>(allUserPlans, HttpStatusCode.valueOf(200));
     }

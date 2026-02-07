@@ -21,8 +21,10 @@ public class WholesalerPlans implements Serializable {
     String slug;
     @Column(name = "user_id")
     Integer userId;
-    @Column(name = "plan_id")
-    Integer servicePlanId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id", referencedColumnName = "id")
+    ServicePlan servicePlan;
     @Column(name = "created_at")
     Long createdAt;
     @Column(name = "expiry_date")

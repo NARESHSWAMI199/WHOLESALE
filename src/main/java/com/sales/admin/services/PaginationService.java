@@ -5,7 +5,7 @@ import com.sales.admin.repositories.PaginationHbRepository;
 import com.sales.admin.repositories.PaginationRepository;
 import com.sales.admin.repositories.UserPaginationsRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPaginationDto;
+import com.sales.dto.UserPaginationRequest;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
 import com.sales.entities.UserPagination;
@@ -77,10 +77,10 @@ public class PaginationService {
     }
 
 
-    public int updateUserPaginationRowsNumber(UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public int updateUserPaginationRowsNumber(UserPaginationRequest userPaginationRequest,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // Check required fields are not null
-        Utils.checkRequiredFields(userPaginationDto,List.of("paginationId","userId"));
-        return paginationHbRepository.updateUserPaginations(userPaginationDto.getPaginationId(),userPaginationDto);
+        Utils.checkRequiredFields(userPaginationRequest,List.of("paginationId","userId"));
+        return paginationHbRepository.updateUserPaginations(userPaginationRequest,loggedUser);
     }
 
 }

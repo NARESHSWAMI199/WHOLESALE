@@ -340,15 +340,12 @@ public class WholesaleUserController  {
 
 
     /** Returning a list of users where users are retailer and wholesaler only for chat purpose.*/
-
-    // TODO : Make sure we using dto
-
     @PostMapping("chat/users")
     @Operation(summary = "Get chat users", description = "Retrieves a list of users (retailers and wholesalers) for chat functionality")
-    public ResponseEntity<Page<User>> getAllChatUser(Authentication authentication,HttpServletRequest request, @RequestBody UserSearchFilters userSearchFilters){
+    public ResponseEntity<Page<WholesaleUserDto>> getAllChatUser(Authentication authentication,HttpServletRequest request, @RequestBody UserSearchFilters userSearchFilters){
         logger.debug("Starting getAllChatUser method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<User> allUsers = wholesaleUserService.getAllUsers(userSearchFilters, loggedUser);
+        Page<WholesaleUserDto> allUsers = wholesaleUserService.getAllUsers(userSearchFilters, loggedUser);
         logger.debug("Completed getAllChatUser method");
         return new ResponseEntity<>(allUsers,HttpStatus.OK);
     }

@@ -20,9 +20,13 @@ import com.sales.utils.DateUtils;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
+import com.sales.wholesaler.dto.WholesaleCategoryDto;
 import com.sales.wholesaler.dto.WholesaleItemDto;
 import com.sales.wholesaler.dto.WholesaleItemListDto;
+import com.sales.wholesaler.dto.WholesaleSubcategoryDto;
+import com.sales.wholesaler.mapper.WholesaleCategoryMapper;
 import com.sales.wholesaler.mapper.WholesaleItemMapper;
+import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +63,8 @@ public class WholesaleItemService  {
     private final WholesaleStoreRepository wholesaleStoreRepository;
     private final WriteExcelUtil writeExcel;
     private final WholesaleItemMapper wholesaleItemMapper;
+    private final WholesaleCategoryMapper wholesaleCategoryMapper;
+    private final WholesaleSubcategoryMapper wholesaleSubcategoryMapper;
 
     @Value("${item.absolute}")
     String itemImagePath;
@@ -401,18 +407,18 @@ public class WholesaleItemService  {
         return monthName;
     }
 
-    public List<ItemCategory> getAllCategory() {
+    public List<WholesaleCategoryDto> getAllCategory() {
         logger.debug("Starting getAllCategory method");
         Sort sort = Sort.by("category").ascending();
-        List<ItemCategory> categories = wholesaleItemCategoryRepository.findAll(sort);
+        List<WholesaleCategoryDto> categories = wholesaleItemCategoryRepository.findAll(sort).stream().map(wholesaleCategoryMapper::toDto).toList();
         logger.debug("Completed getAllCategory method");
         return categories;
     }
 
 
-    public List<ItemSubCategory> getAllItemsSubCategories(int categoryId) {
+    public List<WholesaleSubcategoryDto> getAllItemsSubCategories(int categoryId) {
         logger.debug("Starting getAllItemsSubCategories method with categoryId: {}", categoryId);
-        List<ItemSubCategory> subCategories = wholesaleItemSubCategoryRepository.getSubCategories(categoryId);
+        List<WholesaleSubcategoryDto> subCategories = wholesaleItemSubCategoryRepository.getSubCategories(categoryId).stream().map(wholesaleSubcategoryMapper::toDto).toList();
         logger.debug("Completed getAllItemsSubCategories method");
         return subCategories;
     }

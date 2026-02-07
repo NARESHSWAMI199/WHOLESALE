@@ -3,13 +3,14 @@ package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.PaginationRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPaginationDto;
+import com.sales.dto.UserPaginationRequest;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
 import com.sales.entities.UserPagination;
 import com.sales.global.USER_TYPES;
 import com.sales.specifications.PaginationSpecification;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.mapper.WholesaleUserPaginationMapper;
 import com.sales.wholesaler.repository.WholesalePaginationHbRepository;
 import com.sales.wholesaler.repository.WholesalePaginationRepository;
 import com.sales.wholesaler.repository.WholesaleUserPaginationsRepository;
@@ -32,6 +33,7 @@ public class WholesalePaginationService {
     private final WholesalePaginationRepository wholesalePaginationRepository;
     private final WholesalePaginationHbRepository wholesalePaginationHbRepository;
     private final PaginationRepository paginationRepository;
+    private final WholesaleUserPaginationMapper wholesaleUserPaginationMapper;
 
     public List<UserPagination> findAllUserPagination(){
         return wholesaleUserPaginationsRepository.findAll();
@@ -46,7 +48,7 @@ public class WholesalePaginationService {
             // remove all whitespaces and changed with uppercase like:
             // abc d → ABCD
             key = key.replaceAll("\\s+", "").toUpperCase();
-            result.put(key,userPagination);
+            result.put(key,wholesaleUserPaginationMapper.toDto(userPagination));
         }
         return result;
     }
@@ -82,11 +84,11 @@ public class WholesalePaginationService {
 
 
 
-    public int updateUserPaginationRowsNumber(UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public int updateUserPaginationRowsNumber(UserPaginationRequest userPaginationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // Check required fields are not null
-        Utils.checkRequiredFields(userPaginationDto,List.of("paginationId","userId","rowsNumber"));
+        Utils.checkRequiredFields(userPaginationRequest,List.of("paginationId","rowsNumber"));
         // check pagination field available or not
-        return wholesalePaginationHbRepository.updateUserPaginations(userPaginationDto.getPaginationId(),userPaginationDto);
+        return wholesalePaginationHbRepository.updateUserPaginations(userPaginationRequest,loggedUser);
     }
 
 }

@@ -9,6 +9,8 @@ import com.sales.entities.User;
 import com.sales.entities.Wallet;
 import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleWalletDto;
+import com.sales.wholesaler.mapper.WholesaleWalletMapper;
 import com.sales.wholesaler.repository.WholesaleNotificationRepository;
 import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleStoreRepository;
@@ -32,9 +34,11 @@ public class WholesaleWalletService  {
     private final WalletTransactionService walletTransactionService;
     private final WholesaleServicePlanService wholesaleServicePlanService;
     private final WholesaleNotificationRepository wholesaleNotificationRepository;
+    private final WholesaleWalletMapper wholesaleWalletMapper;
 
-    public Wallet getWalletDetail(Integer userId){
-        return wholesaleWalletRepository.findByUserId(userId);
+    public WholesaleWalletDto getWalletDetail(Integer userId){
+        Wallet wallet = wholesaleWalletRepository.findByUserId(userId);
+        return wholesaleWalletMapper.toDto(wallet);
     }
 
 

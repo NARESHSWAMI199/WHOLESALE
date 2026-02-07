@@ -9,8 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UserPaginationDto {
-    Integer userId;
+public class UserPaginationRequest {
     Integer paginationId;
     Integer rowsNumber;
 }

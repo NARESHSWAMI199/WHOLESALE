@@ -5,6 +5,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
+import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.services.WholesaleItemReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,14 +32,13 @@ public class WholesaleItemReviewController  {
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewController.class);
 
 
-    // TODO : Make sure we using dto
     @PostMapping("all")
     @PreAuthorize("hasAuthority('wholesale.review.all')")
     @Operation(summary = "Get all item reviews", description = "Retrieves a paginated list of all item reviews for the wholesaler based on filter criteria")
-    public ResponseEntity<Page<ItemReviews>> getAllReviews(Authentication authentication, @RequestBody ItemReviewsFilterDto ItemReviewsFilterDto, HttpServletRequest request) {
+    public ResponseEntity<Page<WholesaleItemReviewDto>> getAllReviews(Authentication authentication, @RequestBody ItemReviewsFilterDto ItemReviewsFilterDto, HttpServletRequest request) {
         logger.debug("Starting getAllUsers method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<ItemReviews> ItemReviewsPage = wholesaleItemReviewService.getAllItemReview(ItemReviewsFilterDto, loggedUser);
+        Page<WholesaleItemReviewDto> ItemReviewsPage = wholesaleItemReviewService.getAllItemReview(ItemReviewsFilterDto, loggedUser);
         logger.debug("Completed getAllUsers method");
         return new ResponseEntity<>(ItemReviewsPage, HttpStatus.OK);
     }

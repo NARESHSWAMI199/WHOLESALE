@@ -55,12 +55,12 @@ public class ItemReviews implements Serializable {
 
     @Transient
     Integer repliesCount;
-
-    @Transient
-    String username;
-    @Transient
-    String avatar;
-    @Transient
-    String userSlug;
+//
+//    @Transient
+//    String username;
+//    @Transient
+//    String avatar;
+//    @Transient
+//    String userSlug;
 
 }
