@@ -20,7 +20,7 @@ public record WholesaleItemDto(
         Integer totalReportsCount,
         String status,
         Long createdAt,
-        Long udpatedAt,
+        Long updatedAt,
         String slug,
         String inStock,
         Integer wholesaleId,
