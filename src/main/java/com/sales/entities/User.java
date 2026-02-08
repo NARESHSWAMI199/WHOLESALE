@@ -117,6 +117,6 @@ public class User implements AuthUser,Serializable{
 
     @Override
     public boolean isEnabled() {
-        return this.status.equals("A");
+        return "A".equals(this.status);
     }
 }

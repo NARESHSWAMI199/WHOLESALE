@@ -2,6 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
+import com.sales.entities.User;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
@@ -45,7 +46,7 @@ public class ItemHbRepository{
         query.setParameter("itemCategory" , itemRequest.getItemCategory());
         query.setParameter("itemSubCategory" , itemRequest.getItemSubCategory());
         query.setParameter("updatedAt" , Utils.getCurrentMillis());
-        query.setParameter("updatedBy" , loggedUser.getId());
+        query.setParameter("updatedBy" ,  User.builder().id(loggedUser.getId()).build());
         query.setParameter("slug", itemRequest.getSlug());
         return  query.executeUpdate();
     }
@@ -165,7 +166,7 @@ public class ItemHbRepository{
                 .setParameter("discount", itemRequest.getDiscount())
                 .setParameter("inStock", itemRequest.getInStock())
                 .setParameter("updatedAt", Utils.getCurrentMillis())
-                .setParameter("updatedBy", userId)
+                .setParameter("updatedBy",  User.builder().id(userId).build())
                 .setParameter("slug", itemRequest.getSlug())
                 .setParameter("wholesaleId",wholesaleId);
         return query.executeUpdate();

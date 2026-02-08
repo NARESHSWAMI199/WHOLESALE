@@ -107,7 +107,7 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
         query.setParameter("itemCategory" , WholesaleItemDto.getItemCategory());
         query.setParameter("itemSubCategory" , WholesaleItemDto.getItemSubCategory());
         query.setParameter("updatedAt" , Utils.getCurrentMillis());
-        query.setParameter("updatedBy" , loggedUser.getId());
+        query.setParameter("updatedBy" , User.builder().id(loggedUser.getId()).build());
         query.setParameter("slug", WholesaleItemDto.getSlug());
         query.setParameter("wholesaleId", WholesaleItemDto.getStoreId());
         return  query.executeUpdate();
@@ -178,7 +178,7 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
                 .setParameter("discount", WholesaleItemDto.getDiscount())
                 .setParameter("inStock", WholesaleItemDto.getInStock())
                 .setParameter("updatedAt", Utils.getCurrentMillis())
-                .setParameter("updatedBy", userId)
+                .setParameter("updatedBy",  User.builder().id(userId).build())
                 .setParameter("slug", WholesaleItemDto.getSlug())
                 .setParameter("wholesaleId",wholesaleId);
         return query.executeUpdate();

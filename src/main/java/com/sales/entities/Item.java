@@ -56,8 +56,10 @@ public class Item implements Serializable {
     User createdBy;
     @Column(name = "updated_at")
     Long updatedAt;
-    @Column(name = "updated_by")
-    Integer updatedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by")
+    User updatedBy;
     @Column(name = "slug")
     String slug;
     @Column(name = "in_stock")

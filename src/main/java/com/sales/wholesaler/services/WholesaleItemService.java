@@ -153,6 +153,7 @@ public class WholesaleItemService  {
 
 
 
+    @Transactional
     public WholesaleItemDto findItemBySLug(String slug) {
         logger.debug("Starting findItemBySLug method with slug: {}", slug);
         Item item = wholesaleItemRepository.findItemBySlug(slug);
@@ -260,6 +261,9 @@ public class WholesaleItemService  {
     @Transactional(rollbackOn = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
     public Item createItem (ItemRequest itemRequest, AuthUser loggedUser) throws MyException, IOException {
         logger.debug("Starting createItem method with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
+        User userForUpdate = User.builder()
+                .id(loggedUser.getId())
+                .build();
         String slug = UUID.randomUUID().toString();
         Item item = new Item();
         item.setWholesaleId(itemRequest.getStoreId());
@@ -271,8 +275,8 @@ public class WholesaleItemService  {
         item.setInStock(itemRequest.getInStock());
         item.setUpdatedAt(Utils.getCurrentMillis());
         item.setCreatedAt(Utils.getCurrentMillis());
-        item.setCreatedBy((User) loggedUser);
-        item.setUpdatedBy(loggedUser.getId());
+        item.setCreatedBy(userForUpdate);
+        item.setUpdatedBy(userForUpdate);
         item.setLabel(itemRequest.getLabel());
         item.setCapacity(itemRequest.getCapacity());
         item.setItemCategory(itemRequest.getItemCategory());

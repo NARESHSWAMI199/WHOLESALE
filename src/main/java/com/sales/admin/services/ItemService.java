@@ -226,6 +226,9 @@ public class ItemService {
         Item item = new Item();
         Store store = storeRepository.findStoreBySlug(itemRequest.getWholesaleSlug());
         if (store == null) throw new IllegalArgumentException("Not a valid store.");
+        User userForUpdate = User.builder()
+                .id(loggedUser.getId())
+                .build();
         String slug = UUID.randomUUID().toString();
         item.setWholesaleId(store.getId());
         item.setName(itemRequest.getName());
@@ -236,8 +239,8 @@ public class ItemService {
         item.setInStock(itemRequest.getInStock());
         item.setUpdatedAt(Utils.getCurrentMillis());
         item.setCreatedAt(Utils.getCurrentMillis());
-        item.setCreatedBy((User) loggedUser);
-        item.setUpdatedBy(loggedUser.getId());
+        item.setCreatedBy(userForUpdate);
+        item.setUpdatedBy(userForUpdate);
         item.setLabel(itemRequest.getLabel());
         item.setCapacity(itemRequest.getCapacity());
         item.setSlug(slug);

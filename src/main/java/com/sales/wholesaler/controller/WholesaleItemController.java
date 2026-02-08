@@ -79,10 +79,10 @@ public class WholesaleItemController  {
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable String slug) {
         logger.debug("Starting getItem method");
         Map<String, Object> responseObj = new HashMap<>();
-        WholesaleItemDto alItems = wholesaleItemService.findItemBySLug(slug);
-        if (alItems != null) {
+        WholesaleItemDto wholesaleItemDto = wholesaleItemService.findItemBySLug(slug);
+        if (wholesaleItemDto != null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put(ConstantResponseKeys.RES, alItems);
+            responseObj.put(ConstantResponseKeys.RES, wholesaleItemDto);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item Not Found");
