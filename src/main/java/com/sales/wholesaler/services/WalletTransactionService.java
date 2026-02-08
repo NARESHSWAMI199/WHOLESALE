@@ -4,10 +4,8 @@ import com.sales.dto.SearchFilters;
 import com.sales.dto.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
-import com.sales.entities.WalletTransaction_;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleWalletTransactionDto;
-import com.sales.wholesaler.mapper.WholesaleWalletTransactionMapper;
 import com.sales.wholesaler.repository.WalletTransactionHbRepository;
 import com.sales.wholesaler.repository.WalletTransactionRepository;
 import com.sales.wholesaler.repository.WholesaleWalletRepository;
@@ -49,7 +47,7 @@ public class WalletTransactionService {
 
 
 
-    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto,Integer userId) {
+    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto, Integer userId) {
         logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())

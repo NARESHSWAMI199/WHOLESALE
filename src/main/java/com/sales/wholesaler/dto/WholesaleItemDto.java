@@ -20,11 +20,13 @@ public record WholesaleItemDto(
         Integer totalReportsCount,
         String status,
         Long createdAt,
+        Long udpatedAt,
         String slug,
         String inStock,
         Integer wholesaleId,
         WholesaleCategoryDto itemCategory,
         WholesaleSubcategoryDto itemSubCategory,
-        WholesaleUserDto createdBy
+        WholesaleUserDto createdBy,
+        WholesaleUserDto updatedBy
 ) {
 }

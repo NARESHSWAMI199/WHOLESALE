@@ -52,7 +52,7 @@ public class StoreWalletTransactionService {
 
 
 
-    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto,Integer userId) {
+    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto, Integer userId) {
         logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())

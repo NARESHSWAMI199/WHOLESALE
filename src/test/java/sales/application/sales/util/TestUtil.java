@@ -204,8 +204,8 @@ public class TestUtil {
         String slug = UUID.randomUUID().toString();
         Address address = Address.builder()
                 .street("Test")
-                .state(city.getStateId())
-                .city(city.getId())
+                .state(State.builder().id(city.getStateId()).build() )
+                .city(city)
                 .slug(slug)
                 .build();
         return addressRepository.save(address);
@@ -269,7 +269,7 @@ public class TestUtil {
                 .expiryDate(futureDate.getTime())
                 .isExpired(false)
                 .slug(slug)
-                .servicePlanId(servicePlan.getId())
+                .servicePlan(servicePlan)
                 .build();
         return wholesalePlansRepository.save(wholesalerPlans);
     }

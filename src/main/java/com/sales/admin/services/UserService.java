@@ -101,8 +101,6 @@ public class UserService {
         props.put("mail.smtp.starttls.enable", "true");
 
         User user = userRepository.findUserByEmail(userRequest.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        if(user == null) throw new IllegalArgumentException("We are unable to send mail on this mail id "+userRequest.getEmail());
-        
         String recipient = user.getEmail();
         SupportEmail supportEmail =  supportEmailsRepository.findSupportEmailBySupportType("SUPPORT");
         if(Objects.isNull(supportEmail)) {

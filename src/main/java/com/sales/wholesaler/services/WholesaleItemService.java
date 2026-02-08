@@ -430,6 +430,7 @@ public class WholesaleItemService  {
 
 
 
+    @Transactional
     public String createItemsExcelSheet(ItemSearchFields searchFilters,AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         int wholesaleId = searchFilters.getStoreId();
@@ -446,7 +447,7 @@ public class WholesaleItemService  {
         List<Item> itemsList = wholesaleItemRepository.findAll(specification);
         Map<String,List<Object>> result = new HashMap<>();
         for (Item item : itemsList){
-            String items = new Gson().toJson(item);
+            String items = new Gson().toJson(wholesaleItemMapper.toDto(item));
             Map<String,Object> itemMap = new Gson().fromJson(items,Map.class);
             itemMap.forEach((key,value)->{
                 if(key.equals("wholesale")){

@@ -1,6 +1,7 @@
 INSERT IGNORE INTO item_subcategories
 (slug, category_id, subcategory, unit, icon, updated_at, is_deleted) VALUES
 
+('other',0,'Other',NULL,NULL,UNIX_TIMESTAMP()*1000,'N'),
 -- Groceries (1)
 ('rice',1,'Rice','kg',NULL,UNIX_TIMESTAMP()*1000,'N'),
 ('wheat-flour',1,'Wheat Flour','kg',NULL,UNIX_TIMESTAMP()*1000,'N'),
