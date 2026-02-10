@@ -140,7 +140,7 @@ public class UserControllerTest extends TestUtil {
                     "email" : "{email}",
                     "username" : "naresh swami",
                     "userType"  : "R",
-                    "contact" : "{contact}",
+                    "contact" : "{contact}"
                 }
                 """
                 .replace("{email}",randomEmail)
@@ -339,7 +339,7 @@ public class UserControllerTest extends TestUtil {
 
     @Test
     public void getRetailerWithoutLogin () throws Exception {
-        mockMvc.perform(get("/auth/admin/detail/"+GlobalConstantTest.RETAILER_SLUG))
+        mockMvc.perform(get("/admin/auth/detail/"+GlobalConstantTest.RETAILER_SLUG))
                 .andExpect(status().is(403))
                 .andDo(print());
     }

@@ -1,5 +1,6 @@
 package com.sales.admin.controllers;
 
+import com.sales.admin.dto.ItemDto;
 import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.admin.services.ItemService;
 import com.sales.admin.services.StoreService;
@@ -59,10 +60,10 @@ public class ItemController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
     @Operation(summary = "Get all items", description = "Retrieves a paginated list of all items with optional search filters")
-    public ResponseEntity<Page<Item>> getAllItem(Authentication authentication, @RequestBody ItemSearchFields searchFilters, HttpServletRequest request) {
+    public ResponseEntity<Page<ItemDto>> getAllItem(Authentication authentication, @RequestBody ItemSearchFields searchFilters, HttpServletRequest request) {
         logger.debug("Fetching all items with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<Item> alItems = itemService.getAllItems(searchFilters,loggedUser);
+        Page<ItemDto> alItems = itemService.getAllItems(searchFilters,loggedUser);
         return new ResponseEntity<>(alItems, HttpStatus.OK);
     }
 
@@ -72,10 +73,10 @@ public class ItemController  {
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable String slug) {
         logger.debug("Fetching item details for slug: {}", slug);
         Map<String, Object> responseObj = new HashMap<>();
-        Item alItems = itemService.findItemBySLug(slug);
-        if (alItems != null) {
+        ItemDto itemDto = itemService.findItemDtoBySlug(slug);
+        if (itemDto != null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put(ConstantResponseKeys.RES, alItems);
+            responseObj.put(ConstantResponseKeys.RES, itemDto);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item Not Found");

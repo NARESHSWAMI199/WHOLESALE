@@ -1,6 +1,7 @@
 package sales.application.sales.admin.services;
 
 import com.sales.SalesApplication;
+import com.sales.admin.dto.ItemDto;
 import com.sales.admin.services.ItemService;
 import com.sales.claims.SalesUser;
 import com.sales.dto.ItemSearchFields;
@@ -37,7 +38,7 @@ public class ItemServiceTest extends TestUtil {
         searchFilters.setStoreId(store.getId());
         User user = createUser(UUID.randomUUID().toString(), "test@example.com", "pass", GlobalConstantTest.ADMIN);
         SalesUser loggedUser = new SalesUser(user);
-        Page<Item> items = itemService.getAllItems(searchFilters, loggedUser);
+        Page<ItemDto> items = itemService.getAllItems(searchFilters, loggedUser);
         assertNotNull(items);
     }
 

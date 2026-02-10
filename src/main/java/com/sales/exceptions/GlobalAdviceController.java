@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +23,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartException;
 
 import java.io.FileNotFoundException;
+import java.nio.file.AccessDeniedException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +34,19 @@ public class GlobalAdviceController {
 
     
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
+
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AuthorizationDeniedException ex) {
+        logger.error("AuthorizationDeniedException: {}", ex.getMessage(),ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+        logger.error("AccessDeniedException: {}", ex.getMessage(),ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+    }
 
     @Transactional
     @ExceptionHandler(value = PermissionDeniedDataAccessException.class)

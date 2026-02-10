@@ -1,6 +1,7 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.ItemReportDto;
 import com.sales.admin.services.ItemReportService;
 import com.sales.dto.SearchFilters;
 import com.sales.entities.ItemReport;
@@ -26,8 +27,8 @@ public class ItemReportController {
     @PostMapping("all")
     @PreAuthorize("hasAuthority('item.report.all')")
     @Operation(summary = "Get all item reports", description = "Retrieves a paginated list of all item reports with optional search filters")
-    public ResponseEntity<Page<ItemReport>> findAllItemsReports(@RequestBody SearchFilters searchFilters){
-        Page<ItemReport> itemReports = itemReportService.getAllReportByItemId(searchFilters);
+    public ResponseEntity<Page<ItemReportDto>> findAllItemsReports(@RequestBody SearchFilters searchFilters){
+        Page<ItemReportDto> itemReports = itemReportService.getAllReportDtoByItemId(searchFilters);
         return new ResponseEntity<>(itemReports, HttpStatusCode.valueOf(200));
     }
 
