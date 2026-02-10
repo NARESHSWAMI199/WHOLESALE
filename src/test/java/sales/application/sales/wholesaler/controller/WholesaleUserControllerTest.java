@@ -181,7 +181,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
             mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/password")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andExpectAll(
-                    status().is(403)
+                    status().is(401)
             );
     }
 

@@ -39,7 +39,7 @@ public class DashboardControllerTest extends TestUtil {
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         ).andDo(print());
     }
 
@@ -66,7 +66,7 @@ public class DashboardControllerTest extends TestUtil {
     public void testCountWithoutLogin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/admin/dashboard/counts")
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         ).andDo(print());
     }
 

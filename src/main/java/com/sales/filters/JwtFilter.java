@@ -5,6 +5,7 @@ import com.sales.admin.repositories.UserRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
+import com.sales.config.UnAuthorizedPaths;
 import com.sales.entities.User;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
@@ -39,55 +40,13 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserCacheService userCacheService;
 
 
-    /* Paths which no need to authenticate */
-    String [] unAuthorizePaths = {"/admin/auth/login",
-            "/admin/auth/login/otp",
-            "/admin/auth/sendOtp",
-            "/admin/auth/register",
-            "/wholesale/auth/login",
-            "/wholesale/auth/register",
-            "/wholesale/auth/login/otp",
-            "/wholesale/auth/sendOtp",
-            "/wholesale/auth/register",
-            "/webjars/**",
-            "/admin/auth/profile/**",
-            "/wholesale/auth/profile/**",
-            "/admin/store/image/**",
-            "/admin/item/image/**",
-            "/pg/callback/**",
-            "/cashfree/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/api-docs/**",
-            "/plans/**",
-            "/wholesale/address/state",
-            "/wholesale/address/city/**",
-            "/wholesale/store/category/**",
-            "/wholesale/store/subcategory/**",
-            "/wholesale/auth/validate-otp",
-            "/wholesale/plan/all",
-            "/admin/auth/profile/**",
-            "/index",
-            "/chat2",
-            "/chat/images/**",
-            "/js/**",
-            "/css/**",
-            "/images/**",
-            /* Paths which need to be authenticated but don't need to check in Interceptor due to some different conditions */
-            "/wholesale/plan/my-plans",
-            "/wholesale/plan/is-active",
-            "/pg/pay/**",
-            "/wholesale/store/add",
-            "/wholesale/auth/detail",
-            "/future/plans/**",
-            "/wholesale/wallet/**"
-    };
+
     private final AntPathMatcher matcher = new AntPathMatcher();
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return Arrays.stream(unAuthorizePaths)
+        return Arrays.stream(UnAuthorizedPaths.unAuthorizePaths)
                 .anyMatch(pattern -> matcher.match(pattern, path));
     }
 

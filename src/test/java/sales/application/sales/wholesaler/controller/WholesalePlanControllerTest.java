@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {SalesApplication.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class WholesalePlanController extends TestUtil {
+public class WholesalePlanControllerTest extends TestUtil {
 
     private String token;
 

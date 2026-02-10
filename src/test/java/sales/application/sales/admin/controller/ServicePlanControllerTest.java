@@ -2,6 +2,7 @@ package sales.application.sales.admin.controller;
 
 
 import com.sales.SalesApplication;
+import com.sales.entities.ServicePlan;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +16,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import sales.application.sales.testglobal.GlobalConstantTest;
 import sales.application.sales.util.TestUtil;
 
+import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {SalesApplication.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class ServicePlanController extends TestUtil {
+public class ServicePlanControllerTest extends TestUtil {
 
 
     private String token;
@@ -148,6 +151,9 @@ public class ServicePlanController extends TestUtil {
     public void testGetAllUserPlansWithNoPlansWholesaler() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION,token);
+        ServicePlan servicePlan = createServicePlan(new Date());
+        System.err.println("serviceId : "+servicePlan.getId());
+        System.err.println("services : "+servicePlanRepository.findAll());
         String json = """
                     {}
                 """;
@@ -157,7 +163,7 @@ public class ServicePlanController extends TestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(headers)
         ).andExpectAll(
-                status().isOk()
+                status().is(406)
 //                jsonPath("$.numberOfElements", is(0 ))
         ).andDo(print());
     }

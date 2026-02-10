@@ -1,6 +1,8 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.PlanDto;
+import com.sales.admin.mapper.PlanMapper;
 import com.sales.admin.repositories.ServicePlanHbRepository;
 import com.sales.admin.repositories.ServicePlanRepository;
 import com.sales.admin.repositories.WholesalerPlansRepository;
@@ -15,15 +17,16 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.specifications.PlansSpecifications;
 import com.sales.specifications.ServicePlanSpecification;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -37,6 +40,7 @@ public class ServicePlanService {
     private final ServicePlanRepository servicePlanRepository;
     private final WholesalerPlansRepository wholesalerPlansRepository;
     private final ServicePlanHbRepository servicePlanHbRepository;
+    private final PlanMapper planMapper;
       
   private static final Logger logger = LoggerFactory.getLogger(ServicePlanService.class);
 
@@ -78,7 +82,8 @@ public class ServicePlanService {
         return false;
     }
 
-    public Page<WholesalerPlans> getAllUserPlans(Integer userId , UserPlanRequest searchFilters){
+    @Transactional
+    public Page<PlanDto> getAllUserPlans(Integer userId , UserPlanRequest searchFilters){
         logger.debug("Entering getAllUserPlans with userId: {}, searchFilters: {}", userId, searchFilters);
         Specification<WholesalerPlans> specification = Specification.allOf(
                 PlansSpecifications.hasSlug(searchFilters.getSlug())
@@ -91,8 +96,9 @@ public class ServicePlanService {
         );
         Pageable pageable = getPageable(logger,searchFilters);
         Page<WholesalerPlans> result = wholesalerPlansRepository.findAll(specification, pageable);
+        List<PlanDto> planDtoList = result.getContent().stream().map(planMapper::toDto).toList();
         logger.debug("Exiting getAllUserPlans");
-        return result;
+        return new PageImpl<>(planDtoList,pageable,result.getTotalElements());
     }
 
 

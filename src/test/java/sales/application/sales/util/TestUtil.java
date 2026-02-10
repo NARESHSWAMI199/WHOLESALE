@@ -234,15 +234,17 @@ public class TestUtil {
 
     public ServicePlan createServicePlan(Date currentTime) {
         ServicePlan servicePlan = ServicePlan.builder()
-                .name("Test Service plan")
+                .name("Test Service plan "+UUID.randomUUID())
                 .slug(UUID.randomUUID().toString())
                 .createdAt(currentTime.getTime())
-                .price(101L)
+                .price(new Random().nextLong())
                 .discount(0L)
+                .status("A")
                 .months(6)
                 .updatedAt(currentTime.getTime())
                 .createdBy(1)
                 .updatedBy(1)
+                .isDeleted("N")
                 .build();
         return servicePlanRepository.save(servicePlan);
     }

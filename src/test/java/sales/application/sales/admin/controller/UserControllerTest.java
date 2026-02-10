@@ -150,7 +150,7 @@ public class UserControllerTest extends TestUtil {
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().is(403))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -340,7 +340,7 @@ public class UserControllerTest extends TestUtil {
     @Test
     public void getRetailerWithoutLogin () throws Exception {
         mockMvc.perform(get("/admin/auth/detail/"+GlobalConstantTest.RETAILER_SLUG))
-                .andExpect(status().is(403))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -515,7 +515,7 @@ public class UserControllerTest extends TestUtil {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
-                .andExpect(status().is(403))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 

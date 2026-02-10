@@ -1,6 +1,7 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.PlanDto;
 import com.sales.admin.services.ServicePlanService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
@@ -12,6 +13,7 @@ import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -47,10 +50,11 @@ public class ServicePlanController  {
     @PostMapping(value = {"user-plans/{userSlug}","user-plans"})
     @PreAuthorize("hasAnyAuthority('user.plan.all','user.plan.detail')")
     @Operation(summary = "Get user plans", description = "Retrieves a paginated list of plans for a specific user or all users")
-    public ResponseEntity< Page<WholesalerPlans>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters){
+    public ResponseEntity< Page<PlanDto>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters){
         logger.debug("Fetching user plans for userSlug: {}", userSlug);
         Integer userId = userService.getUserIdBySlug(userSlug);
-        Page<WholesalerPlans> allUserPlans = servicePlanService.getAllUserPlans(userId, searchFilters);
+        if(!Utils.isEmpty(userSlug) && userId == null) throw new IllegalArgumentException("User not found.");
+        Page<PlanDto> allUserPlans = servicePlanService.getAllUserPlans(userId, searchFilters);
         return new ResponseEntity<>(allUserPlans,HttpStatus.OK);
     }
 
