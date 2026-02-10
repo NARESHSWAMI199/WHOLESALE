@@ -22,7 +22,6 @@
 				target/site/jacoco/jacoco.xml
 			</sonar.coverage.jacoco.xmlReportPaths>
 		<mapstruct.version>1.6.0</mapstruct.version>
-		<lombok.version>1.18.34</lombok.version>  <!-- or latest -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -242,15 +241,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-		<!-- H2 Database (In-Memory) -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>2.3.232</version>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -298,12 +288,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok-mapstruct-binding</artifactId>
