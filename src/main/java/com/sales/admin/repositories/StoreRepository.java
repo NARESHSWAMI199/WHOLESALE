@@ -1,6 +1,8 @@
 package com.sales.admin.repositories;
 
 import com.sales.entities.Store;
+import com.sales.entities.Store_;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -10,8 +12,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Integer> , JpaSpecificationExecutor<Store> {
 
+    @EntityGraph(attributePaths = {Store_.USER, Store_.ADDRESS, Store_.STORE_CATEGORY, Store_.STORE_SUB_CATEGORY}, type = EntityGraph.EntityGraphType.FETCH)
     Store findStoreBySlug(String slug);
 
+    @EntityGraph(attributePaths = {Store_.USER, Store_.ADDRESS, Store_.STORE_CATEGORY, Store_.STORE_SUB_CATEGORY}, type = EntityGraph.EntityGraphType.FETCH)
     Store findStoreByUserId(int userId);
 
     @Query(value = "select count(id) as count from Store")

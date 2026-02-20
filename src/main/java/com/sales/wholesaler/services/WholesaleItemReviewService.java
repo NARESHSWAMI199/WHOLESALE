@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class WholesaleItemReviewService  {
     private final WholesaleItemReviewMapper wholesaleItemReviewMapper;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewService.class);
 
+    @Transactional
     public Page<WholesaleItemReviewDto> getAllItemReview(ItemReviewsFilterDto filters, AuthUser loggedUser) {
         logger.debug("Starting getALlItemReview method with filters: {}, loggedUser: {}", filters, loggedUser);
         if(filters.getItemId() == 0) {
@@ -44,9 +46,8 @@ public class WholesaleItemReviewService  {
                         .and(isParentComment(filters.getParentId()))
         );
         Pageable pageable = getPageable(logger,filters);
-        Page<ItemReviews> all = wholesaleItemReviewRepository.findAll(specification, pageable);
-        List<WholesaleItemReviewDto> list = all.getContent().stream().map(wholesaleItemReviewMapper::toDto).toList();
-        return new PageImpl<>(list,pageable,all.getTotalElements());
+            Page<ItemReviews> all = wholesaleItemReviewRepository.findAll(specification, pageable);
+            return all.map(wholesaleItemReviewMapper::toDto);
     }
 
 

@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,12 +28,12 @@ public class ItemReportService {
     private final ItemReportRepository itemReportRepository;
     private final ItemReportMapper itemReportMapper;
 
+    @Transactional
     public Page<ItemReportDto> getAllReportDtoByItemId(SearchFilters searchFilters){
         Pageable pageable = getPageable(logger,searchFilters);
         Specification<ItemReport> specification = Specification.allOf(hasItemId(searchFilters.getItemId()));
         Page<ItemReport> itemReports = itemReportRepository.findAll(specification, pageable);
-        List<ItemReportDto> itemReportDtoList = itemReports.getContent().stream().map(itemReportMapper::toDto).toList();
-        return new PageImpl<>(itemReportDtoList,pageable,itemReports.getTotalElements());
+        return itemReports.map(itemReportMapper::toDto);
     }
 
 

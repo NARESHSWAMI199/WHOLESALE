@@ -1,10 +1,12 @@
 package com.sales.admin.controllers;
 
+import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.*;
 import com.sales.entities.Store;
+import com.sales.admin.dto.StoreDto;
 import com.sales.entities.StoreCategory;
 import com.sales.entities.StoreSubCategory;
 import com.sales.exceptions.MyException;
@@ -14,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,16 +48,19 @@ import java.util.Map;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreMapper storeMapper;
     
     private static final Logger logger = LoggerFactory.getLogger(StoreController.class);
 
+    @Transactional(readOnly = true)
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('store.all')")
     @Operation(summary = "Get all stores", description = "Retrieves a paginated list of all stores with optional search filters")
-    public ResponseEntity<Page<Store>> getAllStore(@RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody SearchFilters searchFilters){
         logger.debug("Fetching all stores with filters: {}", searchFilters);
         Page<Store> storePage =  storeService.getAllStore(searchFilters);
-        return new ResponseEntity<>(storePage, HttpStatus.OK);
+        Page<StoreDto> storeDtoPage = storePage.map(storeMapper::toDto);
+        return new ResponseEntity<>(storeDtoPage, HttpStatus.OK);
     }
 
     @Transactional
@@ -79,6 +84,7 @@ public class StoreController {
 
 
 
+    @Transactional(readOnly = true)
     @GetMapping("/detail/{slug}")
     @PreAuthorize("hasAuthority('store.detail')")
     @Operation(summary = "Get store details", description = "Retrieves detailed information about a store by its slug")
@@ -87,7 +93,7 @@ public class StoreController {
         Map<String,Object> responseObj = new HashMap<>();
         Store store = storeService.getStoreDetails(slug);
         if (store!= null){
-            responseObj.put(ConstantResponseKeys.RES, store);
+            responseObj.put(ConstantResponseKeys.RES, storeMapper.toDto(store));
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "No store found.");
@@ -97,6 +103,7 @@ public class StoreController {
     }
 
 
+    @Transactional(readOnly = true)
     @GetMapping("/detailbyuser/{userSLug}")
     @PreAuthorize("hasAuthority('store.user')")
     @Operation(summary = "Get store details by user slug", description = "Retrieves store details associated with a user by user slug")
@@ -105,7 +112,7 @@ public class StoreController {
         Map<String,Object> responseObj = new HashMap<>();
         Store store = storeService.getStoreByUserSlug(slug);
         if (store!= null){
-            responseObj.put(ConstantResponseKeys.RES, store);
+            responseObj.put(ConstantResponseKeys.RES, storeMapper.toDto(store));
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "No record found.");
@@ -213,7 +220,7 @@ public class StoreController {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
     @PostMapping("category")
     @Operation(summary = "Get all store categories", description = "Retrieves a list of all store categories with optional filters")
     public ResponseEntity<List<StoreCategory>> getAllStoreCategory(@RequestBody SearchFilters searchFilters) {
@@ -271,7 +278,7 @@ public class StoreController {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class ,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
     @PostMapping("subcategory")
     @Operation(summary = "Get all store subcategories", description = "Retrieves a list of all store subcategories with optional filters")
     public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@RequestBody SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {

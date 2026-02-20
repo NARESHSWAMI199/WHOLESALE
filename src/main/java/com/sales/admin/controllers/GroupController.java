@@ -1,6 +1,7 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.GroupDto;
 import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
@@ -12,7 +13,7 @@ import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,11 @@ public class GroupController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('group.all')")
     @Operation(summary = "Get all groups", description = "Retrieves a paginated list of all groups with optional search filters")
-    public ResponseEntity<Page<Group>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
+    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
         logger.debug("Fetching all groups with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<Group> storePage = groupService.getAllGroups(searchFilters, loggedUser);
-        return new ResponseEntity<>(storePage, HttpStatus.OK);
+        Page<GroupDto> groupDtoPage = groupService.getAllGroups(searchFilters, loggedUser);
+        return new ResponseEntity<>(groupDtoPage, HttpStatus.OK);
     }
 
     @GetMapping("/permissions/all")

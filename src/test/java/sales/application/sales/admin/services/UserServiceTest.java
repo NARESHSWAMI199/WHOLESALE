@@ -2,6 +2,7 @@ package sales.application.sales.admin.services;
 
 
 import com.sales.SalesApplication;
+import com.sales.admin.dto.UserDto;
 import com.sales.admin.services.UserService;
 import com.sales.claims.SalesUser;
 import com.sales.dto.UserSearchFilters;
@@ -78,7 +79,7 @@ public class UserServiceTest extends TestUtil {
         SalesUser loggedUser = new SalesUser(admin);
         UserSearchFilters filters = new UserSearchFilters();
         filters.setUserType("A"); // Set userType to avoid NPE
-        Page<User> users = userService.getAllUser(filters, loggedUser);
+        Page<UserDto> users = userService.getAllUser(filters, loggedUser);
         Assertions.assertNotNull(users);
     }
 

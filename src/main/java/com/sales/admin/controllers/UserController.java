@@ -1,6 +1,7 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.UserDto;
 import com.sales.admin.services.PaginationService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
@@ -15,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +57,12 @@ public class UserController  {
     @PreAuthorize("hasAuthority('user.all')")
     @PostMapping("/{userType}/all")
     @Operation(summary = "Get all users by type", description = "Retrieves a paginated list of users based on user type with optional search filters")
-    public ResponseEntity<Page<User>> getAllUsers(Authentication authentication,HttpServletRequest request,@RequestBody UserSearchFilters searchFilters, @PathVariable(required = true) String userType) {
+    public ResponseEntity<Page<UserDto>> getAllUsers(Authentication authentication, HttpServletRequest request, @RequestBody UserSearchFilters searchFilters, @PathVariable(required = true) String userType) {
         logger.info("authentication  authorities : {}",authentication.getAuthorities());
         logger.debug("Fetching all users of type: {}", userType);
         searchFilters.setUserType(userType);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<User> userPage = userService.getAllUser(searchFilters,loggedUser);
+        Page<UserDto> userPage = userService.getAllUser(searchFilters,loggedUser);
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 

@@ -14,7 +14,7 @@ import com.sales.wholesaler.mapper.WholesaleUserPaginationMapper;
 import com.sales.wholesaler.repository.WholesalePaginationHbRepository;
 import com.sales.wholesaler.repository.WholesalePaginationRepository;
 import com.sales.wholesaler.repository.WholesaleUserPaginationsRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.data.jpa.domain.Specification;
@@ -59,7 +59,7 @@ public class WholesalePaginationService {
     }
 
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public void setUserDefaultPaginationForSettings(User user) {
         Specification<Pagination> specification = Specification.allOf(PaginationSpecification.whoCanSee("B")
                 .or(PaginationSpecification.whoCanSee(USER_TYPES.WHOLESALER.getType()))
@@ -72,7 +72,7 @@ public class WholesalePaginationService {
         }
     }
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public UserPagination insertUserPagination(Pagination pagination,AuthUser loggedUser,Integer rowNumbers) {
         UserPagination userPagination = new UserPagination();
         Pagination savedPagination = paginationRepository.save(pagination);

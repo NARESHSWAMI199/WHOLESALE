@@ -1,6 +1,8 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.UserDto;
+import com.sales.admin.mapper.UserMapper;
 import com.sales.admin.repositories.*;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
@@ -15,7 +17,6 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +57,7 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final StoreService storeService;
     private final PaginationService paginationService;
+    private final UserMapper userMapper;
 
     @Value("${profile.absolute}")
     private String profilePath;
@@ -201,7 +204,8 @@ public class UserService {
 
 
 
-    public Page<User> getAllUser(UserSearchFilters filters, AuthUser loggedUser) {
+    @Transactional
+    public Page<UserDto> getAllUser(UserSearchFilters filters, AuthUser loggedUser) {
         logger.debug("Getting all users with filters: {}", filters);
        String notUserType = null;
         if(filters.getUserType().equals("SA") && loggedUser.getId() !=GlobalConstant.suId){
@@ -222,7 +226,8 @@ public class UserService {
         );
 
         Pageable pageable = getPageable(logger,filters);
-        return userRepository.findAll(specification, pageable);
+        Page<User> usersPage = userRepository.findAll(specification, pageable);
+        return usersPage.map(userMapper::toDto);
     }
 
 
@@ -289,7 +294,7 @@ public class UserService {
     /**
         @Important : There are two types of user @loggedUser and @requestUser both are different
      */
-    @Transactional(rollbackOn = {MyException.class, RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
     public Map<String, Object> createOrUpdateUser(UserRequest userRequest, AuthUser loggedUser,String path) throws MyException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Creating or updating user: {}", userRequest);
         Map<String, Object> responseObj = new HashMap<>();
@@ -429,7 +434,7 @@ public class UserService {
         return null;
     }
 
-    @Transactional(rollbackOn = {PermissionDeniedDataAccessException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {PermissionDeniedDataAccessException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
     public int deleteUserBySlug(DeleteDto deleteDto,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting user by slug: {}", deleteDto.getSlug());
         // if there is any required field null, then this will throw IllegalArgumentException
@@ -557,7 +562,7 @@ public class UserService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class,RuntimeException.class})
     public Map<String,Object> updateWholesalerPermissions(UserRequest userRequest) throws MyException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Updating wholesaler permissions for user with slug: {}", userRequest.getSlug());
         // Validating required field is there is any null field this will throw Exception

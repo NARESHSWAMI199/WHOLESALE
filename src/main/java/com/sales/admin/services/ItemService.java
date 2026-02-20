@@ -17,7 +17,7 @@ import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,9 +73,8 @@ public class ItemService {
         );
         Pageable pageable = PageRequest.of(searchFilters.getPageNumber(), searchFilters.getSize(), sort);
         Page<Item> result = itemRepository.findAll(specification, pageable);
-        List<ItemDto> itemDtoList = result.getContent().stream().map(itemMapper::toDto).toList();
         logger.debug("Exiting getAllItems");
-        return new PageImpl<>(itemDtoList,pageable,result.getTotalElements());
+        return result.map(itemMapper::toDto);
     }
 
 
@@ -173,7 +172,7 @@ public class ItemService {
         logger.debug("Exiting validateRequiredFieldsBeforeCreateItem");
     }
 
-    @Transactional(rollbackOn = {MyException.class, IllegalArgumentException.class, RuntimeException.class,})
+    @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class,})
     public Map<String, Object> createOrUpdateItem(ItemRequest itemRequest, AuthUser loggedUser, String path) throws InvocationTargetException, NoSuchMethodException, IOException, IllegalAccessException {
         logger.debug("Entering createOrUpdateItem with itemRequest: {}, loggedUser: {}, path: {}", itemRequest, loggedUser, path);
         // if there is any required field null, then this will throw IllegalArgumentException
@@ -348,7 +347,7 @@ public class ItemService {
     }
 
 
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
+    @Transactional(rollbackFor = {RuntimeException.class, Exception.class})
     public int insertAllItemsWithExcel(Map<String, List<String>> excel, Integer userId, Integer wholesaleId) {
         logger.debug("Entering insertAllItems with excel: {}, userId: {}, wholesaleId: {}", excel, userId, wholesaleId);
         userId = userId == null ? 0 : userId;
@@ -379,7 +378,7 @@ public class ItemService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class})
+    @Transactional(rollbackFor = {MyException.class})
     public List<ItemHbRepository.ItemUpdateError> updateItemsWithExcel(Map<String, List<String>> itemsData, Integer userId, Integer wholesaleId) {
         logger.debug("Updating items using excel sheet : {} and userId : {} and wholesaleId : {}", itemsData, userId, wholesaleId);
         List<String> prefix = List.of("N", "O", "Y"); // N=New or No | Y = Yes | O=Old
@@ -556,7 +555,7 @@ public class ItemService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class, RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
     public ItemCategory saveOrUpdateItemCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateItemCategory with categoryRequest: {}", categoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
@@ -572,7 +571,7 @@ public class ItemService {
         return result;
     }
 
-    @Transactional(rollbackOn = {MyException.class, RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
     public ItemSubCategory saveOrUpdateItemSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateItemSubCategory with subCategoryRequest: {}", subCategoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception

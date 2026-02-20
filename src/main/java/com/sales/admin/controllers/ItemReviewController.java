@@ -1,8 +1,8 @@
 package com.sales.admin.controllers;
 
+import com.sales.admin.dto.ItemReviewDto;
 import com.sales.admin.services.ItemReviewService;
 import com.sales.dto.ItemReviewsFilterDto;
-import com.sales.entities.ItemReviews;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,10 +30,10 @@ public class ItemReviewController  {
     @PostMapping("all")
     @PreAuthorize("hasAuthority('item.review.all')")
     @Operation(summary = "Get all item reviews", description = "Retrieves a paginated list of all item reviews with optional filters")
-    public ResponseEntity<Page<ItemReviews>> getAllReviews(@RequestBody ItemReviewsFilterDto ItemReviewsFilterDto, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Page<ItemReviewDto>> getAllReviews(@RequestBody ItemReviewsFilterDto ItemReviewsFilterDto, HttpServletRequest httpServletRequest) {
         logger.debug("Fetching all item comments with filters: {}", ItemReviewsFilterDto);
-        Page<ItemReviews > itemReviewsPage = itemReviewService.getAllItemReview(ItemReviewsFilterDto);
-        return new ResponseEntity<>(itemReviewsPage, HttpStatus.OK);
+        Page<ItemReviewDto> itemReviewDtoPage = itemReviewService.getAllItemReview(ItemReviewsFilterDto);
+        return new ResponseEntity<>(itemReviewDtoPage, HttpStatus.OK);
     }
 
 }

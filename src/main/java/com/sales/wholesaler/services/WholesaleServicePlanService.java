@@ -46,6 +46,7 @@ public class WholesaleServicePlanService {
 
     private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanService.class);
 
+    @Transactional
     public List<WholesaleServicePlanDto> getAllServicePlan() {
         logger.debug("Starting getALlServicePlan method");
         List<WholesaleServicePlanDto> servicePlans = wholesaleServicePlanRepository.findAll().stream().filter(servicePlan -> servicePlan.getPrice() > 0).map(wholesaleServicePlanMapper::toDto).toList();
@@ -53,6 +54,7 @@ public class WholesaleServicePlanService {
         return servicePlans;
     }
 
+    @Transactional
     public WholesaleServicePlanDto findBySlug(String slug) {
         logger.debug("Starting findBySlug method with params: {}", slug);
         ServicePlan servicePlan = wholesaleServicePlanRepository.findBySlug(slug);
@@ -168,14 +170,12 @@ public class WholesaleServicePlanService {
         );
         Pageable pageable = getPageable(logger, searchFilters);
         Page<WholesalerPlans> userPlans = wholesaleUserPlansRepository.findAll(specification, pageable);
-        List<WholesalerPlanDto> userPlansList = userPlans.getContent().stream().map(wholesalerPlan -> {
+        Page<WholesalerPlanDto> wholesalerPlans = userPlans.map(wholesalerPlan -> {
             if (Objects.nonNull(wholesalerPlan)) {
                 wholesalerPlan.setExpired(wholesalerPlan.getExpiryDate() < Utils.getCurrentMillis());
             }
-            return wholesalerPlan;
-        }).map(wholesalerPlanMapper::toDto).toList();
-        long totalElements = userPlans.getTotalElements();
-        Page<WholesalerPlanDto> wholesalerPlans = new PageImpl<>(userPlansList, pageable, totalElements);
+            return wholesalerPlanMapper.toDto(wholesalerPlan);
+        });
         logger.debug("Completed getAllUserPlans method");
         return wholesalerPlans;
     }

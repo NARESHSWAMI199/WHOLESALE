@@ -28,7 +28,7 @@ import com.sales.wholesaler.mapper.WholesaleCategoryMapper;
 import com.sales.wholesaler.mapper.WholesaleItemMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,7 +199,7 @@ public class WholesaleItemService  {
 
 
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
     public Map<String, Object> createOrUpdateItem(ItemRequest itemRequest, AuthUser loggedUser, String path) throws Exception {
         logger.debug("Starting createOrUpdateItem method with itemRequest: {}, loggedUser: {}, path: {}", itemRequest, loggedUser, path);
         // if there is any required field null then this will throw IllegalArgumentException
@@ -258,7 +258,7 @@ public class WholesaleItemService  {
         return responseObj;
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
     public Item createItem (ItemRequest itemRequest, AuthUser loggedUser) throws MyException, IOException {
         logger.debug("Starting createItem method with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         User userForUpdate = User.builder()
@@ -411,6 +411,7 @@ public class WholesaleItemService  {
         return monthName;
     }
 
+    @Transactional
     public List<WholesaleCategoryDto> getAllCategory() {
         logger.debug("Starting getAllCategory method");
         Sort sort = Sort.by("category").ascending();
@@ -420,6 +421,7 @@ public class WholesaleItemService  {
     }
 
 
+    @Transactional
     public List<WholesaleSubcategoryDto> getAllItemsSubCategories(int categoryId) {
         logger.debug("Starting getAllItemsSubCategories method with categoryId: {}", categoryId);
         List<WholesaleSubcategoryDto> subCategories = wholesaleItemSubCategoryRepository.getSubCategories(categoryId).stream().map(wholesaleSubcategoryMapper::toDto).toList();
@@ -489,7 +491,7 @@ public class WholesaleItemService  {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class})
+    @Transactional(rollbackFor = {MyException.class})
     public List<ItemHbRepository.ItemUpdateError> updateItemsWithExcel(Map<String,List<String>> itemsData, Integer userId){
         Integer wholesaleId = wholesaleStoreRepository.getStoreIdByUserId(userId);
         logger.debug("Updating items using excel sheet : {} and userId : {} and wholesaleId : {}",itemsData,userId,wholesaleId);

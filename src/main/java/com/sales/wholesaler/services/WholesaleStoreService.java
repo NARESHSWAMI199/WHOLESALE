@@ -21,7 +21,7 @@ import com.sales.wholesaler.mapper.WholesaleStoreMapper;
 import com.sales.wholesaler.mapper.WholesaleStoreNotificationMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class WholesaleStoreService  {
     @Value("${store.absolute}")
     String storeImagePath;
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
     public Map<String, Object> updateStoreBySlug(StoreRequest storeRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStoreBySlug method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
 
@@ -114,7 +114,7 @@ public class WholesaleStoreService  {
         return responseObj;
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
     public int updateStore(StoreRequest storeRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStore method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
         AddressRequest address = new AddressRequest();
@@ -187,7 +187,7 @@ public class WholesaleStoreService  {
         return null;
     }
 
-    @Transactional(rollbackOn = {MyException.class, IllegalArgumentException.class, RuntimeException.class, Exception.class})
+    @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class, Exception.class})
     public Store createStore(StoreRequest storeRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting createStore method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
 
@@ -274,16 +274,15 @@ public class WholesaleStoreService  {
         return addressRequest;
     }
 
+    @Transactional
     public Page<WholesaleStoreNotificationDto> getAllStoreNotification(SearchFilters filters, AuthUser loggedUser) {
         logger.debug("Starting getAllStoreNotification method with filters: {}, loggedUser: {}", filters, loggedUser);
         Integer storeId = wholesaleStoreRepository.getStoreIdByUserId(loggedUser.getId());
         Specification<StoreNotifications> specification = Specification.allOf(isUserId(loggedUser.getId()).or(isWholesaleId(storeId)));
         Pageable pageable = getPageable(logger,filters);
         Page<StoreNotifications> notificationsPage = wholesaleNotificationRepository.findAll(specification, pageable);
-        List<WholesaleStoreNotificationDto> notificationDtoList = notificationsPage.getContent().stream().map(wholesaleStoreNotificationMapper::toDto).toList();
-        Page<WholesaleStoreNotificationDto> notifications = new PageImpl<>(notificationDtoList, pageable, notificationsPage.getTotalElements());
         logger.debug("Completed getAllStoreNotification method");
-        return notifications;
+        return notificationsPage.map(wholesaleStoreNotificationMapper::toDto);
     }
 
     public void updateSeen(StoreRequest storeRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -297,6 +296,7 @@ public class WholesaleStoreService  {
         logger.debug("Completed updateSeen method");
     }
 
+    @Transactional
     public List<WholesaleCategoryDto> getAllStoreCategory() {
         logger.debug("Starting getAllStoreCategory method");
         Sort sort = Sort.by("category").ascending();
@@ -305,6 +305,7 @@ public class WholesaleStoreService  {
         return categories;
     }
 
+    @Transactional
     public List<WholesaleSubcategoryDto> getAllStoreSubCategories(int categoryId) {
         logger.debug("Starting getAllStoreSubCategories method with categoryId: {}", categoryId);
         List<WholesaleSubcategoryDto> subCategories = wholesaleSubCategoryRepository.getSubCategories(categoryId).stream().map(wholesaleSubCategoryMapper::toDto).toList();

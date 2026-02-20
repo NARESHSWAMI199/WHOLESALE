@@ -10,7 +10,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +147,7 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
     public Map<String, Object> createOrUpdateStore(StoreRequest storeRequest, AuthUser loggedUser, String path) throws MyException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering createOrUpdateStore with storeRequest: {}, loggedUser: {}, path: {}", storeRequest, loggedUser, path);
             Map<String, Object> responseObj = new HashMap<>();
@@ -221,7 +221,7 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
     public Store createStore(StoreRequest storeRequest , AuthUser loggedUser) throws MyException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering createStore with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
         /** inserting address during create a wholesale */
@@ -250,7 +250,7 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
-    @Transactional(rollbackOn = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class,IllegalArgumentException.class,RuntimeException.class})
     public int updateStore(StoreRequest storeRequest, AuthUser loggedUser){
         logger.debug("Entering updateStore with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
         AddressRequest address = new AddressRequest();
@@ -267,7 +267,7 @@ public class StoreService {
         return result;
     }
 
-    @Transactional(rollbackOn = {MyException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {MyException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
     public int deleteStoreBySlug(DeleteDto deleteDto,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering deleteStoreBySlug with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
         // Validate required fields. if we found any required field this will throw IllegalArgumentException
@@ -320,7 +320,7 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, MyException.class,RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class,RuntimeException.class,Exception.class})
     public int updateStatusBySlug(StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering updateStatusBySlug with statusDto: {}", statusDto);
         // Validate required fields. if we found any required field this will throw IllegalArgumentException
@@ -344,7 +344,7 @@ public class StoreService {
 
 
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, MyException.class,RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class,RuntimeException.class,Exception.class})
     public int updateStoreImage(MultipartFile storeImage, String slug) throws MyException, IOException {
         logger.debug("Entering updateStoreImage with storeImage: {}, slug: {}", storeImage, slug);
         if(storeImage !=null ) {
@@ -392,7 +392,7 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackOn = {MyException.class ,IllegalArgumentException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class ,IllegalArgumentException.class,RuntimeException.class})
     public StoreCategory saveOrUpdateStoreCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateStoreCategory with categoryRequest: {}", categoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
@@ -408,7 +408,7 @@ public class StoreService {
         return result;
     }
 
-    @Transactional(rollbackOn = {MyException.class ,IllegalArgumentException.class,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class ,IllegalArgumentException.class,RuntimeException.class})
     public StoreSubCategory saveOrUpdateStoreSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateStoreSubCategory with subCategoryRequest: {}", subCategoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception

@@ -7,7 +7,7 @@ import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PermissionDeniedDataAccessException;

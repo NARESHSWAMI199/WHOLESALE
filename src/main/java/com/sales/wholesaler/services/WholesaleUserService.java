@@ -17,7 +17,7 @@ import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleSupportEmailsRepository;
 import com.sales.wholesaler.repository.WholesaleUserHbRepository;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -325,10 +325,66 @@ public class WholesaleUserService  {
         );
 
         Pageable pageable = getPageable(logger,filters);
-        Page<User> usersPage = wholesaleUserRepository.findAll(specification,pageable);
-        List<WholesaleUserDto> wholesaleUserDtoList = usersPage.getContent().stream().map(wholesaleUserMapper::toDto).toList();
-        logger.debug("Completed getAllUsers method");
-        return new PageImpl<>(wholesaleUserDtoList,pageable,usersPage.getTotalElements());
+                Page<User> usersPage = wholesaleUserRepository.findAll(specification, pageable);
+                return usersPage.map(wholesaleUserMapper::toDto);
+    }
+
+    /**
+     * DTO returning methods - These wrap entity methods and apply mapper in service layer only
+     * Following the pattern: mappers should only be used in service layer
+     */
+
+    @Transactional
+    public WholesaleUserDto convertUserToDto(User user) {
+        logger.debug("Starting convertUserToDto method with user: {}", user);
+        WholesaleUserDto result = user != null ? wholesaleUserMapper.toDto(user) : null;
+        logger.debug("Completed convertUserToDto method");
+        return result;
+    }
+
+    @Transactional
+    public WholesaleUserDto findByEmailAndPasswordDto(Map<String,String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting findByEmailAndPasswordDto method with param: {}", param);
+        User user = findByEmailAndPassword(param);
+        WholesaleUserDto result = user != null ? wholesaleUserMapper.toDto(user) : null;
+        logger.debug("Completed findByEmailAndPasswordDto method");
+        return result;
+    }
+
+    @Transactional
+    public WholesaleUserDto findUserByOtpAndSlugDto(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting findUserByOtpAndSlugDto method with userRequest: {}", userRequest);
+        User user = findUserByOtpAndSlug(userRequest);
+        WholesaleUserDto result = user != null ? wholesaleUserMapper.toDto(user) : null;
+        logger.debug("Completed findUserByOtpAndSlugDto method");
+        return result;
+    }
+
+    @Transactional
+    public WholesaleUserDto findUserByOtpAndEmailDto(UserRequest userRequest) {
+        logger.debug("Starting findUserByOtpAndEmailDto method with userRequest: {}", userRequest);
+        User user = findUserByOtpAndEmail(userRequest);
+        WholesaleUserDto result = user != null ? wholesaleUserMapper.toDto(user) : null;
+        logger.debug("Completed findUserByOtpAndEmailDto method");
+        return result;
+    }
+
+    @Transactional
+    public WholesaleUserDto resetPasswordByUserSlugDto(PasswordDto passwordDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting resetPasswordByUserSlugDto method with passwordDto: {}, loggedUser: {}", passwordDto, loggedUser);
+        User updatedUser = resetPasswordByUserSlug(passwordDto, loggedUser);
+        WholesaleUserDto result = wholesaleUserMapper.toDto(updatedUser);
+        logger.debug("Completed resetPasswordByUserSlugDto method");
+        return result;
+    }
+
+    @Transactional
+    public WholesaleUserDto addNewUserDto(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting addNewUserDto method with userRequest: {}", userRequest);
+        User insertedUser = addNewUser(userRequest);
+        WholesaleUserDto result = wholesaleUserMapper.toDto(insertedUser);
+        logger.debug("Completed addNewUserDto method");
+        return result;
     }
 
 }

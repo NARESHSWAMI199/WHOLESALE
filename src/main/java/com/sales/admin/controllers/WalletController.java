@@ -1,8 +1,8 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.WalletDto;
 import com.sales.admin.services.WalletService;
-import com.sales.entities.Wallet;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,8 +30,8 @@ public class WalletController  {
     @PreAuthorize("hasAuthority('wallet.detail')")
     @GetMapping("/{userSlug}")
     @Operation(summary = "Get wallet details", description = "Retrieves wallet details for a specific user")
-    public ResponseEntity<Wallet> getWalletDetail(@PathVariable String userSlug, HttpServletRequest request){
-        Wallet walletDetail = walletService.getWalletDetail(userSlug);
+    public ResponseEntity<WalletDto> getWalletDetail(@PathVariable String userSlug, HttpServletRequest request){
+        WalletDto walletDetail = walletService.getWalletDetail(userSlug);
         return new ResponseEntity<>(walletDetail, HttpStatus.OK);
     }
 

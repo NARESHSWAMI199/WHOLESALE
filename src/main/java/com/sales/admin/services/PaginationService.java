@@ -11,7 +11,7 @@ import com.sales.entities.User;
 import com.sales.entities.UserPagination;
 import com.sales.specifications.PaginationSpecification;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,7 +53,7 @@ public class PaginationService {
         return paginationRepository.findByFieldFor(fieldsFor);
     }
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public void setUserDefaultPaginationForSettings(User user) {
         Specification<Pagination> specification = Specification.allOf(PaginationSpecification.whoCanSee("B")
                 .or(PaginationSpecification.whoCanSee(user.getUserType()))
@@ -66,7 +66,7 @@ public class PaginationService {
         }
     }
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public UserPagination insertUserPagination(Pagination pagination,AuthUser loggedUser,Integer rowNumbers) {
         UserPagination userPagination = new UserPagination();
         Pagination savedPagination = paginationRepository.save(pagination);

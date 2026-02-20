@@ -11,7 +11,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class ChatRoomService  {
     }
 
 
-    @Transactional(rollbackOn = {NotFoundException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {NotFoundException.class, RuntimeException.class,Exception.class})
     public ChatRoom createRoom(ChatRoomDto chatRoomDto) {
         // saving room
         ChatRoom chatRoom = ChatRoom.builder()

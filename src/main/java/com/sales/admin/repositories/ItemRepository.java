@@ -2,6 +2,8 @@ package com.sales.admin.repositories;
 
 
 import com.sales.entities.Item;
+import com.sales.entities.Item_;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +23,7 @@ public interface ItemRepository  extends JpaRepository<Item, Long> , JpaSpecific
                                             @Param("toDate") Long toDate);
 
 
+   @EntityGraph(attributePaths = {Item_.ITEM_CATEGORY, Item_.ITEM_SUB_CATEGORY}, type = EntityGraph.EntityGraphType.FETCH)
    Item findItemBySlug(String slug);
 
    @Query(value = "select count(id) as count from Item")

@@ -2,7 +2,7 @@ package com.sales.exceptions;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sales.dto.ErrorDto;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;

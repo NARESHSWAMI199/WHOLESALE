@@ -15,7 +15,7 @@ import com.sales.wholesaler.repository.WholesaleNotificationRepository;
 import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleStoreRepository;
 import com.sales.wholesaler.repository.WholesaleWalletRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

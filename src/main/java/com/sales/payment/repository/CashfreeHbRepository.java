@@ -4,7 +4,7 @@ package com.sales.payment.repository;
 import com.sales.dto.CashfreeRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

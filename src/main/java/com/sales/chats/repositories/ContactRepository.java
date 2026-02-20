@@ -4,7 +4,7 @@ package com.sales.chats.repositories;
 import com.sales.claims.AuthUser;
 import com.sales.entities.Contact;
 import com.sales.entities.User;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

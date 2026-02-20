@@ -1,6 +1,8 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.GroupDto;
+import com.sales.admin.mapper.GroupMapper;
 import com.sales.admin.repositories.GroupRepository;
 import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
@@ -17,7 +19,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +47,12 @@ public class GroupService {
     private final PermissionRepository permissionRepository;
     private final PermissionHbRepository permissionHbRepository;
     private final UserCacheService userCacheService;
+    private final GroupMapper groupMapper;
     
     private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
-    public Page<Group> getAllGroups(SearchFilters filters, AuthUser loggedUser) {
+    @Transactional(readOnly = true)
+    public Page<GroupDto> getAllGroups(SearchFilters filters, AuthUser loggedUser) {
         logger.debug("Entering getAllGroups with filters: {}, loggedUser: {}", filters, loggedUser);
         Specification<Group> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))
@@ -60,7 +64,7 @@ public class GroupService {
         Pageable pageable = getPageable(logger,filters);
         Page<Group> result = groupRepository.findAll(specification, pageable);
         logger.debug("Exiting getAllGroups with result: {}", result);
-        return result;
+        return result.map(groupMapper::toDto);
     }
 
     public void validateRequiredFieldsForGroup(GroupRequest groupRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -71,7 +75,7 @@ public class GroupService {
         logger.debug("Exiting validateRequiredFieldsForGroup");
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, NotFoundException.class, RuntimeException.class, Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, NotFoundException.class, RuntimeException.class, Exception.class})
     public Map<String, Object> createOrUpdateGroup(GroupRequest groupRequest, AuthUser loggedUser, String path) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering createOrUpdateGroup with groupRequest: {}, loggedUser: {}, path: {}", groupRequest, loggedUser, path);
         Map<String, Object> responseObject = new HashMap<>();
@@ -161,7 +165,7 @@ public class GroupService {
         return formattedPermissions;
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, PermissionDeniedDataAccessException.class, RuntimeException.class, Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, PermissionDeniedDataAccessException.class, RuntimeException.class, Exception.class})
     public int deleteGroupBySlug(DeleteDto deleteDto, AuthUser loggedUser) throws Exception {
         logger.debug("Entering deleteGroupBySlug with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
         // if there is any required field null then this will throw IllegalArgumentException

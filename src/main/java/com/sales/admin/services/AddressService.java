@@ -7,7 +7,7 @@ import com.sales.dto.AddressRequest;
 import com.sales.entities.Address;
 import com.sales.entities.City;
 import com.sales.entities.State;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

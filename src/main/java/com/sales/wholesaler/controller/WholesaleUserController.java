@@ -15,7 +15,6 @@ import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleStoreDto;
 import com.sales.wholesaler.dto.WholesaleUserDto;
-import com.sales.wholesaler.mapper.WholesaleUserMapper;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import com.sales.wholesaler.services.WholesaleUserService;
@@ -24,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,6 @@ public class WholesaleUserController  {
     private final JwtToken jwtToken;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleUserController.class);
     private final UserCacheService userCacheService;
-    private final WholesaleUserMapper wholesaleUserMapper;
 
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
@@ -89,7 +87,8 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto storeDetails = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
             Map<String,Object> paginationObj = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
-            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
+            WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
+            responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, storeDetails);
             responseObj.put(ConstantResponseKeys.PAGINATIONS, paginationObj);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -117,8 +116,9 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
+            responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, store);
             responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -154,9 +154,10 @@ public class WholesaleUserController  {
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
-            responseObj.put(ConstantResponseKeys.USER, wholesaleUserMapper.toDto(user));
+            responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, store);
             responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -234,7 +235,6 @@ public class WholesaleUserController  {
 
 
 
-    @Transactional
     @PostMapping("/password")
     @PreAuthorize("hasAuthority('wholesale.password.reset')")
     @Operation(summary = "Reset user password", description = "Resets the password for the authenticated wholesaler user")
@@ -242,8 +242,8 @@ public class WholesaleUserController  {
         logger.debug("Starting resetUserPasswordBySlug method");
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        User updatedUser = wholesaleUserService.resetPasswordByUserSlug(passwordDto,loggedUser);
-        responseObj.put(ConstantResponseKeys.RES,wholesaleUserMapper.toDto(updatedUser));
+        WholesaleUserDto updatedUserDto = wholesaleUserService.resetPasswordByUserSlugDto(passwordDto,loggedUser);
+        responseObj.put(ConstantResponseKeys.RES,updatedUserDto);
         responseObj.put(ConstantResponseKeys.MESSAGE, "User password has been successfully updated.");
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed resetUserPasswordBySlug method");
@@ -304,8 +304,8 @@ public class WholesaleUserController  {
     public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewUser method");
         Map<String,Object> result = new HashMap<>();
-        User insertedUser = wholesaleUserService.addNewUser(userRequest);
-        result.put("user",wholesaleUserMapper.toDto(insertedUser));
+        WholesaleUserDto insertedUserDto = wholesaleUserService.addNewUserDto(userRequest);
+        result.put("user",insertedUserDto);
         result.put(ConstantResponseKeys.MESSAGE, "User created successfully");
         result.put(ConstantResponseKeys.STATUS, 201);
         logger.debug("Completed addNewUser method");

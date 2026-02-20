@@ -3,6 +3,7 @@ package com.sales.admin.services;
 
 import com.sales.admin.dto.PlanDto;
 import com.sales.admin.mapper.PlanMapper;
+import com.sales.admin.mapper.ServicePlanMapper;
 import com.sales.admin.repositories.ServicePlanHbRepository;
 import com.sales.admin.repositories.ServicePlanRepository;
 import com.sales.admin.repositories.WholesalerPlansRepository;
@@ -41,10 +42,12 @@ public class ServicePlanService {
     private final WholesalerPlansRepository wholesalerPlansRepository;
     private final ServicePlanHbRepository servicePlanHbRepository;
     private final PlanMapper planMapper;
+    private final ServicePlanMapper servicePlanMapper;
       
   private static final Logger logger = LoggerFactory.getLogger(ServicePlanService.class);
 
-    public Page<ServicePlan> getALlServicePlan(ServicePlanDto servicePlanDto){
+    @Transactional(readOnly = true)
+    public Page<ServicePlanDto> getALlServicePlan(ServicePlanDto servicePlanDto){
         logger.debug("Entering getALlServicePlan with servicePlanDto: {}", servicePlanDto);
         Specification<ServicePlan> specification = Specification.allOf(
                 ServicePlanSpecification.containsName(servicePlanDto.getName())
@@ -56,7 +59,7 @@ public class ServicePlanService {
         Pageable pageable = getPageable(logger,servicePlanDto);
         Page<ServicePlan> result = servicePlanRepository.findAll(specification,pageable);
         logger.debug("Exiting getALlServicePlan");
-        return result;
+        return result.map(servicePlanMapper::toDto);
     }
 
     public ServicePlan findBySlug(String slug){
@@ -96,9 +99,8 @@ public class ServicePlanService {
         );
         Pageable pageable = getPageable(logger,searchFilters);
         Page<WholesalerPlans> result = wholesalerPlansRepository.findAll(specification, pageable);
-        List<PlanDto> planDtoList = result.getContent().stream().map(planMapper::toDto).toList();
         logger.debug("Exiting getAllUserPlans");
-        return new PageImpl<>(planDtoList,pageable,result.getTotalElements());
+        return result.map(planMapper::toDto);
     }
 
 

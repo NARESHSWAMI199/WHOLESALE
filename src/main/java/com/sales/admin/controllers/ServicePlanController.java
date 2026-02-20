@@ -62,9 +62,10 @@ public class ServicePlanController  {
     @PostMapping("service-plans")
     @PreAuthorize("hasAuthority('service-plans.all')")
     @Operation(summary = "Get all service plans", description = "Retrieves a paginated list of all service plans with optional filters")
-    public ResponseEntity<Page<ServicePlan>> getAllPlans(@RequestBody ServicePlanDto servicePlanDto) {
+    public ResponseEntity<Page<ServicePlanDto>> getAllPlans(@RequestBody ServicePlanDto servicePlanDto) {
         logger.debug("Fetching all service plans with filters: {}", servicePlanDto);
-        return new ResponseEntity<>(servicePlanService.getALlServicePlan(servicePlanDto), HttpStatusCode.valueOf(200));
+        Page<ServicePlanDto> servicePlanDtoPage = servicePlanService.getALlServicePlan(servicePlanDto);
+        return new ResponseEntity<>(servicePlanDtoPage, HttpStatusCode.valueOf(200));
     }
 
 

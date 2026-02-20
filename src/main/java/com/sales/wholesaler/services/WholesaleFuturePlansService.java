@@ -36,8 +36,7 @@ public class WholesaleFuturePlansService  {
     public Page<WholesalerFuturePlanDto> getWholesalerFuturePlans(AuthUser loggedUser, SearchFilters filters) {
         Pageable pageable = getPageable(logger,filters);
         Page<WholesalerFuturePlan> wholesalerFuturePlanPage = wholesaleFuturePlansRepository.findWholesalerFuturePlansByUserIdAndStatus(pageable, loggedUser.getId(), "N");// Getting only new not old or used.
-        List<WholesalerFuturePlanDto> list = wholesalerFuturePlanPage.getContent().stream().map(wholesalerFuturePlanMapper::toDto).toList();
-        return  new PageImpl<>(list,pageable,wholesalerFuturePlanPage.getTotalElements());
+        return wholesalerFuturePlanPage.map(wholesalerFuturePlanMapper::toDto);
     }
 
 

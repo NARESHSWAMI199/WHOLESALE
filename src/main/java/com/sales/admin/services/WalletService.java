@@ -1,6 +1,8 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.WalletDto;
+import com.sales.admin.mapper.WalletMapper;
 import com.sales.admin.repositories.StoreHbRepository;
 import com.sales.admin.repositories.StoreRepository;
 import com.sales.admin.repositories.UserRepository;
@@ -15,7 +17,7 @@ import com.sales.entities.Wallet;
 import com.sales.exceptions.NotFoundException;
 import com.sales.wholesaler.services.WalletTransactionService;
 import com.sales.wholesaler.services.WholesaleServicePlanService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +34,15 @@ public class WalletService {
     private final ServicePlanService servicePlanService;
     private final WholesaleServicePlanService wholesaleServicePlanService;
     private final WalletTransactionService walletTransactionService;
+    private final WalletMapper walletMapper;
     private static final Logger logger = LoggerFactory.getLogger(WalletService.class);
 
-    public Wallet getWalletDetail(String userSlug){
+    @Transactional(readOnly = true)
+    public WalletDto getWalletDetail(String userSlug){
         Integer userId = userRepository.getUserIdBySlug(userSlug);
         if (userId == null) throw new NotFoundException("Wallet user details not found.");
-        return walletRepository.findByUserId(userId);
+        Wallet wallet = walletRepository.findByUserId(userId);
+        return walletMapper.toDto(wallet);
     }
 
 
