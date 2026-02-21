@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.multipart.MultipartException;
 
 import java.io.FileNotFoundException;
@@ -78,6 +79,19 @@ public class GlobalAdviceController {
     public ErrorDto jsonMappingExceptionHandle (JsonMappingException ex , WebRequest request){
         logger.error("JsonMappingException: {}", ex.getMessage(),ex);
         return new ErrorDto(ex.getMessage(), 406);
+    }
+
+    @Transactional
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorDto handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
+        logger.error("MethodArgumentNotValidException: {}", ex.getMessage(), ex);
+        StringBuilder sb = new StringBuilder();
+        ex.getBindingResult().getFieldErrors().forEach(fe -> {
+            sb.append(fe.getField()).append(" ").append(fe.getDefaultMessage()).append("; ");
+        });
+        String msg = sb.length() == 0 ? "Validation failed" : sb.toString().trim();
+        return new ErrorDto(msg, 400);
     }
 
     @Transactional

@@ -40,7 +40,9 @@ public class ChatRoomControllerTest extends TestUtil {
 
     @Test
     public void getAllChatRoomsShouldReturnList() throws Exception {
-        mockMvc.perform(get("/chat_room/all"))
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        mockMvc.perform(get("/chat_room/all").headers(headers))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -50,16 +52,43 @@ public class ChatRoomControllerTest extends TestUtil {
         String json = """
                 {
                     "name": "Test Chat Room",
-                    "description": "This is a test chat room"
+                    "description": "This is a test chat room",
+                    "users": []
                 }
                 """;
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+
         mockMvc.perform(post("/chat_room/add")
                 .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers)
                 .content(json))
                 .andExpect(status().is(201))
                 .andExpect(jsonPath("$.roomId").exists())
                 .andDo(print());
+    }
+
+    @Test
+    public void addNewChatRoomWithNullUsersShouldFailValidation() throws Exception {
+        String json = """
+                {
+                    "name": "Test Chat Room",
+                    "description": "This is a test chat room",
+                    "users": null
+                }
+                """;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        MvcResult result = mockMvc.perform(post("/chat_room/add")
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andDo(print())
+                .andReturn();
+        
+        System.out.println("Response Status: " + result.getResponse().getStatus());
+        System.out.println("Response Body: " + result.getResponse().getContentAsString());
     }
 
     @Test

@@ -6,7 +6,7 @@ import com.sales.chats.repositories.BlockListRepository;
 import com.sales.claims.AuthUser;
 import com.sales.entities.BlockedUser;
 import com.sales.entities.User;
-import com.sales.exceptions.MyException;
+import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class BlockListService  {
         User blockedUser = wholesaleUserRepository.findUserBySlug(blockedUserSlug);
         if (blockedUser == null) {
             logger.error("Blocked user not exists");
-            throw new MyException("Blocked user not exists");
+            throw new NotFoundException("Blocked user not exists");
         }
         BlockedUser blockList = BlockedUser.builder()
             .userId(blockingBy.getId())

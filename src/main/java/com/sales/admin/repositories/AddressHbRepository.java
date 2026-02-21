@@ -32,11 +32,20 @@ public class AddressHbRepository {
                 "updatedAt =:updatedAt, " +
                 "updatedBy =:updatedBy " +
                 "where id =:id ";
+
+        City city = City.builder()
+                .id(addressRequest.getCity())
+                .build();
+
+        State state = State.builder()
+                .id(addressRequest.getState())
+                .build();
+
         Query query = entityManager.createQuery(hqQuery);
         query.setParameter("street",addressRequest.getStreet());
         query.setParameter("zipCode",addressRequest.getZipCode());
-        query.setParameter("city",addressRequest.getCity());
-        query.setParameter("state",addressRequest.getState());
+        query.setParameter("city",city);
+        query.setParameter("state",state);
         query.setParameter("latitude",addressRequest.getLatitude());
         query.setParameter("altitude",addressRequest.getAltitude());
         query.setParameter("updatedBy", loggedUser.getId());

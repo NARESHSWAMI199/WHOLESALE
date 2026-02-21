@@ -9,6 +9,7 @@ import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -38,7 +39,7 @@ public class ChatRoomController {
 
     @PostMapping("add")
     @Operation(summary = "Add new chat room", description = "Creates a new chat room")
-    public ResponseEntity<Map<String,String>> addNewChatRoom(@RequestBody ChatRoomDto chatRoomDto) {
+    public ResponseEntity<Map<String,String>> addNewChatRoom(@Valid @RequestBody ChatRoomDto chatRoomDto) {
         Map<String,String> result = new HashMap<>();
         ChatRoom chatRoom = chatRoomService.createRoom(chatRoomDto);
         result.put("roomId",chatRoom.getSlug());

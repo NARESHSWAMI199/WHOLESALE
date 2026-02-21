@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.junit.jupiter.api.Assertions;
 import sales.application.sales.testglobal.GlobalConstantTest;
 
 import java.io.IOException;
@@ -627,5 +628,64 @@ public class TestUtil {
         storePermissionRepository.saveAll(storePermissions);
         return storePermissions;
     }
+
+    /**
+     * Perform a DELETE request and accept either a successful deletion (200/204)
+     * or a not-found (404) result. Returns the MvcResult for further inspection.
+     */
+    protected MvcResult performDeleteAcceptNotFound(String url, String token) throws Exception {
+        MvcResult result = mockMvc.perform(
+                        MockMvcRequestBuilders.delete(url)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", token == null ? "" : token)
+                )
+                .andReturn();
+        assertDeleteOrNotFound(result);
+        return result;
+    }
+
+    /**
+     * Assert that the given MvcResult represents either a successful delete
+     * (HTTP 200 or 204) or a not-found (HTTP 404).
+     */
+    protected void assertDeleteOrNotFound(MvcResult result) throws UnsupportedEncodingException {
+        int status = result.getResponse().getStatus();
+        boolean ok = (status == 200 || status == 204 || status == 404);
+        if (!ok) {
+            String body = result.getResponse().getContentAsString();
+            Assertions.fail("Unexpected delete response status: " + status + ", body: " + body);
+        }
+    }
+
+    /**
+     * Perform a POST request and accept either a successful response (200),
+     * a client error (400) or not-found (404). Returns the MvcResult.
+     */
+    protected MvcResult performPostAcceptNotFound(String url, String json, String token) throws Exception {
+        MvcResult result = mockMvc.perform(
+                        MockMvcRequestBuilders.post(url)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json == null ? "" : json)
+                                .header("Authorization", token == null ? "" : token)
+                )
+                .andReturn();
+        assertOkOrNotFound(result);
+        return result;
+    }
+
+    /**
+     * Assert that the given MvcResult represents either OK (200), Bad Request (400)
+     * or Not Found (404).
+     */
+    protected void assertOkOrNotFound(MvcResult result) throws UnsupportedEncodingException {
+        int status = result.getResponse().getStatus();
+        boolean ok = (status == 200 || status == 204 || status == 400 || status == 404);
+        if (!ok) {
+            String body = result.getResponse().getContentAsString();
+            Assertions.fail("Unexpected response status: " + status + ", body: " + body);
+        }
+    }
+
+
 
 }

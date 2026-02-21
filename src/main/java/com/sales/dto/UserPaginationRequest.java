@@ -11,5 +11,6 @@ import lombok.Setter;
 @Builder
 public class UserPaginationRequest {
     Integer paginationId;
+    Integer userId;
     Integer rowsNumber;
 }

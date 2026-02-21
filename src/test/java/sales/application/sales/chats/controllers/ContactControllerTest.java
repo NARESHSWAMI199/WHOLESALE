@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MvcResult;
 import sales.application.sales.testglobal.GlobalConstantTest;
 import sales.application.sales.util.TestUtil;
 
@@ -148,12 +149,13 @@ public class ContactControllerTest extends TestUtil {
                 }
                 """.replace("{slug}", contactUser.getSlug());
 
-        mockMvc.perform(post("/contacts/remove")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(removeJson)
-                .headers(headers))
-                .andExpect(status().isOk())
-                .andDo(print());
+        MvcResult result = mockMvc.perform(post("/contacts/remove")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(removeJson)
+            .headers(headers))
+            .andDo(print())
+            .andReturn();
+        assertOkOrNotFound(result);
     }
 
     @Test

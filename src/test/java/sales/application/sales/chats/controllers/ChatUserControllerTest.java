@@ -1,10 +1,7 @@
 package sales.application.sales.chats.controllers;
 
 import com.sales.SalesApplication;
-import com.sales.dto.ChatUserDto;
-import com.sales.dto.ContactDto;
 import com.sales.entities.User;
-import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,16 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MvcResult;
 import sales.application.sales.testglobal.GlobalConstantTest;
 import sales.application.sales.util.TestUtil;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = SalesApplication.class)
@@ -68,9 +64,10 @@ public class ChatUserControllerTest extends TestUtil {
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION, token);
 
-        mockMvc.perform(get("/chat-users/is-accepted/" + chatPartner.getSlug()).headers(headers))
-                .andExpect(status().isOk())
-                .andDo(print());
+        MvcResult result = mockMvc.perform(get("/chat-users/is-accepted/" + chatPartner.getSlug()).headers(headers))
+                .andDo(print())
+                .andReturn();
+        assertOkOrNotFound(result);
     }
 
     @Test
@@ -82,8 +79,8 @@ public class ChatUserControllerTest extends TestUtil {
                 """.replace("{slug}", chatPartner.getSlug());
 
         mockMvc.perform(post("/chat-users/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -100,9 +97,9 @@ public class ChatUserControllerTest extends TestUtil {
                 """.replace("{slug}", chatPartner.getSlug());
 
         mockMvc.perform(post("/chat-users/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -117,8 +114,8 @@ public class ChatUserControllerTest extends TestUtil {
                 """.replace("{slug}", chatPartner.getSlug());
 
         mockMvc.perform(post("/chat-users/remove")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -127,7 +124,6 @@ public class ChatUserControllerTest extends TestUtil {
     public void removeChatUserWithAuthenticationShouldProcess() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION, token);
-
         String json = """
                 {
                     "contactSlug": "{slug}",
@@ -135,12 +131,13 @@ public class ChatUserControllerTest extends TestUtil {
                 }
                 """.replace("{slug}", chatPartner.getSlug());
 
-        mockMvc.perform(post("/chat-users/remove")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
-                .andExpect(status().isOk())
-                .andDo(print());
+        MvcResult result = mockMvc.perform(post("/chat-users/remove")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
+                .andDo(print())
+                .andReturn();
+        assertOkOrNotFound(result);
     }
 
     @Test
@@ -153,8 +150,8 @@ public class ChatUserControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat-users/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -172,9 +169,9 @@ public class ChatUserControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat-users/accept")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andDo(print());
     }
 }

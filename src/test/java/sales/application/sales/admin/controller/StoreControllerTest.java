@@ -109,8 +109,8 @@ public class StoreControllerTest extends TestUtil {
                 .replace("{storeSlug}",store.getSlug())
                 .replace("{storeEmail}",randomEmail)
                 .replace("{storePhone}",randomPhone)
-                .replace("{city}",String.valueOf(store.getAddress().getCity()))
-                .replace("{state}",String.valueOf(store.getAddress().getState()))
+                .replace("{city}",String.valueOf(store.getAddress().getCity().getId()))
+                .replace("{state}",String.valueOf(store.getAddress().getState().getId()))
                 .replace("{categoryId}",String.valueOf(store.getStoreCategory().getId()))
                 .replace("{subCategoryId}",String.valueOf(store.getStoreSubCategory().getId()))
                 ;

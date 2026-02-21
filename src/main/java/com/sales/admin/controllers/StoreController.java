@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -145,7 +146,7 @@ public class StoreController {
     @PostMapping(value = {"/add","/update"})
     @PreAuthorize("hasAnyAuthority('store.add','store.update','store.edit')")
     @Operation(summary = "Add or update store", description = "Creates a new store or updates an existing store based on the provided data")
-    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request,  @ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request, @Valid @ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Adding or updating store with details: {}", storeRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI().toLowerCase();
