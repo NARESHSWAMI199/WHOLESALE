@@ -86,8 +86,7 @@ public class UserServiceTest extends TestUtil {
     @Test
     public void testGetUserDetail() {
         User user = createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.ADMIN);
-        SalesUser loggedUser = new SalesUser(user);
-        User detail = userService.getUserDetail(user.getSlug(), loggedUser);
+        User detail = userService.getUserDetail(user.getSlug());
         Assertions.assertNotNull(detail);
         Assertions.assertEquals(user.getSlug(), detail.getSlug());
     }
