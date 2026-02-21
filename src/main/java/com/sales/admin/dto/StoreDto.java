@@ -19,6 +19,7 @@ public record StoreDto(
         AddressDto address,
         Integer totalStoreItems,
         CategoryDto storeCategory,
-        SubcategoryDto storeSubCategory
+        SubcategoryDto storeSubCategory,
+        Long updatedAt
 ) {
 }

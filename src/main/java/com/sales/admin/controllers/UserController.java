@@ -202,7 +202,7 @@ public class UserController  {
         logger.debug("Fetching details for user with slug: {}", slug);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        User user = userService.getUserDetail(slug,loggedUser);
+        UserDto user = userService.getUserDetailDto(slug,loggedUser);
         if (user != null) {
             responseObj.put(ConstantResponseKeys.RES, user);
             responseObj.put(ConstantResponseKeys.STATUS, 200);

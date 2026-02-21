@@ -416,11 +416,11 @@ public class UserService {
         return userHbRepository.updateUser(userRequest,loggedUser);
     }
 
-    public User getUserDetail(String slug ,AuthUser loggedUser){
+    public UserDto getUserDetailDto(String slug ,AuthUser loggedUser){
         logger.debug("Getting user detail for slug: {}", slug);
        User user = userRepository.findUserBySlug(slug);
         if(user !=null && (user.getId() !=GlobalConstant.suId || loggedUser.getId() == GlobalConstant.suId )){
-            return user;
+            return userMapper.toDto(user);
         }
         return null;
     }

@@ -58,9 +58,8 @@ public class StoreController {
     @Operation(summary = "Get all stores", description = "Retrieves a paginated list of all stores with optional search filters")
     public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody SearchFilters searchFilters){
         logger.debug("Fetching all stores with filters: {}", searchFilters);
-        Page<Store> storePage =  storeService.getAllStore(searchFilters);
-        Page<StoreDto> storeDtoPage = storePage.map(storeMapper::toDto);
-        return new ResponseEntity<>(storeDtoPage, HttpStatus.OK);
+        Page<StoreDto> storePage =  storeService.getAllStore(searchFilters);
+        return new ResponseEntity<>(storePage, HttpStatus.OK);
     }
 
     @Transactional

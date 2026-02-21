@@ -1,5 +1,7 @@
 package com.sales.admin.services;
 
+import com.sales.admin.dto.StoreDto;
+import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
 import com.sales.dto.*;
@@ -49,13 +51,14 @@ public class StoreService {
     private final UserRepository userRepository;
     private final AddressService addressService;
     private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
+    private final StoreMapper storeMapper;
 
     @Value("${store.absolute}")
     String storeImagePath;
 
 
 
-    public Page<Store> getAllStore(SearchFilters filters) {
+    public Page<StoreDto> getAllStore(SearchFilters filters) {
         logger.debug("Entering getAllStore with filters: {}", filters);
         Specification<Store> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()).or(containsEmail(filters.getSearchKey())))
@@ -70,7 +73,7 @@ public class StoreService {
         storeList.forEach(store -> store.setTotalStoreItems(itemRepository.totalItemCountByWholesaleId(store.getId())));
         storePage = new PageImpl<>(storeList,pageable,storePage.getTotalElements());
         logger.debug("Exiting getAllStore");
-        return storePage;
+        return storePage.map(storeMapper::toDto);
     }
 
 
