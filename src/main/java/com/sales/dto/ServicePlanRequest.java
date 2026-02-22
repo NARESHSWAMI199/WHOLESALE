@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ServicePlanDto  extends  SearchFilters{
+public class ServicePlanRequest extends  SearchFilters{
 
     Integer months;
     Long price;

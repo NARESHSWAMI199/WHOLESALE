@@ -2,16 +2,16 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.dto.PlanDto;
+import com.sales.admin.dto.ServicePlanDto;
 import com.sales.admin.services.ServicePlanService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.dto.DeleteDto;
-import com.sales.dto.ServicePlanDto;
+import com.sales.dto.ServicePlanRequest;
 import com.sales.dto.StatusDto;
 import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
-import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -62,9 +61,9 @@ public class ServicePlanController  {
     @PostMapping("service-plans")
     @PreAuthorize("hasAuthority('service-plans.all')")
     @Operation(summary = "Get all service plans", description = "Retrieves a paginated list of all service plans with optional filters")
-    public ResponseEntity<Page<ServicePlanDto>> getAllPlans(@RequestBody ServicePlanDto servicePlanDto) {
-        logger.debug("Fetching all service plans with filters: {}", servicePlanDto);
-        Page<ServicePlanDto> servicePlanDtoPage = servicePlanService.getALlServicePlan(servicePlanDto);
+    public ResponseEntity<Page<ServicePlanDto>> getAllPlans(@RequestBody ServicePlanRequest servicePlanRequest) {
+        logger.debug("Fetching all service plans with filters: {}", servicePlanRequest);
+        Page<ServicePlanDto> servicePlanDtoPage = servicePlanService.getALlServicePlan(servicePlanRequest);
         return new ResponseEntity<>(servicePlanDtoPage, HttpStatusCode.valueOf(200));
     }
 
@@ -83,11 +82,11 @@ public class ServicePlanController  {
     @PostMapping("add")
     @PreAuthorize("hasAuthority('service-plans.add')")
     @Operation(summary = "Add service plan", description = "Creates a new service plan")
-    public ResponseEntity<Map<String,Object>> insertServicePlans(Authentication authentication,HttpServletRequest request , @RequestBody ServicePlanDto servicePlanDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Inserting new service plan: {}", servicePlanDto);
+    public ResponseEntity<Map<String,Object>> insertServicePlans(Authentication authentication,HttpServletRequest request , @RequestBody ServicePlanRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Inserting new service plan: {}", servicePlanRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String,Object> result = new HashMap<>();
-        ServicePlan servicePlan = servicePlanService.insertServicePlan(loggedUser,servicePlanDto);
+        ServicePlan servicePlan = servicePlanService.insertServicePlan(loggedUser,servicePlanRequest);
         result.put(ConstantResponseKeys.RES,servicePlan);
         result.put(ConstantResponseKeys.MESSAGE,"Service plan added successfully.");
         result.put(ConstantResponseKeys.STATUS , 201);

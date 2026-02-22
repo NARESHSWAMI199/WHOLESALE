@@ -9,7 +9,8 @@ import com.sales.admin.repositories.ServicePlanRepository;
 import com.sales.admin.repositories.WholesalerPlansRepository;
 import com.sales.claims.AuthUser;
 import com.sales.dto.DeleteDto;
-import com.sales.dto.ServicePlanDto;
+import com.sales.admin.dto.ServicePlanDto;
+import com.sales.dto.ServicePlanRequest;
 import com.sales.dto.StatusDto;
 import com.sales.dto.UserPlanRequest;
 import com.sales.entities.ServicePlan;
@@ -47,16 +48,16 @@ public class ServicePlanService {
   private static final Logger logger = LoggerFactory.getLogger(ServicePlanService.class);
 
     @Transactional(readOnly = true)
-    public Page<ServicePlanDto> getALlServicePlan(ServicePlanDto servicePlanDto){
-        logger.debug("Entering getALlServicePlan with servicePlanDto: {}", servicePlanDto);
+    public Page<ServicePlanDto> getALlServicePlan(ServicePlanRequest servicePlanRequest){
+        logger.debug("Entering getALlServicePlan with servicePlanDto: {}", servicePlanRequest);
         Specification<ServicePlan> specification = Specification.allOf(
-                ServicePlanSpecification.containsName(servicePlanDto.getName())
-                        .and(ServicePlanSpecification.hasSlug(servicePlanDto.getSlug()))
-                        .and(ServicePlanSpecification.isStatus(servicePlanDto.getStatus()))
-                        .and(ServicePlanSpecification.greaterThanOrEqualFromDate(servicePlanDto.getFromDate()))
-                        .and(ServicePlanSpecification.lessThanOrEqualToToDate(servicePlanDto.getToDate()))
+                ServicePlanSpecification.containsName(servicePlanRequest.getName())
+                        .and(ServicePlanSpecification.hasSlug(servicePlanRequest.getSlug()))
+                        .and(ServicePlanSpecification.isStatus(servicePlanRequest.getStatus()))
+                        .and(ServicePlanSpecification.greaterThanOrEqualFromDate(servicePlanRequest.getFromDate()))
+                        .and(ServicePlanSpecification.lessThanOrEqualToToDate(servicePlanRequest.getToDate()))
         );
-        Pageable pageable = getPageable(logger,servicePlanDto);
+        Pageable pageable = getPageable(logger,servicePlanRequest);
         Page<ServicePlan> result = servicePlanRepository.findAll(specification,pageable);
         logger.debug("Exiting getALlServicePlan");
         return result.map(servicePlanMapper::toDto);
@@ -106,22 +107,22 @@ public class ServicePlanService {
 
 
     @Transactional
-    public ServicePlan insertServicePlan(AuthUser loggedUser, ServicePlanDto servicePlanDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering insertServicePlan with loggedUser: {}, servicePlanDto: {}", loggedUser, servicePlanDto);
+    public ServicePlan insertServicePlan(AuthUser loggedUser, ServicePlanRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering insertServicePlan with loggedUser: {}, servicePlanDto: {}", loggedUser, servicePlanRequest);
         if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action. Contact to your administrator.",new Exception());
 
         // Validating required fields if there we found any required field is null, then it will throw an Exception
-        Utils.checkRequiredFields(servicePlanDto, List.of("planName","price","discount","months","description"));
+        Utils.checkRequiredFields(servicePlanRequest, List.of("planName","price","discount","months","description"));
 
-        if(servicePlanDto.getPrice() < 0) throw new IllegalArgumentException("Price can't be less than 0.");
-        if(servicePlanDto.getDiscount() < 0 || servicePlanDto.getDiscount() > servicePlanDto.getPrice()) throw new IllegalArgumentException("Discount can't be greater than price and can't be less than 0.");
+        if(servicePlanRequest.getPrice() < 0) throw new IllegalArgumentException("Price can't be less than 0.");
+        if(servicePlanRequest.getDiscount() < 0 || servicePlanRequest.getDiscount() > servicePlanRequest.getPrice()) throw new IllegalArgumentException("Discount can't be greater than price and can't be less than 0.");
 
         ServicePlan servicePlan = ServicePlan.builder()
-                .name(servicePlanDto.getPlanName())
-                .price(servicePlanDto.getPrice())
-                .discount(servicePlanDto.getDiscount())
-                .months(servicePlanDto.getMonths())
-                .description(servicePlanDto.getDescription())
+                .name(servicePlanRequest.getPlanName())
+                .price(servicePlanRequest.getPrice())
+                .discount(servicePlanRequest.getDiscount())
+                .months(servicePlanRequest.getMonths())
+                .description(servicePlanRequest.getDescription())
                 .createdBy(loggedUser.getId())
                 .updatedBy(loggedUser.getId())
                 .slug(UUID.randomUUID().toString())
