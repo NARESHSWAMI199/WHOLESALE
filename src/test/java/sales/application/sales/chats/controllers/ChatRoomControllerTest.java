@@ -1,9 +1,6 @@
 package sales.application.sales.chats.controllers;
 
 import com.sales.SalesApplication;
-import com.sales.dto.ChatRoomDto;
-import com.sales.entities.ChatRoom;
-import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import sales.application.sales.testglobal.GlobalConstantTest;
 import sales.application.sales.util.TestUtil;
-
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;

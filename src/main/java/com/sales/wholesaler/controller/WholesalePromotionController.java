@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.StorePromotionDto;
+import com.sales.request.StorePromotionDto;
 import com.sales.wholesaler.services.WholesalePromotionsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

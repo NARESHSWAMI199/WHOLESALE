@@ -3,7 +3,7 @@ package sales.application.sales.chats.services;
 import com.sales.SalesApplication;
 import com.sales.chats.services.ChatService;
 import com.sales.claims.SalesUser;
-import com.sales.dto.MessageDto;
+import com.sales.request.MessageDto;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import org.junit.jupiter.api.Test;

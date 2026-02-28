@@ -2,7 +2,7 @@ package com.sales.wholesaler.repository;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StorePromotionDto;
+import com.sales.request.StorePromotionDto;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;

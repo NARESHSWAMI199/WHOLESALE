@@ -6,8 +6,7 @@ import com.sales.admin.services.PaginationService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.*;
-import com.sales.entities.User;
+import com.sales.request.*;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.jwtUtils.JwtToken;
@@ -89,7 +88,7 @@ public class UserController  {
         if (user.isEnabled()) {
             message = ConstantResponseKeys.SUCCESS;
             Map<String, Object> paginations = paginationService.findUserPaginationsByUserId(user);
-            responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
+            responseObj.put(ConstantResponseKeys.TOKEN,jwtToken.generateToken(user.getSlug()));
             responseObj.put("user", user);
             responseObj.put(ConstantResponseKeys.PAGINATIONS,paginations);
             responseObj.put(ConstantResponseKeys.STATUS, 200);

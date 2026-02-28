@@ -1,7 +1,7 @@
 package com.sales.exceptions;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sales.dto.ErrorDto;
+import com.sales.request.ErrorDto;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.ObjectNotFoundException;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -38,15 +37,17 @@ public class GlobalAdviceController {
 
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<?> handleAccessDenied(AuthorizationDeniedException ex) {
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorDto handleAccessDenied(AuthorizationDeniedException ex) {
         logger.error("AuthorizationDeniedException: {}", ex.getMessage(),ex);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+        return new ErrorDto(ex.getMessage(), 403);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorDto handleAccessDenied(AccessDeniedException ex) {
         logger.error("AccessDeniedException: {}", ex.getMessage(),ex);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access Denied");
+        return new ErrorDto(ex.getMessage(), 403);
     }
 
     @Transactional

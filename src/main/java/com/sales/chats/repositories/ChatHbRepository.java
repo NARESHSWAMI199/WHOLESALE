@@ -1,7 +1,7 @@
 package com.sales.chats.repositories;
 
 
-import com.sales.dto.MessageDto;
+import com.sales.request.MessageDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.transaction.annotation.Transactional;

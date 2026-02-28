@@ -1,7 +1,7 @@
 package com.sales.exceptions;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sales.dto.ErrorDto;
+import com.sales.request.ErrorDto;
 import org.hibernate.ObjectNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -2,7 +2,7 @@ package com.sales.wholesaler.repository;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPaginationRequest;
+import com.sales.request.UserPaginationRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.transaction.annotation.Transactional;

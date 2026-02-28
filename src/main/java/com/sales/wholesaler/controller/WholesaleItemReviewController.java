@@ -3,8 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.ItemReviewsFilterDto;
-import com.sales.entities.ItemReviews;
+import com.sales.request.ItemReviewsFilterDto;
 import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.services.WholesaleItemReviewService;
 import io.swagger.v3.oas.annotations.Operation;

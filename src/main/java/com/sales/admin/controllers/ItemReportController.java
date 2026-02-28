@@ -3,8 +3,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.ItemReportDto;
 import com.sales.admin.services.ItemReportService;
-import com.sales.dto.SearchFilters;
-import com.sales.entities.ItemReport;
+import com.sales.request.SearchFilters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

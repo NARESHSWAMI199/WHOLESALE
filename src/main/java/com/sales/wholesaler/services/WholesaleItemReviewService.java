@@ -1,7 +1,7 @@
 package com.sales.wholesaler.services;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.ItemReviewsFilterDto;
+import com.sales.request.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
 import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.mapper.WholesaleItemReviewMapper;
@@ -10,13 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.ItemReviewSpecifications.*;

@@ -4,7 +4,7 @@ import com.sales.SalesApplication;
 import com.sales.admin.dto.ItemDto;
 import com.sales.admin.services.ItemService;
 import com.sales.claims.SalesUser;
-import com.sales.dto.ItemSearchFields;
+import com.sales.request.ItemSearchFields;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.Store;
@@ -74,7 +74,7 @@ public class ItemServiceTest extends TestUtil {
     @Test
     public void testGetAllCategory() {
         ItemCategory category = createItemCategory();
-        com.sales.dto.SearchFilters searchFilters = new com.sales.dto.SearchFilters();
+        com.sales.request.SearchFilters searchFilters = new com.sales.request.SearchFilters();
         var categories = itemService.getAllCategory(searchFilters);
         assertNotNull(categories);
         assertFalse(categories.isEmpty());
@@ -92,7 +92,7 @@ public class ItemServiceTest extends TestUtil {
     public void testUpdateStatusBySlug() throws Exception {
         Store store = createStore();
         Item item = createItem(store.getId());
-        com.sales.dto.StatusDto statusDto = new com.sales.dto.StatusDto();
+        com.sales.request.StatusDto statusDto = new com.sales.request.StatusDto();
         statusDto.setSlug(item.getSlug());
         statusDto.setStatus("A");
         User user = createUser(UUID.randomUUID().toString(), "test@example.com", "pass", GlobalConstantTest.ADMIN);

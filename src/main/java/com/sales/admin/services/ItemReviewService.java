@@ -3,7 +3,7 @@ package com.sales.admin.services;
 import com.sales.admin.dto.ItemReviewDto;
 import com.sales.admin.mapper.ItemReviewMapper;
 import com.sales.admin.repositories.ItemReviewRepository;
-import com.sales.dto.ItemReviewsFilterDto;
+import com.sales.request.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package com.sales.wholesaler.services;
 
-import com.sales.dto.SearchFilters;
-import com.sales.dto.WalletTransactionRequest;
+import com.sales.request.SearchFilters;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
 import com.sales.utils.Utils;

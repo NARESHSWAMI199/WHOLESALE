@@ -2,7 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPlanRequest;
+import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerFuturePlan;
 import com.sales.entities.WholesalerPlans;
@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

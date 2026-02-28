@@ -1,7 +1,7 @@
 package sales.application.sales.admin.controller;
 
 import com.sales.SalesApplication;
-import com.sales.dto.WalletTransactionRequest;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.WalletTransaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

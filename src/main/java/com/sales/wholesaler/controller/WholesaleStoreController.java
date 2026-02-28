@@ -3,12 +3,9 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.SearchFilters;
-import com.sales.dto.StoreRequest;
+import com.sales.request.SearchFilters;
+import com.sales.request.StoreRequest;
 import com.sales.entities.Store;
-import com.sales.entities.StoreCategory;
-import com.sales.entities.StoreNotifications;
-import com.sales.entities.StoreSubCategory;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;

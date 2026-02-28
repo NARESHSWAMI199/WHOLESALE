@@ -6,7 +6,7 @@ import com.sales.admin.services.ItemService;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.*;
+import com.sales.request.*;
 import com.sales.entities.*;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
@@ -57,6 +57,24 @@ public class ItemController  {
 
   private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(schema = @Schema(example = """
+                    {
+                      "searchKey": "string",
+                      "name": "string",
+                      "status": "string",
+                      "fromDate": "",
+                      "toDate": "",
+                      "orderBy": "string",
+                      "order": "string",
+                      "pageNumber": 1073741824,
+                      "size": 1073741824,
+                      "slug": "string",
+                      "inStock": "Y",
+                      "label": "string"
+                    }
+                    """)
+            ))
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
     @Operation(summary = "Get all items", description = "Retrieves a paginated list of all items with optional search filters")
@@ -336,7 +354,7 @@ public class ItemController  {
 
 
     @GetMapping("category/{categoryId}")
-    @PreAuthorize("hasAuthority('item.subcategory.detail')")
+    @PreAuthorize("hasAuthority('item.category.detail')")
     @Operation(summary = "Get item category by ID", description = "Retrieves details of a specific item category by its ID")
     public ResponseEntity<ItemCategory> getAllCategory(@PathVariable Integer categoryId) {
         logger.debug("Fetching item category with id: {}", categoryId);

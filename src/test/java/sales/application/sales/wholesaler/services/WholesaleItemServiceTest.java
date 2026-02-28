@@ -1,7 +1,7 @@
 package sales.application.sales.wholesaler.services;
 
 import com.sales.SalesApplication;
-import com.sales.dto.ItemSearchFields;
+import com.sales.request.ItemSearchFields;
 import com.sales.wholesaler.dto.WholesaleItemDto;
 import com.sales.wholesaler.dto.WholesaleItemListDto;
 import com.sales.entities.Item;

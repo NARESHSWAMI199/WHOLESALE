@@ -10,7 +10,7 @@ import com.phonepe.sdk.pg.payments.v1.models.response.PayPageInstrumentResponse;
 import com.phonepe.sdk.pg.payments.v1.models.response.PgPayResponse;
 import com.sales.admin.services.ServicePlanService;
 import com.sales.claims.AuthUser;
-import com.sales.dto.PhonePeDto;
+import com.sales.request.PhonePeDto;
 import com.sales.entities.PhonePeTrans;
 import com.sales.entities.ServicePlan;
 import com.sales.global.ConstantResponseKeys;

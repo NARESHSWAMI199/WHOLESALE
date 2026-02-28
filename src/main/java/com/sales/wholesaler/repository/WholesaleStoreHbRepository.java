@@ -1,7 +1,7 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StoreRequest;
+import com.sales.request.StoreRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;

@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.services.StoreWalletTransactionService;
-import com.sales.dto.SearchFilters;
+import com.sales.request.SearchFilters;
 import com.sales.entities.WalletTransaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

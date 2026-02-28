@@ -2,7 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressRequest;
+import com.sales.request.AddressRequest;
 import com.sales.entities.City;
 import com.sales.entities.State;
 import com.sales.utils.Utils;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.cachemanager.services.UserCacheService;
-import com.sales.dto.ErrorDto;
+import com.sales.request.ErrorDto;
 import com.sales.entities.User;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;

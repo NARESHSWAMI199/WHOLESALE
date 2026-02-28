@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.GraphDto;
+import com.sales.request.GraphDto;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.services.WholesaleItemService;
 import com.sales.wholesaler.services.WholesaleStoreService;

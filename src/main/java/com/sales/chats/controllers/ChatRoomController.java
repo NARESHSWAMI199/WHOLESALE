@@ -3,7 +3,7 @@ package com.sales.chats.controllers;
 import com.sales.chats.services.ChatRoomService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.ChatRoomDto;
+import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;

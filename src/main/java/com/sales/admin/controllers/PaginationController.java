@@ -4,7 +4,7 @@ package com.sales.admin.controllers;
 import com.sales.admin.services.PaginationService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.UserPaginationRequest;
+import com.sales.request.UserPaginationRequest;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

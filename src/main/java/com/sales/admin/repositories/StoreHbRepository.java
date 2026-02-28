@@ -1,7 +1,7 @@
 package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StoreRequest;
+import com.sales.request.StoreRequest;
 import com.sales.entities.StoreNotifications;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;

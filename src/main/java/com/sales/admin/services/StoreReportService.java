@@ -2,7 +2,7 @@ package com.sales.admin.services;
 
 
 import com.sales.admin.repositories.StoreReportRepository;
-import com.sales.dto.SearchFilters;
+import com.sales.request.SearchFilters;
 import com.sales.entities.StoreReport;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

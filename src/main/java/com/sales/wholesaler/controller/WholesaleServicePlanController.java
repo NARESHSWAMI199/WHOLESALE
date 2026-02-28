@@ -3,9 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPlanRequest;
-import com.sales.entities.ServicePlan;
-import com.sales.entities.WholesalerPlans;
+import com.sales.request.UserPlanRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;

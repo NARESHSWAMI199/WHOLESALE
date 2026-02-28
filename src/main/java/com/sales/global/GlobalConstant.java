@@ -35,7 +35,7 @@ public class GlobalConstant {
 
     public static final String ITEMS_NOT_UPDATED_PATH_FOR_ADMIN = "/admin/item/notUpdated/";
     public static final String ITEMS_NOT_UPDATED_PATH_FOR_WHOLESALE = "/wholesale/item/notUpdated/";
-    public static final String AUTH_TOKEN_PREFIX = "Beaver ";
+    public static final String AUTH_TOKEN_PREFIX = "Bearer ";
     public static final String AUTHORIZATION = "Authorization";
 
     public static final List<String> HEADERS_FOR_ITEMS = List.of("NAME","TOKEN","PRICE", "DISCOUNT","LABEL","CAPACITY","RATING","IN-STOCK","STATUS","CREATED-AT","UPDATED-AT");

@@ -1,6 +1,6 @@
 package com.sales.helpers;
 
-import com.sales.dto.SearchFilters;
+import com.sales.request.SearchFilters;
 import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

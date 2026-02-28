@@ -2,9 +2,9 @@ package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.AddressRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressRequest;
-import com.sales.dto.SearchFilters;
-import com.sales.dto.StoreRequest;
+import com.sales.request.AddressRequest;
+import com.sales.request.SearchFilters;
+import com.sales.request.StoreRequest;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -38,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.ItemReviewSpecifications.isUserId;

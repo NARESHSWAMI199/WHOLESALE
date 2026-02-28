@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
-import com.sales.dto.GraphDto;
+import com.sales.request.GraphDto;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

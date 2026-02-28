@@ -5,7 +5,7 @@ import com.sales.SalesApplication;
 import com.sales.admin.dto.UserDto;
 import com.sales.admin.services.UserService;
 import com.sales.claims.SalesUser;
-import com.sales.dto.UserSearchFilters;
+import com.sales.request.UserSearchFilters;
 import com.sales.entities.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

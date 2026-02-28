@@ -9,7 +9,7 @@ import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.WalletTransactionRequest;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.StoreNotifications;
 import com.sales.entities.User;

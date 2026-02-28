@@ -5,7 +5,7 @@ import com.sales.admin.repositories.PaginationHbRepository;
 import com.sales.admin.repositories.PaginationRepository;
 import com.sales.admin.repositories.UserPaginationsRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPaginationRequest;
+import com.sales.request.UserPaginationRequest;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
 import com.sales.entities.UserPagination;

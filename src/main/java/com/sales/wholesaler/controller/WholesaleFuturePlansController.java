@@ -2,8 +2,7 @@ package com.sales.wholesaler.controller;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.SearchFilters;
-import com.sales.entities.WholesalerFuturePlan;
+import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;

@@ -2,7 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.GroupRequest;
+import com.sales.request.GroupRequest;
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
 import jakarta.persistence.EntityManager;

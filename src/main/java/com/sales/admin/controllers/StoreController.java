@@ -4,7 +4,7 @@ import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.*;
+import com.sales.request.*;
 import com.sales.entities.Store;
 import com.sales.admin.dto.StoreDto;
 import com.sales.entities.StoreCategory;

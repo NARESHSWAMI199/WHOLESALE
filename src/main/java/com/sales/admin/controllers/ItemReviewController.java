@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.ItemReviewDto;
 import com.sales.admin.services.ItemReviewService;
-import com.sales.dto.ItemReviewsFilterDto;
+import com.sales.request.ItemReviewsFilterDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
