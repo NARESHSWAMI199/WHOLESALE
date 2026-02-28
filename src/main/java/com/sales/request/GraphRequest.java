@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class UserPermissionsDto {
-    Integer userId;
-    List<Integer> groupList;
+public class GraphRequest {
+    Integer year;
+    List<Integer> months;
 }

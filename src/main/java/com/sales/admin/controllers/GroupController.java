@@ -5,7 +5,7 @@ import com.sales.admin.dto.GroupDto;
 import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.DeleteDto;
+import com.sales.request.DeleteRequest;
 import com.sales.request.GroupRequest;
 import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
@@ -83,11 +83,11 @@ public class GroupController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('group.delete')")
     @Operation(summary = "Delete group", description = "Deletes a group by its slug")
-    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteDto deleteDto) throws Exception {
-        logger.debug("Deleting group with slug: {}", deleteDto);
+    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws Exception {
+        logger.debug("Deleting group with slug: {}", deleteRequest);
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = groupService.deleteGroupBySlug(deleteDto, loggedUser);
+        int isUpdated = groupService.deleteGroupBySlug(deleteRequest, loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "User has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);

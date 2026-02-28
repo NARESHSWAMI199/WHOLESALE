@@ -8,10 +8,10 @@ import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.request.DeleteDto;
+import com.sales.request.DeleteRequest;
 import com.sales.request.GroupRequest;
 import com.sales.request.SearchFilters;
-import com.sales.request.UserPermissionsDto;
+import com.sales.request.UserPermissionsRequest;
 import com.sales.entities.Group;
 import com.sales.entities.Permission;
 import com.sales.exceptions.NotFoundException;
@@ -166,16 +166,16 @@ public class GroupService {
     }
 
     @Transactional(rollbackFor = {IllegalArgumentException.class, PermissionDeniedDataAccessException.class, RuntimeException.class, Exception.class})
-    public int deleteGroupBySlug(DeleteDto deleteDto, AuthUser loggedUser) throws Exception {
-        logger.debug("Entering deleteGroupBySlug with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public int deleteGroupBySlug(DeleteRequest deleteRequest, AuthUser loggedUser) throws Exception {
+        logger.debug("Entering deleteGroupBySlug with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
 
         //Only super admin can create or update a group.
         if (!loggedUser.getUserType().equals("SA"))
             throw new PermissionDeniedDataAccessException("You don't have permission to delete a group. Please contact a super admin", null);
 
-        String slug = deleteDto.getSlug();
+        String slug = deleteRequest.getSlug();
         Group group = groupRepository.findGroupBySlug(slug);
         if (group == null) throw new NotFoundException("No group found to delete");
         int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(),(loggedUser.getId() == GlobalConstant.suId));
@@ -183,10 +183,10 @@ public class GroupService {
         return result;
     }
 
-    public int assignGroupsToUser(UserPermissionsDto userPermissionsDto, AuthUser loggedUser) throws Exception {
-        logger.debug("Entering assignGroupsToUser with userPermissionsDto: {}, loggedUser: {}", userPermissionsDto, loggedUser);
-        int userId = userPermissionsDto.getUserId();
-        int result = permissionHbRepository.assignGroupsToUser(userId, userPermissionsDto.getGroupList(), loggedUser);
+    public int assignGroupsToUser(UserPermissionsRequest userPermissionsRequest, AuthUser loggedUser) throws Exception {
+        logger.debug("Entering assignGroupsToUser with userPermissionsDto: {}, loggedUser: {}", userPermissionsRequest, loggedUser);
+        int userId = userPermissionsRequest.getUserId();
+        int result = permissionHbRepository.assignGroupsToUser(userId, userPermissionsRequest.getGroupList(), loggedUser);
         logger.debug("Exiting assignGroupsToUser with result: {}", result);
         return result;
     }

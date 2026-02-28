@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteDto {
+public class StatusRequest {
     String slug;
+    String status="D";
 }

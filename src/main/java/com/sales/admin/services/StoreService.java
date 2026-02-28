@@ -101,12 +101,12 @@ public class StoreService {
         return addressRequest;
     }
 
-    public Map<String,Object> getStoreCountByMonths(GraphDto graphDto){
-        logger.debug("Entering getStoreCountByMonths with graphDto: {}", graphDto);
-        List<Integer> months = graphDto.getMonths();
+    public Map<String,Object> getStoreCountByMonths(GraphRequest graphRequest){
+        logger.debug("Entering getStoreCountByMonths with graphRequest: {}", graphRequest);
+        List<Integer> months = graphRequest.getMonths();
         months = (months == null || months.isEmpty()) ?
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12) : months;
-        Integer year = graphDto.getYear();
+        Integer year = graphRequest.getYear();
         Map<String,Object> monthsObj= new LinkedHashMap<>();
         for(Integer month : months) {
             monthsObj.put(getMonthName(month),storeRepository.totalStoreViaMonth(month,year));
@@ -271,12 +271,12 @@ public class StoreService {
     }
 
     @Transactional(rollbackFor = {MyException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
-    public int deleteStoreBySlug(DeleteDto deleteDto,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteStoreBySlug with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public int deleteStoreBySlug(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteStoreBySlug with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // Validate required fields. if we found any required field this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto,List.of("slug"));
+        Utils.checkRequiredFields(deleteRequest,List.of("slug"));
 
-        String slug = deleteDto.getSlug();
+        String slug = deleteRequest.getSlug();
         Store store = storeRepository.findStoreBySlug(slug);
         if(store == null) throw new NotFoundException("No store found to delete.");
         User user = store.getUser();
@@ -324,18 +324,18 @@ public class StoreService {
 
 
     @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class,RuntimeException.class,Exception.class})
-    public int updateStatusBySlug(StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering updateStatusBySlug with statusDto: {}", statusDto);
+    public int updateStatusBySlug(StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering updateStatusBySlug with statusRequest: {}", statusRequest);
         // Validate required fields. if we found any required field this will throw IllegalArgumentException
-        Utils.checkRequiredFields(statusDto,List.of("status","slug"));
+        Utils.checkRequiredFields(statusRequest,List.of("status","slug"));
 
-        switch (statusDto.getStatus()) {
+        switch (statusRequest.getStatus()) {
             case "A", "D":
-                Store store = storeRepository.findStoreBySlug(statusDto.getSlug());
+                Store store = storeRepository.findStoreBySlug(statusRequest.getSlug());
                 if (store == null) throw new NotFoundException("No store found to update.");
-                String status = statusDto.getStatus();
+                String status = statusRequest.getStatus();
                 // updating store user status also
-                store.getUser().setStatus(statusDto.getStatus());
+                store.getUser().setStatus(statusRequest.getStatus());
                 store.setStatus(status);
                 int result = storeRepository.save(store).getId();
                 logger.debug("Exiting updateStatusBySlug");
@@ -437,12 +437,12 @@ public class StoreService {
     }
 
 
-    public int deleteStoreCategory(DeleteDto deleteDto,AuthUser user) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteStoreCategory with deleteDto: {}, user: {}", deleteDto, user);
+    public int deleteStoreCategory(DeleteRequest deleteRequest, AuthUser user) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteStoreCategory with deleteRequest: {}, user: {}", deleteRequest, user);
         // Validating required fields if they are null, this will throw an Exception
-        Utils.checkRequiredFields(deleteDto,List.of("slug"));
+        Utils.checkRequiredFields(deleteRequest,List.of("slug"));
         if (!user.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("Only super admin can delete a store category.",new Exception());
-        String slug = deleteDto.getSlug();
+        String slug = deleteRequest.getSlug();
         Integer categoryId = storeHbRepository.getStoreCategoryIdBySLug(slug);
         if (categoryId == null) throw new NotFoundException("Store's category not found.");
         storeHbRepository.switchCategoryToOther(categoryId);  // before delete category assign store to the other category.
@@ -451,11 +451,11 @@ public class StoreService {
         return result;
     }
 
-    public int deleteStoreSubCategory(DeleteDto deleteDto,AuthUser user) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteStoreSubCategory with deleteDto: {}, user: {}", deleteDto, user);
+    public int deleteStoreSubCategory(DeleteRequest deleteRequest, AuthUser user) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteStoreSubCategory with deleteRequest: {}, user: {}", deleteRequest, user);
         // Validating required fields if they are null this will throw an Exception
-        Utils.checkRequiredFields(deleteDto,List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest,List.of("slug"));
+        String slug = deleteRequest.getSlug();
         if (!user.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("Only super admin can delete a store subcategory.",new Exception());
         Integer subCategoryId = storeSubCategoryRepository.getStoreSubCategoryIdBySlug(slug);
         if (subCategoryId == null) throw new NotFoundException("Store's subcategory not found.");

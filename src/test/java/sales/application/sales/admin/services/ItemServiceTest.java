@@ -9,6 +9,7 @@ import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.Store;
 import com.sales.entities.User;
+import com.sales.request.StatusRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -92,12 +93,12 @@ public class ItemServiceTest extends TestUtil {
     public void testUpdateStatusBySlug() throws Exception {
         Store store = createStore();
         Item item = createItem(store.getId());
-        com.sales.request.StatusDto statusDto = new com.sales.request.StatusDto();
-        statusDto.setSlug(item.getSlug());
-        statusDto.setStatus("A");
+        StatusRequest statusRequest = new StatusRequest();
+        statusRequest.setSlug(item.getSlug());
+        statusRequest.setStatus("A");
         User user = createUser(UUID.randomUUID().toString(), "test@example.com", "pass", GlobalConstantTest.ADMIN);
         SalesUser loggedUser = new SalesUser(user);
-        int result = itemService.updateStatusBySlug(statusDto, loggedUser);
+        int result = itemService.updateStatusBySlug(statusRequest, loggedUser);
         assertEquals(1, result);
     }
 }

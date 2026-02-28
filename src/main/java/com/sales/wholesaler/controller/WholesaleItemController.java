@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.DeleteDto;
+import com.sales.request.DeleteRequest;
 import com.sales.request.ItemSearchFields;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
@@ -125,12 +125,12 @@ public class WholesaleItemController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('wholesale.item.delete')")
     @Operation(summary = "Delete item by slug", description = "Deletes an item from the wholesaler's store using the item's slug identifier")
-    public ResponseEntity<Map<String,Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String,Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting deleteItemBySlug method");
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        int isUpdated = wholesaleItemService.deleteItem(deleteDto,storeId);
+        int isUpdated = wholesaleItemService.deleteItem(deleteRequest,storeId);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);

@@ -215,11 +215,11 @@ public class UserController  {
     @Transactional
     @PreAuthorize("hasAuthority('user.delete')")
     @PostMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteUserBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting user with slug: {}", deleteDto.getSlug());
+    public ResponseEntity<Map<String, Object>> deleteUserBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting user with slug: {}", deleteRequest.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = userService.deleteUserBySlug(deleteDto,loggedUser);
+        int isUpdated = userService.deleteUserBySlug(deleteRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "User has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -251,11 +251,11 @@ public class UserController  {
 
     @PreAuthorize("hasAuthority('user.status')")
     @PostMapping("/status")
-    public ResponseEntity<Map<String, Object>> stockSlug(Authentication authentication,HttpServletRequest request,@RequestBody StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating status for user with slug: {}", statusDto.getSlug());
+    public ResponseEntity<Map<String, Object>> stockSlug(Authentication authentication,HttpServletRequest request,@RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating status for user with slug: {}", statusRequest.getSlug());
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = userService.updateStatusBySlug(statusDto,loggedUser);
+        int isUpdated = userService.updateStatusBySlug(statusRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "User's status updated successfully.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);

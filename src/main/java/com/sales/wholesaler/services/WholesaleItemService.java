@@ -4,8 +4,8 @@ package com.sales.wholesaler.services;
 import com.google.gson.Gson;
 import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.DeleteDto;
-import com.sales.request.GraphDto;
+import com.sales.request.DeleteRequest;
+import com.sales.request.GraphRequest;
 import com.sales.request.ItemSearchFields;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
@@ -354,11 +354,11 @@ public class WholesaleItemService  {
         return updateCount;
     }
 
-    public int deleteItem(DeleteDto deleteDto, Integer storeId) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting deleteItem method with deleteDto: {}, storeId: {}", deleteDto, storeId);
+    public int deleteItem(DeleteRequest deleteRequest, Integer storeId) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting deleteItem method with deleteRequest: {}, storeId: {}", deleteRequest, storeId);
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto,List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest,List.of("slug"));
+        String slug = deleteRequest.getSlug();
         String status = getItemStatus(slug);
         if(status == null) throw new NotFoundException("No item to delete.");
         if (status.equals("D")) throw new IllegalArgumentException("Can't deactivated items.");
@@ -380,14 +380,14 @@ public class WholesaleItemService  {
 
 
 
-    public Map<String,Object> getItemCountByMonths(GraphDto graphDto,Integer storeId){
-        logger.debug("Starting getItemCountByMonths method with graphDto: {}, storeId: {}", graphDto, storeId);
+    public Map<String,Object> getItemCountByMonths(GraphRequest graphRequest, Integer storeId){
+        logger.debug("Starting getItemCountByMonths method with graphRequest: {}, storeId: {}", graphRequest, storeId);
         Date date = new Date();
         int currentYear = date.getYear();
-        List<Integer> months = graphDto.getMonths();
+        List<Integer> months = graphRequest.getMonths();
         months = (months == null || months.isEmpty()) ?
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12) : months;
-        int year = Objects.nonNull(graphDto.getYear()) ? graphDto.getYear() : currentYear;
+        int year = Objects.nonNull(graphRequest.getYear()) ? graphRequest.getYear() : currentYear;
 
         Map<String,Object> monthsObj= new LinkedHashMap<>();
         for(Integer month : months) {

@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.StorePromotionDto;
+import com.sales.request.StorePromotionRequest;
 import com.sales.wholesaler.services.WholesalePromotionsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,10 +34,10 @@ public class WholesalePromotionController  {
     @PostMapping("/")
     @PreAuthorize("hasAuthority('wholesale.promoted.item.add')")
     @Operation(summary = "Insert promoted item", description = "Adds a new promoted item for the wholesaler store")
-    public ResponseEntity<Map<String,Object>> insertPromotedItem(Authentication authentication, HttpServletRequest request, @ModelAttribute StorePromotionDto storePromotionDto){
+    public ResponseEntity<Map<String,Object>> insertPromotedItem(Authentication authentication, HttpServletRequest request, @ModelAttribute StorePromotionRequest storePromotionRequest){
         logger.debug("Starting insertPromotedItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> response = wholesalePromotionsService.insertItemPromotion(storePromotionDto,loggedUser);
+        Map<String,Object> response = wholesalePromotionsService.insertItemPromotion(storePromotionRequest,loggedUser);
         logger.debug("Completed insertPromotedItem method");
         return new ResponseEntity<>(response,HttpStatus.valueOf((Integer) response.get("status")));
     }

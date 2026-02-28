@@ -292,11 +292,11 @@ public class ItemService {
     }
 
     @Transactional
-    public int deleteItem(DeleteDto deleteDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteItem with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteItem with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // Verify required fields if any issue found this will throw  IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
+        String slug = deleteRequest.getSlug();
         Item item = findItemBySLug(slug);
         if (item == null) throw new NotFoundException("Item not found to delete.");
         String title = "Item " + item.getName() + " deleted.";
@@ -320,17 +320,17 @@ public class ItemService {
         throw new IllegalArgumentException("The key slug can't be blank.");
     }
 
-    public int updateStatusBySlug(StatusDto statusDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering updateStatusBySlug with statusDto: {}, loggedUser: {}", statusDto, loggedUser);
+    public int updateStatusBySlug(StatusRequest statusRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering updateStatusBySlug with statusRequest: {}, loggedUser: {}", statusRequest, loggedUser);
         // Verify required fields update item status
-        Utils.checkRequiredFields(statusDto, List.of("status", "slug"));
-        switch (statusDto.getStatus()) {
+        Utils.checkRequiredFields(statusRequest, List.of("status", "slug"));
+        switch (statusRequest.getStatus()) {
             case "A", "D":
-                Item item = findItemBySLug(statusDto.getSlug());
+                Item item = findItemBySLug(statusRequest.getSlug());
                 if (item == null) return 0;
                 String title = "";
                 String messageBody = "";
-                if (statusDto.getStatus().equals("D")) {
+                if (statusRequest.getStatus().equals("D")) {
                     title = "Item " + item.getName() + " deactivated";
                     messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " deactivated by admin because it's legal policy issue. If you have any issue please contact to administrator.";
                 } else {
@@ -338,7 +338,7 @@ public class ItemService {
                     messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " activated successfully by admin.";
                 }
                 sendNotification(title, messageBody, item.getWholesaleId(), loggedUser);
-                int result = itemHbRepository.updateStatus(statusDto.getSlug(), statusDto.getStatus());
+                int result = itemHbRepository.updateStatus(statusRequest.getSlug(), statusRequest.getStatus());
                 logger.debug("Exiting updateStatusBySlug with result: {}", result);
                 return result;
             default:
@@ -507,11 +507,11 @@ public class ItemService {
         return result;
     }
 
-    public int deleteItemCategory(DeleteDto deleteDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteItemCategory with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public int deleteItemCategory(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteItemCategory with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // Validating required fields if they are null, this will throw an Exception
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
+        String slug = deleteRequest.getSlug();
         // only super admin can delete it subcategory
         if (!loggedUser.getUserType().equals("SA"))
             throw new PermissionDeniedDataAccessException("Only super admin can delete item's category.", new Exception());
@@ -524,11 +524,11 @@ public class ItemService {
 
     }
 
-    public int deleteItemSubCategory(DeleteDto deleteDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deleteItemSubCategory with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public int deleteItemSubCategory(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deleteItemSubCategory with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // Validating required fields if they are null, this will throw an Exception
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
+        String slug = deleteRequest.getSlug();
         // only super admin can delete it subcategory
         if (!loggedUser.getUserType().equals("SA"))
             throw new PermissionDeniedDataAccessException("Only super admin can delete subcategory.", new Exception());

@@ -8,10 +8,10 @@ import com.sales.admin.repositories.ServicePlanHbRepository;
 import com.sales.admin.repositories.ServicePlanRepository;
 import com.sales.admin.repositories.WholesalerPlansRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.DeleteDto;
+import com.sales.request.DeleteRequest;
 import com.sales.admin.dto.ServicePlanDto;
 import com.sales.request.ServicePlanRequest;
-import com.sales.request.StatusDto;
+import com.sales.request.StatusRequest;
 import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
@@ -135,19 +135,19 @@ public class ServicePlanService {
         return result;
     }
 
-    public Map<String,Object> updateServicePlanStatus(StatusDto statusDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering updateServicePlanStatus with statusDto: {}, loggedUser: {}", statusDto, loggedUser);
+    public Map<String,Object> updateServicePlanStatus(StatusRequest statusRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering updateServicePlanStatus with statusRequest: {}, loggedUser: {}", statusRequest, loggedUser);
         // Validating required fields if there we found any required field is null, then it will throw an Exception
-        Utils.checkRequiredFields(statusDto, List.of("status","slug"));
+        Utils.checkRequiredFields(statusRequest, List.of("status","slug"));
 
-        String status = statusDto.getStatus();
+        String status = statusRequest.getStatus();
         Map<String, Object> result = new HashMap<>();
         if (!loggedUser.getUserType().equals("SA"))
             throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator",new Exception());
 
         switch (status) {
             case "A", "D":
-                int isUpdated = servicePlanHbRepository.updateServicePlansStatus(status, statusDto.getSlug(), loggedUser);
+                int isUpdated = servicePlanHbRepository.updateServicePlansStatus(status, statusRequest.getSlug(), loggedUser);
                 if (isUpdated > 0) {
                     if (status.equals("A")) {
                         result.put(ConstantResponseKeys.MESSAGE, "Successfully Activated.");
@@ -166,11 +166,11 @@ public class ServicePlanService {
         }
     }
 
-    public Map<String,Object> deletedServicePlan(DeleteDto deleteDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering deletedServicePlan with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    public Map<String,Object> deletedServicePlan(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering deletedServicePlan with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // Validating required fields if their we found any required field is null, then it will throw an Exception
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
-        String slug = deleteDto.getSlug();
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
+        String slug = deleteRequest.getSlug();
         Map<String,Object> result = new HashMap<>();
         if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator.",new Exception());
         int isUpdated = servicePlanHbRepository.deleteServicePlan(slug, loggedUser);

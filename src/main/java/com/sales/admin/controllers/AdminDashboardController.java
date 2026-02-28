@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
-import com.sales.request.GraphDto;
+import com.sales.request.GraphRequest;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,10 +46,10 @@ public class AdminDashboardController  {
     @PreAuthorize("hasAuthority('dashboard.count')")
     @PostMapping("graph/months/")
     @Operation(summary = "Get graph data by months", description = "Retrieves graph data for store counts by months based on filters")
-    public ResponseEntity<Map<String, Object>> getAllGraphData(@RequestBody GraphDto graphDto) {
-        logger.debug("Fetching graph data for months with filters: {}", graphDto);
+    public ResponseEntity<Map<String, Object>> getAllGraphData(@RequestBody GraphRequest graphRequest) {
+        logger.debug("Fetching graph data for months with filters: {}", graphRequest);
         Map<String, Object> responseObj = new HashMap<>();
-        responseObj.put(ConstantResponseKeys.RES, storeService.getStoreCountByMonths(graphDto));
+        responseObj.put(ConstantResponseKeys.RES, storeService.getStoreCountByMonths(graphRequest));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         return new ResponseEntity<>(responseObj,HttpStatus.OK);
     }

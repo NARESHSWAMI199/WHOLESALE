@@ -7,9 +7,9 @@ import com.sales.admin.services.ServicePlanService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.DeleteDto;
+import com.sales.request.DeleteRequest;
 import com.sales.request.ServicePlanRequest;
-import com.sales.request.StatusDto;
+import com.sales.request.StatusRequest;
 import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.global.ConstantResponseKeys;
@@ -97,10 +97,10 @@ public class ServicePlanController  {
     @PreAuthorize("hasAuthority('service-plans.status.update')")
     @PostMapping(ConstantResponseKeys.STATUS)
     @Operation(summary = "Update service plan status", description = "Updates the status of a service plan")
-    public ResponseEntity<Map<String,Object>> updateStatus(Authentication authentication,HttpServletRequest request, @RequestBody StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating status for service plan: {}", statusDto);
+    public ResponseEntity<Map<String,Object>> updateStatus(Authentication authentication,HttpServletRequest request, @RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating status for service plan: {}", statusRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String, Object> result = servicePlanService.updateServicePlanStatus(statusDto, loggedUser);
+        Map<String, Object> result = servicePlanService.updateServicePlanStatus(statusRequest, loggedUser);
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 
@@ -108,10 +108,10 @@ public class ServicePlanController  {
     @PreAuthorize("hasAuthority('service-plans.delete')")
     @PostMapping("delete")
     @Operation(summary = "Delete service plan", description = "Deletes a service plan")
-    public ResponseEntity<Map<String,Object>> deleteStatus(Authentication authentication,@RequestBody DeleteDto deleteDto, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting service plan: {}", deleteDto);
+    public ResponseEntity<Map<String,Object>> deleteStatus(Authentication authentication, @RequestBody DeleteRequest deleteRequest, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting service plan: {}", deleteRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String, Object> result = servicePlanService.deletedServicePlan(deleteDto,loggedUser);
+        Map<String, Object> result = servicePlanService.deletedServicePlan(deleteRequest,loggedUser);
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 

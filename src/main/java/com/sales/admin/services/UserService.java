@@ -435,19 +435,19 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = {PermissionDeniedDataAccessException.class,IllegalArgumentException.class,RuntimeException.class,Exception.class})
-    public int deleteUserBySlug(DeleteDto deleteDto,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting user by slug: {}", deleteDto.getSlug());
+    public int deleteUserBySlug(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting user by slug: {}", deleteRequest.getSlug());
         // if there is any required field null, then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
 
-        String slug = deleteDto.getSlug();
+        String slug = deleteRequest.getSlug();
         User user = getUserDetail(slug);
         if(user == null) throw new NotFoundException("User not found to delete.");
         // if logged user doesn't have permission, then can't delete it this will throw an Exception
         Utils.canUpdateAStaff(slug,user.getUserType(),loggedUser);
         if(user.getUserType().equals(USER_TYPES.WHOLESALER.getType())) storeService.deleteStoreByUserId(user.getId());
         // Evict deleted user from redis
-        userCacheService.deleteCacheUser(deleteDto.getSlug());
+        userCacheService.deleteCacheUser(deleteRequest.getSlug());
         return userHbRepository.deleteUserBySlug(slug);
     }
 
@@ -463,21 +463,21 @@ public class UserService {
     }
 
     @Transactional
-    public int updateStatusBySlug(StatusDto statusDto,AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating status for user with slug: {}", statusDto.getSlug());
+    public int updateStatusBySlug(StatusRequest statusRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating status for user with slug: {}", statusRequest.getSlug());
         try {
             // if there is any required field null, then this will throw IllegalArgumentException
-            Utils.checkRequiredFields(statusDto, List.of("status", "slug"));
+            Utils.checkRequiredFields(statusRequest, List.of("status", "slug"));
 
-            switch (statusDto.getStatus()){
+            switch (statusRequest.getStatus()){
                 case "A" , "D":
                     // Evict status user from redis
-                    userCacheService.deleteCacheUser(statusDto.getSlug());
-                    String status = statusDto.getStatus();
+                    userCacheService.deleteCacheUser(statusRequest.getSlug());
+                    String status = statusRequest.getStatus();
                     /* Getting user and updating status */
-                    User user = userRepository.findUserBySlug(statusDto.getSlug());
+                    User user = userRepository.findUserBySlug(statusRequest.getSlug());
                     if (user == null) throw new NotFoundException("No user not found to update.");
-                    Utils.canUpdateAStaffStatus(statusDto.getSlug(),user.getUserType(),loggedUser);
+                    Utils.canUpdateAStaffStatus(statusRequest.getSlug(),user.getUserType(),loggedUser);
                     user.setStatus(status);
                     // if userType is wholesaler no need to go further
                     if(!user.getUserType().equals(USER_TYPES.WHOLESALER.getType())){

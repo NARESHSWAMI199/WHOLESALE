@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-public class StorePromotionDto {
+public class StorePromotionRequest {
     Integer id;
     String bannerImage = "test.png";
     String promotionType;

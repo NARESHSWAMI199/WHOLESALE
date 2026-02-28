@@ -221,11 +221,11 @@ public class ItemController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('item.delete')")
     @Operation(summary = "Delete item", description = "Deletes an item by its slug")
-    public ResponseEntity<Map<String, Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting item with slug: {}", deleteDto);
+    public ResponseEntity<Map<String, Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting item with slug: {}", deleteRequest);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = itemService.deleteItem(deleteDto,loggedUser);
+        int isUpdated = itemService.deleteItem(deleteRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -269,11 +269,11 @@ public class ItemController  {
     @PostMapping("/status")
     @PreAuthorize("hasAuthority('item.status')")
     @Operation(summary = "Update item status", description = "Updates the status of an item")
-    public ResponseEntity<Map<String, Object>> updateItemStatus(Authentication authentication,HttpServletRequest request ,@RequestBody StatusDto statusDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Updating status for item with statusDto: {}", statusDto);
+    public ResponseEntity<Map<String, Object>> updateItemStatus(Authentication authentication,HttpServletRequest request ,@RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Updating status for item with statusRequest: {}", statusRequest);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = itemService.updateStatusBySlug(statusDto,loggedUser);
+        int isUpdated = itemService.updateStatusBySlug(statusRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item's status has been successfully updated.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -337,11 +337,11 @@ public class ItemController  {
     @PostMapping("category/delete")
     @PreAuthorize("hasAuthority('item.category.delete')")
     @Operation(summary = "Delete item category", description = "Deletes an item category by ID")
-    public ResponseEntity<Map<String,Object>> deleteItemCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting item category with id: {}", deleteDto);
+    public ResponseEntity<Map<String,Object>> deleteItemCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting item category with id: {}", deleteRequest);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = itemService.deleteItemCategory(deleteDto,loggedUser);
+        int isUpdated = itemService.deleteItemCategory(deleteRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item's category delete successfully.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -399,11 +399,11 @@ public class ItemController  {
     @PostMapping("subcategory/delete")
     @PreAuthorize("hasAuthority('item.subcategory.delete')")
     @Operation(summary = "Delete item subcategory", description = "Deletes an item subcategory by ID")
-    public ResponseEntity<Map<String,Object>> deleteItemSubCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteDto deleteDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Deleting item subcategory with id: {}", deleteDto);
+    public ResponseEntity<Map<String,Object>> deleteItemSubCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Deleting item subcategory with id: {}", deleteRequest);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = itemService.deleteItemSubCategory(deleteDto,loggedUser);
+        int isUpdated = itemService.deleteItemSubCategory(deleteRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item's subcategory deleted successfully");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
