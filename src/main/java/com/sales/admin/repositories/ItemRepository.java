@@ -13,26 +13,25 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ItemRepository  extends JpaRepository<Item, Long> , JpaSpecificationExecutor<Item> {
+public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
 
 
+    @Query("from Item where wholesaleId=:wholesaleId and createdAt >= :fromDate and createdAt <= :toDate")
+    List<Item> getAllItemsWithFilters(@Param("wholesaleId") Integer wholesaleId,
+                                      @Param("fromDate") Long fromDate,
+                                      @Param("toDate") Long toDate);
 
-   @Query("from Item where wholesaleId=:wholesaleId and createdAt >= :fromDate and createdAt <= :toDate")
-   List<Item> getAllItemsWithFilters(@Param("wholesaleId")Integer wholesaleId,
-                                            @Param("fromDate") Long fromDate,
-                                            @Param("toDate") Long toDate);
 
+    @EntityGraph(attributePaths = {Item_.ITEM_CATEGORY, Item_.ITEM_SUB_CATEGORY}, type = EntityGraph.EntityGraphType.FETCH)
+    Item findItemBySlug(String slug);
 
-   @EntityGraph(attributePaths = {Item_.ITEM_CATEGORY, Item_.ITEM_SUB_CATEGORY}, type = EntityGraph.EntityGraphType.FETCH)
-   Item findItemBySlug(String slug);
+    @Query(value = "select count(id) as count from Item")
+    Integer totalItemCount();
 
-   @Query(value = "select count(id) as count from Item")
-   Integer totalItemCount();
+    @Query(value = "select count(id) as count from Item where status=:status")
+    Integer optionItemCount(@Param("status") String status);
 
-   @Query(value = "select count(id) as count from Item where status=:status")
-   Integer optionItemCount(@Param("status") String status);
-
-   @Query(value = "select count(id) as count from Item where wholesaleId = :wholesaleId")
-   Integer totalItemCountByWholesaleId(Integer wholesaleId);
+    @Query(value = "select count(id) as count from Item where wholesaleId = :wholesaleId")
+    Integer totalItemCountByWholesaleId(Integer wholesaleId);
 
 }

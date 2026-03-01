@@ -7,12 +7,15 @@ import com.sales.admin.dto.ItemDto;
 import com.sales.admin.mapper.ItemMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
+import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.request.enums.ITEM_LABEL;
+import com.sales.request.enums.ITEM_STOCK;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
@@ -78,6 +81,7 @@ public class ItemService {
     }
 
 
+    @Transactional
     public String createItemsExcelSheet(ItemSearchFields searchFilters, String wholesaleSlug, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         Specification<Item> specification = Specification.allOf(
@@ -130,12 +134,13 @@ public class ItemService {
     public ItemDto findItemDtoBySlug(String slug) {
         logger.debug("Entering findItemDtoBySlug with slug: {}", slug);
         Item result = itemRepository.findItemBySlug(slug);
+        result.setStoreSlug(storeRepository.findStoreSlugByStoreId(result.getWholesaleId()));
         logger.debug("Exiting findItemDtoBySlug");
         return itemMapper.toDto(result);
     }
 
 
-    public Item findItemBySLug(String slug) {
+    public Item findItemBySlug(String slug) {
         logger.debug("Entering findItemBySLug with slug: {}", slug);
         Item result = itemRepository.findItemBySlug(slug);
         logger.debug("Exiting findItemBySLug");
@@ -179,10 +184,10 @@ public class ItemService {
         validateRequiredFields(itemRequest);
 
         // Validate inStock
-        if (!(itemRequest.getInStock().equals("N") || itemRequest.getInStock().equals("Y")))
+        if (!(ITEM_STOCK.OUT_OF_STOCK.getStock().equals(itemRequest.getInStock()) || ITEM_STOCK.INSTOCK.getStock().equals(itemRequest.getInStock())))
             throw new IllegalArgumentException("inStock must be 'Y' or 'N'.");
         // Validate label
-        if (!(itemRequest.getLabel().equals("N") || itemRequest.getLabel().equals("O")))
+        if (!(ITEM_LABEL.NEW.getLabel().equals(itemRequest.getLabel()) || ITEM_LABEL.OLD.getLabel().equals(itemRequest.getLabel())))
             throw new IllegalArgumentException("label must be 'O' or 'N'.");
         // Validate price and discount
         if (itemRequest.getPrice() < itemRequest.getDiscount() || itemRequest.getDiscount() < 0)
@@ -202,10 +207,13 @@ public class ItemService {
 
         // Going to update item
         if (!Utils.isEmpty(itemRequest.getSlug()) || path.contains("update")) {
-            logger.debug("We are going to update the item.");
-            // if there is any required field null, then this will throw IllegalArgumentException
-            Utils.checkRequiredFields(itemRequest, List.of("slug"));
-
+            logger.info("We are going to update the item.");
+            Integer storeId = storeRepository.getStoreIdByStoreSlug(itemRequest.getWholesaleSlug());
+            if (storeId != null) {
+                itemRequest.setStoreId(storeId);
+            } else {
+                throw new NotFoundException("No store found for update this item.");
+            }
             int isUpdated = updateItem(itemRequest, loggedUser);
             // updating item images
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
@@ -221,7 +229,8 @@ public class ItemService {
             // if there is any required field null, then this will throw IllegalArgumentException
             validateRequiredFieldsBeforeCreateItem(itemRequest);
             Item createdItem = createItem(itemRequest, loggedUser);
-            responseObj.put(ConstantResponseKeys.RES, createdItem);
+            ItemDto cratedItemDto = itemMapper.toDto(createdItem);
+            responseObj.put(ConstantResponseKeys.RES, cratedItemDto);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully inserted.");
             responseObj.put(ConstantResponseKeys.STATUS, 201);
         }
@@ -239,6 +248,7 @@ public class ItemService {
         if (store == null) throw new IllegalArgumentException("Not a valid store.");
         User userForUpdate = User.builder()
                 .id(loggedUser.getId())
+                .username(loggedUser.getUsername())
                 .build();
         String slug = UUID.randomUUID().toString();
         item.setWholesaleId(store.getId());
@@ -266,15 +276,15 @@ public class ItemService {
 
     @Transactional
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
-        logger.debug("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
-        Item item = findItemBySLug(itemRequest.getSlug());
+        logger.info("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
+        Item item = findItemBySlug(itemRequest.getSlug());
         String title = "Item " + item.getName() + " updated.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " updated by admin previous data was " +
                 item.toString()
                 + ". If you have any issue please contact to administrator.";
         sendNotification(title, messageBody, item.getWholesaleId(), loggedUser);
         int result = itemHbRepository.updateItems(itemRequest, loggedUser);
-        logger.debug("Exiting updateItem");
+        logger.info("Exiting updateItem");
         return result;
     }
 
@@ -294,10 +304,9 @@ public class ItemService {
     @Transactional
     public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering deleteItem with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
-        // Verify required fields if any issue found this will throw  IllegalArgumentException
-        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
+        if(!USER_TYPES.SUPER_ADMIN.getType().equals(loggedUser.getUserType())) throw new MyException("Only Superuser has permission to delete it.");
         String slug = deleteRequest.getSlug();
-        Item item = findItemBySLug(slug);
+        Item item = findItemBySlug(slug);
         if (item == null) throw new NotFoundException("Item not found to delete.");
         String title = "Item " + item.getName() + " deleted.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " deleted by admin. If you have any issue please contact to administrator.";
@@ -326,7 +335,7 @@ public class ItemService {
         Utils.checkRequiredFields(statusRequest, List.of("status", "slug"));
         switch (statusRequest.getStatus()) {
             case "A", "D":
-                Item item = findItemBySLug(statusRequest.getSlug());
+                Item item = findItemBySlug(statusRequest.getSlug());
                 if (item == null) return 0;
                 String title = "";
                 String messageBody = "";
@@ -373,7 +382,7 @@ public class ItemService {
         itemDetailMap.put("CAPACITY", capacityList.get(index));
         itemDetailMap.put("PRICE", priceList.get(index));
         itemDetailMap.put("DISCOUNT", discountList.get(index));
-        itemDetailMap.put("IN-STOCK", inStockList.get(index));
+        itemDetailMap.put("IN-ITEM_STOCK", inStockList.get(index));
         return itemDetailMap;
     }
 
@@ -385,7 +394,7 @@ public class ItemService {
         ItemHbRepository.ItemUpdateError itemUpdateError = new ItemHbRepository.ItemUpdateError();
         List<ItemHbRepository.ItemUpdateError> errorsList = new ArrayList<>();
         List<String> nameList = itemsData.get("NAME"), labelList = itemsData.get("LABEL"), slugList = itemsData.get("TOKEN"),
-                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-STOCK");
+                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-ITEM_STOCK");
 
         for (int i = 0; i < nameList.size(); i++) {
             Map<String, Object> itemStringDetail = null;
@@ -598,6 +607,4 @@ public class ItemService {
         logger.debug("Exiting getAllMeasurementUnit with result: {}", result);
         return result;
     }
-
-
 }

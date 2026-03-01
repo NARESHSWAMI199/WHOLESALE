@@ -36,13 +36,13 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
     private final EntityManager entityManager;
 
     // find with pageable and specs.
-    public Page<WholesaleItemListDto> findAll(Specification<Item> spec, Pageable pageable){
+    public Page<WholesaleItemListDto> findAll(Specification<Item> spec, Pageable pageable) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        Long itemsCounts = getCounts(entityManager,criteriaBuilder, spec,Item.class);
+        Long itemsCounts = getCounts(entityManager, criteriaBuilder, spec, Item.class);
         if (itemsCounts == 0) {
             return new PageImpl<>(List.of(), pageable, 0L);
         }
-        List<WholesaleItemListDto> content = getAllFilteredItems(criteriaBuilder,spec, pageable);
+        List<WholesaleItemListDto> content = getAllFilteredItems(criteriaBuilder, spec, pageable);
         return new PageImpl<>(content, pageable, itemsCounts);
     }
 
@@ -84,61 +84,61 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
         return query.getResultList();
     }
 
-    public int updateItems(ItemRequest WholesaleItemDto, AuthUser loggedUser){
+    public int updateItems(ItemRequest WholesaleItemDto, AuthUser loggedUser) {
         String hqQuery = "update Item set " +
                 "name =:name," +
                 "capacity =:capacity," +
                 "description =:description," +
-                "label =:label,"+
+                "label =:label," +
                 "price =:price," +
                 "discount =:discount," +
-                "itemCategory =:itemCategory,"+
-                "itemSubCategory =:itemSubCategory,"+
+                "itemCategory =:itemCategory," +
+                "itemSubCategory =:itemSubCategory," +
                 "updatedAt =:updatedAt," +
                 "updatedBy =:updatedBy " +
                 "where slug =:slug and wholesaleId =:wholesaleId";
         Query query = entityManager.createQuery(hqQuery);
-        query.setParameter("name" , WholesaleItemDto.getName());
-        query.setParameter("capacity" , WholesaleItemDto.getCapacity());
-        query.setParameter("description" , WholesaleItemDto.getDescription());
-        query.setParameter("label" , WholesaleItemDto.getLabel());
-        query.setParameter("price" , WholesaleItemDto.getPrice());
-        query.setParameter("discount" , WholesaleItemDto.getDiscount());
-        query.setParameter("itemCategory" , WholesaleItemDto.getItemCategory());
-        query.setParameter("itemSubCategory" , WholesaleItemDto.getItemSubCategory());
-        query.setParameter("updatedAt" , Utils.getCurrentMillis());
-        query.setParameter("updatedBy" , User.builder().id(loggedUser.getId()).build());
+        query.setParameter("name", WholesaleItemDto.getName());
+        query.setParameter("capacity", WholesaleItemDto.getCapacity());
+        query.setParameter("description", WholesaleItemDto.getDescription());
+        query.setParameter("label", WholesaleItemDto.getLabel());
+        query.setParameter("price", WholesaleItemDto.getPrice());
+        query.setParameter("discount", WholesaleItemDto.getDiscount());
+        query.setParameter("itemCategory", WholesaleItemDto.getItemCategory());
+        query.setParameter("itemSubCategory", WholesaleItemDto.getItemSubCategory());
+        query.setParameter("updatedAt", Utils.getCurrentMillis());
+        query.setParameter("updatedBy", User.builder().id(loggedUser.getId()).build());
         query.setParameter("slug", WholesaleItemDto.getSlug());
         query.setParameter("wholesaleId", WholesaleItemDto.getStoreId());
-        return  query.executeUpdate();
-    }
-
-
-    public int deleteItem(String slug,Integer storeId){
-        String hqlString = "update Item set isDeleted='Y' where slug=:slug and wholesaleId =:wholesaleId";
-        Query query = entityManager.createQuery(hqlString);
-        query.setParameter("slug",slug);
-        query.setParameter("wholesaleId",storeId);
         return query.executeUpdate();
     }
 
-    public int updateStock(String stock , String slug, Integer storeId){
+
+    public int deleteItem(String slug) {
+        String hqlString = "update Item set isDeleted='Y' where slug=:slug";
+        Query query = entityManager.createQuery(hqlString);
+        query.setParameter("slug", slug);
+        return query.executeUpdate();
+    }
+
+    public int updateStock(String stock, String slug, Integer storeId) {
         String hqlString = "update Item set inStock=:stock where slug=:slug and wholesaleId =:wholesaleId";
         Query query = entityManager.createQuery(hqlString);
-        query.setParameter("stock",stock);
-        query.setParameter("slug",slug);
-        query.setParameter("wholesaleId",storeId);
+        query.setParameter("stock", stock);
+        query.setParameter("slug", slug);
+        query.setParameter("wholesaleId", storeId);
         return query.executeUpdate();
     }
 
-    public int updateStatus(String slug, String status){
+    public int updateStatus(String slug, String status) {
         String hql = "Update Item set status=:status where slug=:slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("status",status);
-        query.setParameter("slug",slug);
+        query.setParameter("status", status);
+        query.setParameter("slug", slug);
         return query.executeUpdate();
     }
-    public int updateItemImages(String slug , String filename){
+
+    public int updateItemImages(String slug, String filename) {
         String hql = "update Item set avtars =:avtars where slug=:slug";
         Query query = entityManager.createQuery(hql);
         query.setParameter("avtars", filename);
@@ -153,23 +153,23 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
     @Setter
     @ToString
     public static class ItemUpdateError {
-        Map<String,Object> itemRowDetail;
+        Map<String, Object> itemRowDetail;
         String errorMessage;
     }
 
 
-    public int updateExcelSheetItems(ItemRequest WholesaleItemDto, Integer userId, Integer wholesaleId){
+    public int updateExcelSheetItems(ItemRequest WholesaleItemDto, Integer userId, Integer wholesaleId) {
         String hql = """
-           update Item set name=:name,
-                label=:label,
-                capacity=:capacity,
-                price=:price,
-                discount=:discount,
-                inStock=:inStock,
-                updatedAt=:updatedAt,
-                updatedBy=:updatedBy
-           where slug=:slug and wholesaleId=:wholesaleId
-        """;
+                   update Item set name=:name,
+                        label=:label,
+                        capacity=:capacity,
+                        price=:price,
+                        discount=:discount,
+                        inStock=:inStock,
+                        updatedAt=:updatedAt,
+                        updatedBy=:updatedBy
+                   where slug=:slug and wholesaleId=:wholesaleId
+                """;
         Query query = entityManager.createQuery(hql);
         query.setParameter("name", WholesaleItemDto.getName())
                 .setParameter("label", WholesaleItemDto.getLabel())
@@ -178,12 +178,11 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
                 .setParameter("discount", WholesaleItemDto.getDiscount())
                 .setParameter("inStock", WholesaleItemDto.getInStock())
                 .setParameter("updatedAt", Utils.getCurrentMillis())
-                .setParameter("updatedBy",  User.builder().id(userId).build())
+                .setParameter("updatedBy", User.builder().id(userId).build())
                 .setParameter("slug", WholesaleItemDto.getSlug())
-                .setParameter("wholesaleId",wholesaleId);
+                .setParameter("wholesaleId", wholesaleId);
         return query.executeUpdate();
     }
-
 
 
 }

@@ -40,7 +40,7 @@ public class WholesaleItemServiceTest extends TestUtil {
     public void testFindItemBySLug() {
         Store store = createStore();
         Item item = createItem(store.getId());
-        WholesaleItemDto found = wholesaleItemService.findItemBySLug(item.getSlug());
+        WholesaleItemDto found = wholesaleItemService.findItemDtoBySlug(item.getSlug());
         assertNotNull(found);
         assertEquals(item.getSlug(), found.slug());
     }

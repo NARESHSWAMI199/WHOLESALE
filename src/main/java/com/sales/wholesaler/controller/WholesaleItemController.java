@@ -77,7 +77,7 @@ public class WholesaleItemController  {
     public ResponseEntity<Map<String, Object>> getItem(@PathVariable String slug) {
         logger.debug("Starting getItem method");
         Map<String, Object> responseObj = new HashMap<>();
-        WholesaleItemDto wholesaleItemDto = wholesaleItemService.findItemBySLug(slug);
+        WholesaleItemDto wholesaleItemDto = wholesaleItemService.findItemDtoBySlug(slug);
         if (wholesaleItemDto != null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put(ConstantResponseKeys.RES, wholesaleItemDto);
@@ -129,8 +129,7 @@ public class WholesaleItemController  {
         logger.debug("Starting deleteItemBySlug method");
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        int isUpdated = wholesaleItemService.deleteItem(deleteRequest,storeId);
+        int isUpdated = wholesaleItemService.deleteItem(deleteRequest,loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);

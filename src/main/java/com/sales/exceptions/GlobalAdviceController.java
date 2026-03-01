@@ -60,10 +60,10 @@ public class GlobalAdviceController {
 
     @Transactional
     @ExceptionHandler(value = NotFoundException.class)
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDto notFoundException (NotFoundException ex , WebRequest request){
         logger.error("NotFoundException: {}", ex.getMessage(),ex);
-        return new ErrorDto(ex.getMessage(), 404);
+        return new ErrorDto(ex.getMessage(), 400);
     }
 
     @Transactional
@@ -176,7 +176,7 @@ public class GlobalAdviceController {
 
     @Transactional
     @ExceptionHandler(value = {MyException.class})
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDto myException(MyException ex, WebRequest request) {
         logger.error("MyException: {}", ex.getMessage(),ex);
         String errorMessage = ex.getMessage();

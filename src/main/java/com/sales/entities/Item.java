@@ -52,13 +52,13 @@ public class Item implements Serializable {
     @Column(name = "created_at")
     Long createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by" , referencedColumnName = "user_id")
     User createdBy;
     @Column(name = "updated_at")
     Long updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by")
+    @JoinColumn(name = "updated_by", referencedColumnName = "user_id")
     User updatedBy;
     @Column(name = "slug")
     String slug;
@@ -77,6 +77,9 @@ public class Item implements Serializable {
     @JoinColumn(name = "subcategory", referencedColumnName = "id")
     ItemSubCategory itemSubCategory;
 
+
+    @Transient
+    String storeSlug;
 
 //    @ManyToOne
 //    @JoinColumn(name = "wholesale_id")

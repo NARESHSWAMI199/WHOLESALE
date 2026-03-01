@@ -29,7 +29,7 @@ public class UploadImageValidator {
                 int width = image.getWidth();
                 int height = image.getHeight();
 
-                safeLog.info("image width : {} : {}", width, height);
+                safeLog.info("image width : {} : and height : {}", width, height);
                 // Check dimensions
                 if (width < minWidth || width > maxWidth || height < minHeight || height > maxHeight) {
                     if(width < minWidth || height < minHeight) {

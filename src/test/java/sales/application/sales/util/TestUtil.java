@@ -332,7 +332,7 @@ public class TestUtil {
 
         Map<String,String> response = new HashMap<>();
         response.put("slug", extractSlugFromResponseViaUser(result));
-        response.put(ConstantResponseKeys.TOKEN, extractTokenFromResponse(result));
+        response.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX+ extractTokenFromResponse(result));
         return response;
     }
 

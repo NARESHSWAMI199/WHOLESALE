@@ -11,7 +11,6 @@ public record WholesaleUserDto(
         String otp,
         String avatar,
         String username,
-        String password,
         String email,
         String contact,
         String userType,

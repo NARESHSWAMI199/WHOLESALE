@@ -23,10 +23,10 @@ public record ItemDto(
         Long updatedAt,
         String slug,
         String inStock,
-        Integer wholesaleId,
         CategoryDto itemCategory,
         SubcategoryDto itemSubCategory,
         UserDto createdBy,
-        UserDto updatedBy
+        UserDto updatedBy,
+        String storeSlug
 ) {
 }

@@ -213,7 +213,7 @@ public class ItemControllerTest extends TestUtil {
                         .headers(headers)
                 )
                 .andExpectAll(
-                        status().is(404)
+                        status().is(400)
                 )
                 .andDo(print());
     }
@@ -509,7 +509,7 @@ public class ItemControllerTest extends TestUtil {
         mockMvc.perform(get("/admin/item/detail/{slug}", "nonexistent")
                 .headers(headers)
         ).andExpectAll(
-                status().is(404),
+                status().is(400),
                 jsonPath("$.message", is("Item Not Found"))
         );
     }

@@ -3,7 +3,10 @@ package com.sales.wholesaler.services;
 
 import com.google.gson.Gson;
 import com.sales.admin.repositories.ItemHbRepository;
+import com.sales.admin.repositories.StoreRepository;
+import com.sales.admin.repositories.UserRepository;
 import com.sales.claims.AuthUser;
+import com.sales.global.STATUS;
 import com.sales.request.DeleteRequest;
 import com.sales.request.GraphRequest;
 import com.sales.request.ItemSearchFields;
@@ -52,9 +55,9 @@ import static com.sales.specifications.ItemsSpecifications.*;
 
 @Service
 @RequiredArgsConstructor
-public class WholesaleItemService  {
+public class WholesaleItemService {
 
-    
+
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemService.class);
     private final WholesaleItemRepository wholesaleItemRepository;
     private final WholesaleItemHbRepository wholesaleItemHbRepository;
@@ -68,6 +71,9 @@ public class WholesaleItemService  {
 
     @Value("${item.absolute}")
     String itemImagePath;
+    private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
+    private final WholesaleUserRepository wholesaleUserRepository;
 
 
     public Page<WholesaleItemListDto> getAllItems(ItemSearchFields searchFilters, Integer storeId) {
@@ -92,73 +98,78 @@ public class WholesaleItemService  {
     }
 
 
-
-
-    public Map<String, Integer> getItemCounts (Integer storeId) {
+    public Map<String, Integer> getItemCounts(Integer storeId) {
         logger.debug("Starting getItemCounts method with storeId: {}", storeId);
-        Map<String,Integer> responseObj = new HashMap<>();
-        responseObj.put("all",wholesaleItemRepository.totalItemCount(storeId));
-        responseObj.put("inStock",wholesaleItemRepository.getItemCountInStock("Y",storeId));
-        responseObj.put("outStock",wholesaleItemRepository.getItemCountInStock("N",storeId));
-        responseObj.put("active",wholesaleItemRepository.optionItemCount("A",storeId));
-        responseObj.put("deactive",wholesaleItemRepository.optionItemCount("D",storeId));
+        Map<String, Integer> responseObj = new HashMap<>();
+        responseObj.put("all", wholesaleItemRepository.totalItemCount(storeId));
+        responseObj.put("inStock", wholesaleItemRepository.getItemCountInStock("Y", storeId));
+        responseObj.put("outStock", wholesaleItemRepository.getItemCountInStock("N", storeId));
+        responseObj.put("active", wholesaleItemRepository.optionItemCount("A", storeId));
+        responseObj.put("deactive", wholesaleItemRepository.optionItemCount("D", storeId));
         logger.debug("Completed getItemCounts method");
         return responseObj;
     }
 
-    public Map<String, Integer> getItemCountsForNewLabel (Integer storeId) {
+    public Map<String, Integer> getItemCountsForNewLabel(Integer storeId) {
         logger.debug("Starting getItemCountsForNewLabel method with storeId: {}", storeId);
-        Map<String,Integer> responseObj = new HashMap<>();
-        responseObj.put("all",wholesaleItemRepository.getItemCountLabel("N",storeId));
-        responseObj.put("inStock",wholesaleItemRepository.getItemCountInStock("Y","N",storeId));
-        responseObj.put("outStock",wholesaleItemRepository.getItemCountInStock("N","N",storeId));
-        responseObj.put("active",wholesaleItemRepository.optionItemCountLabel("N","A",storeId));
-        responseObj.put("deactive",wholesaleItemRepository.optionItemCountLabel("N","D",storeId));
+        Map<String, Integer> responseObj = new HashMap<>();
+        responseObj.put("all", wholesaleItemRepository.getItemCountLabel("N", storeId));
+        responseObj.put("inStock", wholesaleItemRepository.getItemCountInStock("Y", "N", storeId));
+        responseObj.put("outStock", wholesaleItemRepository.getItemCountInStock("N", "N", storeId));
+        responseObj.put("active", wholesaleItemRepository.optionItemCountLabel("N", "A", storeId));
+        responseObj.put("deactive", wholesaleItemRepository.optionItemCountLabel("N", "D", storeId));
         logger.debug("Completed getItemCountsForNewLabel method");
         return responseObj;
     }
 
-    public Map<String, Integer> getItemCountsForOldLabel (Integer storeId) {
+    public Map<String, Integer> getItemCountsForOldLabel(Integer storeId) {
         logger.debug("Starting getItemCountsForOldLabel method with storeId: {}", storeId);
-        Map<String,Integer> responseObj = new HashMap<>();
-        responseObj.put("all",wholesaleItemRepository.getItemCountLabel("O",storeId));
-        responseObj.put("inStock",wholesaleItemRepository.getItemCountInStock("Y","O",storeId));
-        responseObj.put("outStock",wholesaleItemRepository.getItemCountInStock("N","O",storeId));
-        responseObj.put("active",wholesaleItemRepository.optionItemCountLabel("O","A",storeId));
-        responseObj.put("deactive",wholesaleItemRepository.optionItemCountLabel("O","D",storeId));
+        Map<String, Integer> responseObj = new HashMap<>();
+        responseObj.put("all", wholesaleItemRepository.getItemCountLabel("O", storeId));
+        responseObj.put("inStock", wholesaleItemRepository.getItemCountInStock("Y", "O", storeId));
+        responseObj.put("outStock", wholesaleItemRepository.getItemCountInStock("N", "O", storeId));
+        responseObj.put("active", wholesaleItemRepository.optionItemCountLabel("O", "A", storeId));
+        responseObj.put("deactive", wholesaleItemRepository.optionItemCountLabel("O", "D", storeId));
         logger.debug("Completed getItemCountsForOldLabel method");
         return responseObj;
     }
 
-    public Map<String, Integer> getItemCountsForInStock (Integer storeId) {
+    public Map<String, Integer> getItemCountsForInStock(Integer storeId) {
         logger.debug("Starting getItemCountsForInStock method with storeId: {}", storeId);
-        Map<String,Integer> responseObj = new HashMap<>();
-        responseObj.put("all",wholesaleItemRepository.getItemCountInStock("Y",storeId));
-        responseObj.put("active",wholesaleItemRepository.optionItemCountInStock("Y","A",storeId));
-        responseObj.put("deactive",wholesaleItemRepository.optionItemCountInStock("Y","D",storeId));
+        Map<String, Integer> responseObj = new HashMap<>();
+        responseObj.put("all", wholesaleItemRepository.getItemCountInStock("Y", storeId));
+        responseObj.put("active", wholesaleItemRepository.optionItemCountInStock("Y", "A", storeId));
+        responseObj.put("deactive", wholesaleItemRepository.optionItemCountInStock("Y", "D", storeId));
         logger.debug("Completed getItemCountsForInStock method");
         return responseObj;
     }
 
 
-    public Map<String, Integer> getItemCountsForOutStock (Integer storeId) {
+    public Map<String, Integer> getItemCountsForOutStock(Integer storeId) {
         logger.debug("Starting getItemCountsForOutStock method with storeId: {}", storeId);
-        Map<String,Integer> responseObj = new HashMap<>();
-        responseObj.put("all",wholesaleItemRepository.getItemCountInStock("N",storeId));
-        responseObj.put("active",wholesaleItemRepository.optionItemCountLabel("N","A",storeId));
-        responseObj.put("deactive",wholesaleItemRepository.optionItemCountLabel("N","D",storeId));
+        Map<String, Integer> responseObj = new HashMap<>();
+        responseObj.put("all", wholesaleItemRepository.getItemCountInStock("N", storeId));
+        responseObj.put("active", wholesaleItemRepository.optionItemCountLabel("N", "A", storeId));
+        responseObj.put("deactive", wholesaleItemRepository.optionItemCountLabel("N", "D", storeId));
         logger.debug("Completed getItemCountsForOutStock method");
         return responseObj;
     }
 
 
+    @Transactional
+    public WholesaleItemDto findItemDtoBySlug(String slug) {
+        logger.debug("Starting findItemBySlugDto method with slug: {}", slug);
+        Item item = wholesaleItemRepository.findItemBySlug(slug);
+        logger.debug("Completed findItemBySlugDto method");
+        return wholesaleItemMapper.toDto(item);
+    }
 
     @Transactional
-    public WholesaleItemDto findItemBySLug(String slug) {
+    private Item findItemBySlug(String slug) {
         logger.debug("Starting findItemBySLug method with slug: {}", slug);
         Item item = wholesaleItemRepository.findItemBySlug(slug);
         logger.debug("Completed findItemBySLug method");
-        return wholesaleItemMapper.toDto(item) ;
+        return item;
     }
 
 
@@ -172,7 +183,7 @@ public class WholesaleItemService  {
     public void validateRequiredFields(ItemRequest itemRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting validateRequiredFields method with itemRequest: {}", itemRequest);
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(itemRequest,List.of(
+        Utils.checkRequiredFields(itemRequest, List.of(
                 "name",
                 "price",
                 "discount",
@@ -188,7 +199,7 @@ public class WholesaleItemService  {
         logger.debug("Starting validateRequiredFieldsBeforeCreateItem method with itemRequest: {}", itemRequest);
         /** @Note : During creation we are checking only extra required params  */
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(itemRequest,List.of(
+        Utils.checkRequiredFields(itemRequest, List.of(
                 "rating",
                 "inStock",
                 "label",
@@ -198,17 +209,17 @@ public class WholesaleItemService  {
     }
 
 
-
-    @Transactional(rollbackFor = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
     public Map<String, Object> createOrUpdateItem(ItemRequest itemRequest, AuthUser loggedUser, String path) throws Exception {
         logger.debug("Starting createOrUpdateItem method with itemRequest: {}, loggedUser: {}, path: {}", itemRequest, loggedUser, path);
         // if there is any required field null then this will throw IllegalArgumentException
         validateRequiredFields(itemRequest);
 
         // Discount can't be less than item's price
-        if(itemRequest.getPrice() < itemRequest.getDiscount()) throw new IllegalArgumentException("Discount can't be greater then price.");
+        if (itemRequest.getPrice() < itemRequest.getDiscount())
+            throw new IllegalArgumentException("Discount can't be greater then price.");
         // If item name not in proper syntax this will throw Exception
-        String itemName = Utils.isValidName( itemRequest.getName(),"item");
+        String itemName = Utils.isValidName(itemRequest.getName(), "item");
         itemRequest.setName(itemName);
 
         Integer storeId = wholesaleStoreRepository.getStoreIdByUserId(loggedUser.getId());
@@ -216,10 +227,10 @@ public class WholesaleItemService  {
 
         // Getting category and subcategory from database behalf on provided Ids.
         ItemCategory itemCategory = wholesaleItemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store item category not found."));
-        if(itemCategory == null) throw new IllegalArgumentException("Invalid categoryId.");
+        if (itemCategory == null) throw new IllegalArgumentException("Invalid categoryId.");
         itemRequest.setItemCategory(itemCategory);
         ItemSubCategory itemSubCategory = wholesaleItemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store item subcategory not found."));
-        if(itemSubCategory == null) throw new IllegalArgumentException("Invalid subCategoryId.");
+        if (itemSubCategory == null) throw new IllegalArgumentException("Invalid subCategoryId.");
         itemRequest.setItemSubCategory(itemSubCategory);
 
         Map<String, Object> responseObj = new HashMap<>();
@@ -228,15 +239,15 @@ public class WholesaleItemService  {
         if (!Utils.isEmpty(itemRequest.getSlug()) || path.contains("update")) {
 
             // if there is any required field null then this will throw IllegalArgumentException
-            Utils.checkRequiredFields(itemRequest,List.of("slug"));
+            Utils.checkRequiredFields(itemRequest, List.of("slug"));
 
             // Getting item's status from database and validating the item not blocked
             String itemStatus = getItemStatus(itemRequest.getSlug());
-            if(itemStatus == null) throw new NotFoundException("No item found to update.");
+            if (itemStatus == null) throw new NotFoundException("No item found to update.");
             if (itemStatus.equals("D")) throw new MyException("You can't update a blocked item.");
 
             // Update item images
-            updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(),"update");
+            updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             int isUpdated = updateItem(itemRequest, loggedUser); // Update operation
             if (isUpdated > 0) {
                 responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
@@ -258,8 +269,8 @@ public class WholesaleItemService  {
         return responseObj;
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class,MyException.class, RuntimeException.class,Exception.class})
-    public Item createItem (ItemRequest itemRequest, AuthUser loggedUser) throws MyException, IOException {
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
+    public Item createItem(ItemRequest itemRequest, AuthUser loggedUser) throws MyException, IOException {
         logger.debug("Starting createItem method with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         User userForUpdate = User.builder()
                 .id(loggedUser.getId())
@@ -282,17 +293,17 @@ public class WholesaleItemService  {
         item.setItemCategory(itemRequest.getItemCategory());
         item.setItemSubCategory(itemRequest.getItemSubCategory());
         item.setSlug(slug);
-        item.setAvtars(updateStoreImage("", itemRequest.getNewItemImages(),slug,"create"));
+        item.setAvtars(updateStoreImage("", itemRequest.getNewItemImages(), slug, "create"));
         Item savedItem = wholesaleItemRepository.save(item); // Create operation
         logger.debug("Completed createItem method");
         return savedItem;
     }
 
-    public String updateStoreImage(String previousImages, List<MultipartFile> itemImages,String slug,String action) throws IOException {
+    public String updateStoreImage(String previousImages, List<MultipartFile> itemImages, String slug, String action) throws IOException {
         logger.debug("Starting updateStoreImage method with previousImages: {}, itemImages: {}, slug: {}, action: {}", previousImages, itemImages, slug, action);
         String newImages = "";
         int index = 0;
-        if(itemImages != null) {
+        if (itemImages != null) {
             for (MultipartFile multipartFile : itemImages) {
                 if (index == itemImages.size() - 1) {
                     newImages += saveItemImageName(multipartFile, slug);
@@ -303,15 +314,15 @@ public class WholesaleItemService  {
             }
         }
         String updatedImages = "";
-        if(!Utils.isEmpty(previousImages) && !Utils.isEmpty(newImages)) {
-            updatedImages =  previousImages+newImages;
-        }else if(Utils.isEmpty(previousImages)){
+        if (!Utils.isEmpty(previousImages) && !Utils.isEmpty(newImages)) {
+            updatedImages = previousImages + newImages;
+        } else if (Utils.isEmpty(previousImages)) {
             updatedImages = newImages;
-        }else {
+        } else {
             /** because it's contains ',' at the end */
-            updatedImages = previousImages.substring(0,previousImages.length()-1);
+            updatedImages = previousImages.substring(0, previousImages.length() - 1);
         }
-        if(!Utils.isEmpty(updatedImages) && action.equalsIgnoreCase("update")){
+        if (!Utils.isEmpty(updatedImages) && action.equalsIgnoreCase("update")) {
             wholesaleItemHbRepository.updateItemImages(slug, updatedImages); // Update operation
         }
         logger.debug("Completed updateStoreImage method");
@@ -322,16 +333,16 @@ public class WholesaleItemService  {
     @Transactional
     public String saveItemImageName(MultipartFile itemImage, String slug) throws IOException {
         logger.debug("Starting saveItemImageName method with itemImage: {}, slug: {}", itemImage, slug);
-        if(itemImage !=null) {
+        if (itemImage != null) {
             if (UploadImageValidator.isValidImage(itemImage, GlobalConstant.minWidth,
                     GlobalConstant.minHeight, GlobalConstant.maxWidth, GlobalConstant.maxHeight,
                     GlobalConstant.allowedAspectRatios, GlobalConstant.allowedFormats)) {
 
-                String fileOriginalName = UUID.randomUUID()+itemImage.getOriginalFilename().replaceAll(" ", "_");
-                String dirPath = itemImagePath+slug+GlobalConstant.PATH_SEPARATOR;
+                String fileOriginalName = UUID.randomUUID() + itemImage.getOriginalFilename().replaceAll(" ", "_");
+                String dirPath = itemImagePath + slug + GlobalConstant.PATH_SEPARATOR;
                 File dir = new File(dirPath);
-                if(!dir.exists()) dir.mkdirs();
-                String filePath = dirPath+fileOriginalName;
+                if (!dir.exists()) dir.mkdirs();
+                String filePath = dirPath + fileOriginalName;
                 File file = new File(filePath);
                 itemImage.transferTo(file);
                 //if (!UploadImageValidator.hasWhiteBackground(new File(filePath))) throw new MyException("Image must have a white background");
@@ -345,42 +356,40 @@ public class WholesaleItemService  {
     }
 
 
-
-
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
         logger.debug("Starting updateItem method with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
-        int updateCount = wholesaleItemHbRepository.updateItems(itemRequest,loggedUser); // Update operation
+        int updateCount = wholesaleItemHbRepository.updateItems(itemRequest, loggedUser); // Update operation
         logger.debug("Completed updateItem method");
         return updateCount;
     }
 
-    public int deleteItem(DeleteRequest deleteRequest, Integer storeId) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting deleteItem method with deleteRequest: {}, storeId: {}", deleteRequest, storeId);
-        // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteRequest,List.of("slug"));
-        String slug = deleteRequest.getSlug();
-        String status = getItemStatus(slug);
-        if(status == null) throw new NotFoundException("No item to delete.");
-        if (status.equals("D")) throw new IllegalArgumentException("Can't deactivated items.");
-        int deleteCount = wholesaleItemHbRepository.deleteItem(slug,storeId); // Update operation
+    public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) {
+        logger.debug("Starting deleteItem method with deleteRequest: {}", deleteRequest);
+        Item item = findItemBySlug(deleteRequest.getSlug());
+        if (item == null) throw new NotFoundException("No item found to delete.");
+        if (STATUS.DE_ACTIVE.getStatus().equals(item.getStatus()))
+            throw new IllegalArgumentException("Can't delete deactivated items.");
+        // Make sure the right user deleting the items.
+        Integer userId = wholesaleStoreRepository.findUserIdByStoreId(item.getWholesaleId());
+        if (loggedUser.getId() == userId) throw new MyException("You are not authorized to delete this item.");
+        int deleteCount = wholesaleItemHbRepository.deleteItem(deleteRequest.getSlug());
         logger.debug("Completed deleteItem method");
         return deleteCount;
     }
 
-    public int updateStock(Map<String,String> params,Integer storeId) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public int updateStock(Map<String, String> params, Integer storeId) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStock method with params: {}, storeId: {}", params, storeId);
         // if there is any required field null then this will throw IllegalArgumentException
         Utils.checkRequiredFields(params, List.of("slug", "stock"));
         String slug = params.get("slug");
         String stock = params.get("stock");
-        int updateCount = wholesaleItemHbRepository.updateStock(stock,slug,storeId); // Update operation
+        int updateCount = wholesaleItemHbRepository.updateStock(stock, slug, storeId); // Update operation
         logger.debug("Completed updateStock method");
         return updateCount;
     }
 
 
-
-    public Map<String,Object> getItemCountByMonths(GraphRequest graphRequest, Integer storeId){
+    public Map<String, Object> getItemCountByMonths(GraphRequest graphRequest, Integer storeId) {
         logger.debug("Starting getItemCountByMonths method with graphRequest: {}, storeId: {}", graphRequest, storeId);
         Date date = new Date();
         int currentYear = date.getYear();
@@ -389,12 +398,12 @@ public class WholesaleItemService  {
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12) : months;
         int year = Objects.nonNull(graphRequest.getYear()) ? graphRequest.getYear() : currentYear;
 
-        Map<String,Object> monthsObj= new LinkedHashMap<>();
-        for(Integer month : months) {
+        Map<String, Object> monthsObj = new LinkedHashMap<>();
+        for (Integer month : months) {
             long start = DateUtils.getStartOfMonthEpochMillis(year, month);
             long end = DateUtils.getStartOfNextMonthEpochMillis(year, month);
             Integer total = wholesaleItemRepository.totalItemsViaMonth(storeId, start, end);
-            monthsObj.put(getMonthName(month),total);
+            monthsObj.put(getMonthName(month), total);
         }
         logger.debug("Completed getItemCountByMonths method");
         return monthsObj;
@@ -430,10 +439,8 @@ public class WholesaleItemService  {
     }
 
 
-
-
     @Transactional
-    public String createItemsExcelSheet(ItemSearchFields searchFilters,AuthUser loggedUser) throws IOException {
+    public String createItemsExcelSheet(ItemSearchFields searchFilters, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         int wholesaleId = searchFilters.getStoreId();
         Specification<Item> specification = Specification.allOf(
@@ -447,81 +454,79 @@ public class WholesaleItemService  {
                         .and(lessThanOrEqualToToDate(searchFilters.getToDate()))
         );
         List<Item> itemsList = wholesaleItemRepository.findAll(specification);
-        Map<String,List<Object>> result = new HashMap<>();
-        for (Item item : itemsList){
+        Map<String, List<Object>> result = new HashMap<>();
+        for (Item item : itemsList) {
             String items = new Gson().toJson(wholesaleItemMapper.toDto(item));
-            Map<String,Object> itemMap = new Gson().fromJson(items,Map.class);
-            itemMap.forEach((key,value)->{
-                if(key.equals("wholesale")){
+            Map<String, Object> itemMap = new Gson().fromJson(items, Map.class);
+            itemMap.forEach((key, value) -> {
+                if (key.equals("wholesale")) {
                     // skip...
-                }
-                else if (result.containsKey(key.toUpperCase())){
+                } else if (result.containsKey(key.toUpperCase())) {
                     result.get(key.toUpperCase()).add(itemMap.get(key));
-                }else {
+                } else {
                     List<Object> valueList = new ArrayList<>();
                     valueList.add(value);
-                    result.put(key.toUpperCase(),valueList);
+                    result.put(key.toUpperCase(), valueList);
                 }
             });
         }
         int totalItem = itemsList.size();
-        String filePath = writeExcel.createExcelSheet(result, totalItem,GlobalConstant.HEADERS_FOR_ITEMS,"WHOLESALER_"+loggedUser.getSlug());
+        String filePath = writeExcel.createExcelSheet(result, totalItem, GlobalConstant.HEADERS_FOR_ITEMS, "WHOLESALER_" + loggedUser.getSlug());
         logger.debug("Exiting createItemsExcelSheet");
         return filePath;
     }
 
 
     public Map<String, Object> getItemString(List<String> nameList,
-         List<String> labelList,
-         List<String> slugList,
-         List<String> capacityList,
-         List<String> priceList,
-         List<String> discountList,
-         List<String> inStockList,
-         int index) {
-        Map<String,Object> itemDetailMap = new HashMap<>();
-        itemDetailMap.put("NAME",nameList.get(index));
-        itemDetailMap.put("LABEL",labelList.get(index));
-        itemDetailMap.put("TOKEN",slugList.get(index));
-        itemDetailMap.put("CAPACITY",capacityList.get(index));
-        itemDetailMap.put("PRICE",priceList.get(index));
-        itemDetailMap.put("DISCOUNT",discountList.get(index));
-        itemDetailMap.put("STOCK",inStockList.get(index));
+                                             List<String> labelList,
+                                             List<String> slugList,
+                                             List<String> capacityList,
+                                             List<String> priceList,
+                                             List<String> discountList,
+                                             List<String> inStockList,
+                                             int index) {
+        Map<String, Object> itemDetailMap = new HashMap<>();
+        itemDetailMap.put("NAME", nameList.get(index));
+        itemDetailMap.put("LABEL", labelList.get(index));
+        itemDetailMap.put("TOKEN", slugList.get(index));
+        itemDetailMap.put("CAPACITY", capacityList.get(index));
+        itemDetailMap.put("PRICE", priceList.get(index));
+        itemDetailMap.put("DISCOUNT", discountList.get(index));
+        itemDetailMap.put("ITEM_STOCK", inStockList.get(index));
         return itemDetailMap;
     }
 
 
     @Transactional(rollbackFor = {MyException.class})
-    public List<ItemHbRepository.ItemUpdateError> updateItemsWithExcel(Map<String,List<String>> itemsData, Integer userId){
+    public List<ItemHbRepository.ItemUpdateError> updateItemsWithExcel(Map<String, List<String>> itemsData, Integer userId) {
         Integer wholesaleId = wholesaleStoreRepository.getStoreIdByUserId(userId);
-        logger.debug("Updating items using excel sheet : {} and userId : {} and wholesaleId : {}",itemsData,userId,wholesaleId);
-        List<String> prefix = List.of("N","O","Y"); // N=New or No | Y = Yes | O=Old
+        logger.debug("Updating items using excel sheet : {} and userId : {} and wholesaleId : {}", itemsData, userId, wholesaleId);
+        List<String> prefix = List.of("N", "O", "Y"); // N=New or No | Y = Yes | O=Old
         ItemHbRepository.ItemUpdateError itemUpdateError = new ItemHbRepository.ItemUpdateError();
         List<ItemHbRepository.ItemUpdateError> errorsList = new ArrayList<>();
-        List<String> nameList = itemsData.get("NAME") , labelList = itemsData.get("LABEL"),slugList = itemsData.get("TOKEN"),
-                capacityList = itemsData.get("CAPACITY"),priceList = itemsData.get("PRICE"),discountList = itemsData.get("DISCOUNT")
-                ,inStockList = itemsData.get("IN-STOCK");
-        if(Objects.isNull(nameList) ||
-            Objects.isNull(labelList) ||
-            Objects.isNull(slugList) ||
-            Objects.isNull(capacityList) ||
-            Objects.isNull(priceList) ||
-            Objects.isNull(discountList) ||
-            Objects.isNull(inStockList)
+        List<String> nameList = itemsData.get("NAME"), labelList = itemsData.get("LABEL"), slugList = itemsData.get("TOKEN"),
+                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-ITEM_STOCK");
+        if (Objects.isNull(nameList) ||
+                Objects.isNull(labelList) ||
+                Objects.isNull(slugList) ||
+                Objects.isNull(capacityList) ||
+                Objects.isNull(priceList) ||
+                Objects.isNull(discountList) ||
+                Objects.isNull(inStockList)
         ) throw new MyException("Excel sheet columns missing.");
 
         for (int i = 0; i < nameList.size(); i++) {
-            Map<String,Object> itemStringDetail = null;
+            Map<String, Object> itemStringDetail = null;
             try {
-                itemStringDetail = getItemString(nameList,labelList,slugList,capacityList,priceList,discountList,inStockList,i);
-                if(nameList.get(i).trim().isEmpty()) continue; // if there is no item name, leave that row.
-                String name = Utils.isValidName(nameList.get(i),"item");
+                itemStringDetail = getItemString(nameList, labelList, slugList, capacityList, priceList, discountList, inStockList, i);
+                if (nameList.get(i).trim().isEmpty()) continue; // if there is no item name, leave that row.
+                String name = Utils.isValidName(nameList.get(i), "item");
                 String label = labelList.get(i);
                 String inStock = inStockList.get(i);
-                if(!Utils.isEmpty(label)) label = String.valueOf(labelList.get(i).charAt(0)).toUpperCase();
-                if(!Utils.isEmpty(inStock)) inStock = String.valueOf(inStockList.get(i).charAt(0)).toUpperCase();
-                if(!prefix.contains(label)) throw new MyException("Label must be New or Old.");
-                if(!prefix.contains(inStock)) throw new MyException("Stock must be Yes or NO.");
+                if (!Utils.isEmpty(label)) label = String.valueOf(labelList.get(i).charAt(0)).toUpperCase();
+                if (!Utils.isEmpty(inStock)) inStock = String.valueOf(inStockList.get(i).charAt(0)).toUpperCase();
+                if (!prefix.contains(label)) throw new MyException("Label must be New or Old.");
+                if (!prefix.contains(inStock)) throw new MyException("Stock must be Yes or NO.");
                 Float capacity = capacityList.get(i).isEmpty() ? 0f : Float.parseFloat(capacityList.get(i));
                 Float discount = discountList.get(i).isEmpty() ? 0f : Float.parseFloat(discountList.get(i));
                 Float price = priceList.get(i).isEmpty() ? 0f : Float.parseFloat(priceList.get(i));
@@ -537,8 +542,8 @@ public class WholesaleItemService  {
                 itemRequest.setDiscount(discount);
                 itemRequest.setSlug(slugList.get(i));
 
-                int updated = wholesaleItemHbRepository.updateExcelSheetItems(itemRequest,userId,wholesaleId);
-                if(updated < 1){
+                int updated = wholesaleItemHbRepository.updateExcelSheetItems(itemRequest, userId, wholesaleId);
+                if (updated < 1) {
                     itemUpdateError.setItemRowDetail(itemStringDetail);
                     itemUpdateError.setErrorMessage("Item not found.");
                     errorsList.add(itemUpdateError);
@@ -553,9 +558,6 @@ public class WholesaleItemService  {
         logger.debug("Exiting updateItemsWithExcel with result: {}", errorsList);
         return errorsList;
     }
-
-
-
 
 
 }

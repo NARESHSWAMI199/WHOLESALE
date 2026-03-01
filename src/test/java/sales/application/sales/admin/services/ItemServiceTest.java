@@ -47,14 +47,14 @@ public class ItemServiceTest extends TestUtil {
     public void testFindItemBySLug() {
         Store store = createStore();
         Item item = createItem(store.getId());
-        Item found = itemService.findItemBySLug(item.getSlug());
+        Item found = itemService.findItemBySlug(item.getSlug());
         assertNotNull(found);
         assertEquals(item.getSlug(), found.getSlug());
     }
 
     @Test
     public void testFindItemBySLugNotFound() {
-        Item found = itemService.findItemBySLug("nonexistent");
+        Item found = itemService.findItemBySlug("nonexistent");
         assertNull(found);
     }
 

@@ -134,7 +134,7 @@ public class WholesaleStoreService  {
     @Transactional
     public WholesaleStoreDto getStoreDtoByUserSlug(String slug) {
         logger.debug("Starting getStoreByUserSlug method with slug: {}", slug);
-        Store store = wholesaleStoreRepository.getStoreIdByUserSlug(slug);
+        Store store = wholesaleStoreRepository.getStoreByUserSlug(slug);
         logger.debug("Completed getStoreByUserSlug method");
         return wholesaleStoreMapper.toDto(store);
     }

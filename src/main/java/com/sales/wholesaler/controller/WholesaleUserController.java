@@ -4,14 +4,14 @@ package com.sales.wholesaler.controller;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.PasswordDto;
-import com.sales.request.UserRequest;
-import com.sales.request.UserSearchFilters;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.STATUS;
 import com.sales.jwtUtils.JwtToken;
+import com.sales.request.PasswordDto;
+import com.sales.request.UserRequest;
+import com.sales.request.UserSearchFilters;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleStoreDto;
 import com.sales.wholesaler.dto.WholesaleUserDto;
@@ -50,7 +50,7 @@ import java.util.Map;
 @RequestMapping("wholesale/auth")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale User Authentication and Management", description = "APIs for wholesaler user authentication, profile management, and user operations")
-public class WholesaleUserController  {
+public class WholesaleUserController {
 
     private final WholesaleUserService wholesaleUserService;
     private final WholesaleStoreService wholesaleStoreService;
@@ -70,7 +70,7 @@ public class WholesaleUserController  {
     )))
     @PostMapping("/login")
     @Operation(summary = "Login wholesaler", description = "Authenticates a wholesaler user with email and password credentials")
-    public ResponseEntity<Map<String, Object>> loginWholesaler(@RequestBody Map<String,String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> loginWholesaler(@RequestBody Map<String, String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting loginWholesaler method");
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findByEmailAndPassword(param);
@@ -78,20 +78,20 @@ public class WholesaleUserController  {
         if (user == null) {
             message = "invalid credentials.";
             responseObj.put(ConstantResponseKeys.STATUS, 401);
-        }else if(!Utils.isEmpty(user.getOtp())) {
+        } else if (!Utils.isEmpty(user.getOtp())) {
             message = "User exist but not verified. You can login via otp.";
             responseObj.put(ConstantResponseKeys.STATUS, 401);
-        }else if (user.getStatus().equalsIgnoreCase(STATUS.ACTIVE.getStatus())) {
+        } else if (user.getStatus().equalsIgnoreCase(STATUS.ACTIVE.getStatus())) {
             message = ConstantResponseKeys.SUCCESS;
-            responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
+            responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto storeDetails = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
-            Map<String,Object> paginationObj = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            Map<String, Object> paginationObj = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
             responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, storeDetails);
             responseObj.put(ConstantResponseKeys.PAGINATIONS, paginationObj);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-        }else {
+        } else {
             message = "You are blocked by admin.";
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         }
@@ -101,10 +101,9 @@ public class WholesaleUserController  {
     }
 
 
-
     @PostMapping("/login/otp")
     @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
-    public ResponseEntity<Map<String, Object>> loginUserViaOtp (@RequestBody UserRequest userDetails) {
+    public ResponseEntity<Map<String, Object>> loginUserViaOtp(@RequestBody UserRequest userDetails) {
         logger.debug("Starting loginUserViaOtp method");
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findUserByOtpAndEmail(userDetails);
@@ -114,12 +113,12 @@ public class WholesaleUserController  {
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
-            Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            Map<String, Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, store);
-            responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
+            responseObj.put(ConstantResponseKeys.PAGINATIONS, pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             wholesaleUserService.resetOtp(user.getEmail());
         } else {
@@ -152,13 +151,13 @@ public class WholesaleUserController  {
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
-            Map<String,Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
+            Map<String, Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, store);
-            responseObj.put(ConstantResponseKeys.PAGINATIONS,pagination);
+            responseObj.put(ConstantResponseKeys.PAGINATIONS, pagination);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             // setting blank otp
             wholesaleUserService.resetOtp(user.getEmail());
@@ -173,56 +172,56 @@ public class WholesaleUserController  {
 
     @PostMapping("sendOtp")
     @Operation(summary = "Send OTP", description = "Sends an OTP to the user's email for verification")
-    public ResponseEntity<Map<String,Object>> sendOtp(HttpServletRequest request, @RequestBody UserRequest userRequest){
+    public ResponseEntity<Map<String, Object>> sendOtp(HttpServletRequest request, @RequestBody UserRequest userRequest) {
         logger.debug("Starting sendOtp method");
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         boolean sendOtp = wholesaleUserService.sendOtp(userRequest);
-        if(sendOtp)  {
-            responseObj.put(ConstantResponseKeys.STATUS,200);
+        if (sendOtp) {
+            responseObj.put(ConstantResponseKeys.STATUS, 200);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Otp sent successfully");
-        }else {
-            responseObj.put(ConstantResponseKeys.STATUS,400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userRequest.getEmail());
+        } else {
+            responseObj.put(ConstantResponseKeys.STATUS, 400);
+            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->" + userRequest.getEmail());
         }
         logger.debug("Completed sendOtp method");
-        return  new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
     // For add and update user
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = @Content(schema = @Schema( description = "If you going to update must add slug",
+            content = @Content(schema = @Schema(description = "If you going to update must add slug",
                     example = """
-                {
-                    "slug" : "string",
-                    "email" : "string",
-                    "username" : "string",
-                    "contact" : "string"
-                }
-            """)
+                                {
+                                    "slug" : "string",
+                                    "email" : "string",
+                                    "username" : "string",
+                                    "contact" : "string"
+                                }
+                            """)
             ))
     @PostMapping(value = {"/update"})
     @Operation(summary = "Update user profile", description = "Updates the profile information of the authenticated wholesaler user")
-    public ResponseEntity<Map<String, Object>> updateAuth(Authentication authentication,HttpServletRequest request, @RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> updateAuth(Authentication authentication, HttpServletRequest request, @RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateAuth method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> responseObj = wholesaleUserService.updateUserProfile(userRequest, loggedUser);
+        Map<String, Object> responseObj = wholesaleUserService.updateUserProfile(userRequest, loggedUser);
         logger.debug("Completed updateAuth method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
 
     }
 
-    @GetMapping(value = {"/detail","/detail/{slug}"})
+    @GetMapping(value = {"/detail", "/detail/{slug}"})
     @Operation(summary = "Get user details", description = "Retrieves detailed information for the authenticated user or a specific user by slug")
     public ResponseEntity<Map<String, Object>> getDetailUser(@PathVariable(required = false) String slug, HttpServletRequest request) {
         logger.debug("Starting getDetailUser method");
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser user = null;
-        if(slug == null){
-            user = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        }else {
+        if (slug == null) {
+            user = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        } else {
             user = new SalesUser(wholesaleUserService.findUserBySlug(slug));
         }
-        if(slug == null){
+        if (slug == null) {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
             responseObj.put(ConstantResponseKeys.STORE, store);
         }
@@ -233,16 +232,15 @@ public class WholesaleUserController  {
     }
 
 
-
     @PostMapping("/password")
     @PreAuthorize("hasAuthority('wholesale.password.reset')")
     @Operation(summary = "Reset user password", description = "Resets the password for the authenticated wholesaler user")
-    public ResponseEntity<Map<String, Object>> resetUserPasswordBySlug(Authentication authentication,HttpServletRequest request ,@RequestBody PasswordDto passwordDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> resetUserPasswordBySlug(Authentication authentication, HttpServletRequest request, @RequestBody PasswordDto passwordDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting resetUserPasswordBySlug method");
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        WholesaleUserDto updatedUserDto = wholesaleUserService.resetPasswordByUserSlugDto(passwordDto,loggedUser);
-        responseObj.put(ConstantResponseKeys.RES,updatedUserDto);
+        WholesaleUserDto updatedUserDto = wholesaleUserService.resetPasswordByUserSlugDto(passwordDto, loggedUser);
+        responseObj.put(ConstantResponseKeys.RES, updatedUserDto);
         responseObj.put(ConstantResponseKeys.MESSAGE, "User password has been successfully updated.");
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed resetUserPasswordBySlug method");
@@ -250,22 +248,21 @@ public class WholesaleUserController  {
     }
 
 
-
     @PostMapping("/update_profile")
     @PreAuthorize("hasAnyAuthority('wholesale.profile.update','wholesale.profile.edit')")
     @Operation(summary = "Update profile image", description = "Updates the profile image of the authenticated wholesaler user")
-    public ResponseEntity<Map<String, Object>> updateProfileImage(Authentication authentication,HttpServletRequest request, @RequestPart MultipartFile profileImage) throws IOException {
+    public ResponseEntity<Map<String, Object>> updateProfileImage(Authentication authentication, HttpServletRequest request, @RequestPart MultipartFile profileImage) throws IOException {
         logger.debug("Starting updateProfileImage method");
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        String  imageName = wholesaleUserService.updateProfileImage(profileImage,loggedUser);
-        if(imageName!=null) {
-            responseObj.put("imageName",imageName);
-            responseObj.put(ConstantResponseKeys.MESSAGE , "Profile image successfully updated");
-            responseObj.put(ConstantResponseKeys.STATUS , 200);
-        }else {
-            responseObj.put(ConstantResponseKeys.STATUS , 406);
-            responseObj.put(ConstantResponseKeys.MESSAGE , "Not a valid profile image");
+        String imageName = wholesaleUserService.updateProfileImage(profileImage, loggedUser);
+        if (imageName != null) {
+            responseObj.put("imageName", imageName);
+            responseObj.put(ConstantResponseKeys.MESSAGE, "Profile image successfully updated");
+            responseObj.put(ConstantResponseKeys.STATUS, 200);
+        } else {
+            responseObj.put(ConstantResponseKeys.STATUS, 406);
+            responseObj.put(ConstantResponseKeys.MESSAGE, "Not a valid profile image");
         }
         logger.debug("Completed updateProfileImage method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -277,7 +274,7 @@ public class WholesaleUserController  {
 
     @GetMapping("/profile/{slug}/{filename}")
     @Operation(summary = "Get profile image", description = "Retrieves the profile image file for a specific user")
-    public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename , @PathVariable String slug) throws MalformedURLException {
+    public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename, @PathVariable String slug) throws MalformedURLException {
         Path filePathFolder = Paths.get(filePath);
         Path userSlug = filePathFolder.resolve(slug).normalize();
         Path path = userSlug.resolve(filename).normalize();
@@ -288,35 +285,35 @@ public class WholesaleUserController  {
 
     // For add and update user
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = @Content(schema = @Schema( description = "If you going to update must add slug",
-                example = """
-                {
-                    "email" : "string",
-                    "username" : "string",
-                    "password' : "string",
-                    "contact" : "string"
-                }
-            """)
-    ))
-    @PostMapping(value = {"add","register"})
+            content = @Content(schema = @Schema(description = "If you going to update must add slug",
+                    example = """
+                                {
+                                    "email" : "string",
+                                    "username" : "string",
+                                    "password' : "string",
+                                    "contact" : "string"
+                                }
+                            """)
+            ))
+    @PostMapping(value = {"add", "register"})
     @Operation(summary = "Add new user", description = "Creates a new wholesaler user account")
-    public ResponseEntity<Map<String,Object>> addNewUser(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> addNewUser(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewUser method");
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         WholesaleUserDto insertedUserDto = wholesaleUserService.addNewUserDto(userRequest);
-        result.put("user",insertedUserDto);
+        result.put("user", insertedUserDto);
         result.put(ConstantResponseKeys.MESSAGE, "User created successfully");
         result.put(ConstantResponseKeys.STATUS, 201);
         logger.debug("Completed addNewUser method");
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 
 
     @GetMapping("last-seen")
     @Operation(summary = "Update last seen", description = "Updates the last seen timestamp for the authenticated user")
-    public ResponseEntity<Map<String,Object>> updateUserLastSeen(Authentication authentication,HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> updateUserLastSeen(Authentication authentication, HttpServletRequest request) {
         logger.debug("Starting updateUserLastSeen method");
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = wholesaleUserService.updateLastSeen(loggedUser);
 
@@ -324,31 +321,31 @@ public class WholesaleUserController  {
         user.setOnline(false);
         wholesaleUserService.updateLastSeen(loggedUser);
         GlobalConstant.onlineUsers.put(loggedUser.getSlug(), user);
-        if(isUpdated > 0){
+        if (isUpdated > 0) {
             result.put(ConstantResponseKeys.MESSAGE, "User's last seen successfully updated.");
             result.put(ConstantResponseKeys.STATUS, 200);
-        }else{
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during updating last seen of user");
-            result.put(ConstantResponseKeys.STATUS,500);
+        } else {
+            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during updating last seen of user");
+            result.put(ConstantResponseKeys.STATUS, 500);
         }
         logger.debug("Completed updateUserLastSeen method");
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
 
     }
 
 
-
-    /** Returning a list of users where users are retailer and wholesaler only for chat purpose.*/
+    /**
+     * Returning a list of users where users are retailer and wholesaler only for chat purpose.
+     */
     @PostMapping("chat/users")
     @Operation(summary = "Get chat users", description = "Retrieves a list of users (retailers and wholesalers) for chat functionality")
-    public ResponseEntity<Page<WholesaleUserDto>> getAllChatUser(Authentication authentication,HttpServletRequest request, @RequestBody UserSearchFilters userSearchFilters){
+    public ResponseEntity<Page<WholesaleUserDto>> getAllChatUser(Authentication authentication, HttpServletRequest request, @RequestBody UserSearchFilters userSearchFilters) {
         logger.debug("Starting getAllChatUser method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Page<WholesaleUserDto> allUsers = wholesaleUserService.getAllUsers(userSearchFilters, loggedUser);
         logger.debug("Completed getAllChatUser method");
-        return new ResponseEntity<>(allUsers,HttpStatus.OK);
+        return new ResponseEntity<>(allUsers, HttpStatus.OK);
     }
-
 
 
 }

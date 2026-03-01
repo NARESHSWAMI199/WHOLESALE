@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,24 +58,6 @@ public class ItemController  {
 
   private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = @Content(schema = @Schema(example = """
-                    {
-                      "searchKey": "string",
-                      "name": "string",
-                      "status": "string",
-                      "fromDate": "",
-                      "toDate": "",
-                      "orderBy": "string",
-                      "order": "string",
-                      "pageNumber": 1073741824,
-                      "size": 1073741824,
-                      "slug": "string",
-                      "inStock": "Y",
-                      "label": "string"
-                    }
-                    """)
-            ))
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
     @Operation(summary = "Get all items", description = "Retrieves a paginated list of all items with optional search filters")
@@ -128,7 +111,7 @@ public class ItemController  {
     @PostMapping(value = {"/add", "/update"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyAuthority('item.add','item.update','item.edit')")
     @Operation(summary = "Add or update item", description = "Creates a new item or updates an existing item with the provided data and images")
-    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @ModelAttribute ItemRequest itemRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> addOrUpdateItems(Authentication authentication,HttpServletRequest request, @Valid @ModelAttribute ItemRequest itemRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Adding or updating item: {}", itemRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
@@ -221,18 +204,13 @@ public class ItemController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('item.delete')")
     @Operation(summary = "Delete item", description = "Deletes an item by its slug")
-    public ResponseEntity<Map<String, Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> deleteItemBySlug(Authentication authentication,HttpServletRequest request,@Valid @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting item with slug: {}", deleteRequest);
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = itemService.deleteItem(deleteRequest,loggedUser);
-        if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
-            responseObj.put(ConstantResponseKeys.STATUS, 200);
-        } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to delete.");
-            responseObj.put(ConstantResponseKeys.STATUS, 404);
-        }
+        itemService.deleteItem(deleteRequest,loggedUser);
+        responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
+        responseObj.put(ConstantResponseKeys.STATUS, 200);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
