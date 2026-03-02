@@ -81,7 +81,7 @@ public class ItemController  {
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Item Not Found");
-            responseObj.put(ConstantResponseKeys.STATUS, 404);
+            responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }

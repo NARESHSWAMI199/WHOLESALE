@@ -117,7 +117,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-                status().is(500)
+                status().is(400)
         ).andDo(print()).andReturn();
     }
 

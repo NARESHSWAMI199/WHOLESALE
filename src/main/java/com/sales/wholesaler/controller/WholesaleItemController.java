@@ -135,7 +135,7 @@ public class WholesaleItemController  {
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else{
             responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to delete.");
-            responseObj.put(ConstantResponseKeys.STATUS, 404);
+            responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         logger.debug("Completed deleteItemBySlug method");
         return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

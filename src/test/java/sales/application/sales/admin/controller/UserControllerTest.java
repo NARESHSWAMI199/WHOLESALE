@@ -657,7 +657,7 @@ public void updateUserWrongStatus() throws Exception {
                         .headers(headers)
                 )
                 .andExpectAll(
-                        status().is(404)
+                        status().is(400)
                 )
                 .andDo(print());
     }

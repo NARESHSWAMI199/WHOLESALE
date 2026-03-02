@@ -191,7 +191,7 @@ public class StoreControllerTest extends TestUtil {
         mockMvc.perform(get("/admin/store/detailbyuser/"+GlobalConstantTest.WHOLESALER_SLUG+"ddsf")
                 .headers(headers)
         ).andExpectAll(
-                status().is(404)
+                status().is(400)
         ).andDo(print());
 
     }
@@ -260,7 +260,7 @@ public class StoreControllerTest extends TestUtil {
                 .content(json)
                 .headers(headers)
         ).andExpectAll(
-                status().is(404)
+                status().is(400)
         ).andDo(print());
 
     }

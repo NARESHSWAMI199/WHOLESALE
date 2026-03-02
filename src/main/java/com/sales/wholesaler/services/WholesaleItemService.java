@@ -31,6 +31,7 @@ import com.sales.wholesaler.mapper.WholesaleCategoryMapper;
 import com.sales.wholesaler.mapper.WholesaleItemMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -370,8 +371,8 @@ public class WholesaleItemService {
         if (STATUS.DE_ACTIVE.getStatus().equals(item.getStatus()))
             throw new IllegalArgumentException("Can't delete deactivated items.");
         // Make sure the right user deleting the items.
-        Integer userId = wholesaleStoreRepository.findUserIdByStoreId(item.getWholesaleId());
-        if (loggedUser.getId() == userId) throw new MyException("You are not authorized to delete this item.");
+        Integer storeOwnerId = wholesaleStoreRepository.findUserIdByStoreId(item.getWholesaleId());
+        if (loggedUser.getId() != storeOwnerId) throw new PermissionDeniedDataAccessException("You are not authorized to delete this item.",new Exception());
         int deleteCount = wholesaleItemHbRepository.deleteItem(deleteRequest.getSlug());
         logger.debug("Completed deleteItem method");
         return deleteCount;

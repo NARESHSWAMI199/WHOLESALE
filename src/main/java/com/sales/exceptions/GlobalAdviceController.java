@@ -181,7 +181,7 @@ public class GlobalAdviceController {
         logger.error("MyException: {}", ex.getMessage(),ex);
         String errorMessage = ex.getMessage();
         errorMessage = errorMessage.contains(";") ? errorMessage.substring(0, errorMessage.indexOf(";")) : errorMessage;
-        ErrorDto message = new ErrorDto(errorMessage,500);
+        ErrorDto message = new ErrorDto(errorMessage,400);
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         return message;
     }
@@ -193,7 +193,7 @@ public class GlobalAdviceController {
         logger.error("UserException: {}", ex.getMessage(),ex);
         String errorMessage = ex.getMessage();
         errorMessage = errorMessage.contains(";") ? errorMessage.substring(0, errorMessage.indexOf(";")) : errorMessage;
-        ErrorDto message = new ErrorDto(errorMessage,500);
+        ErrorDto message = new ErrorDto(errorMessage,401);
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         return message;
     }

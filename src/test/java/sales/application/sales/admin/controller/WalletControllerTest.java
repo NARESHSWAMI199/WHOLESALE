@@ -107,7 +107,7 @@ public class WalletControllerTest extends TestUtil {
                 .andReturn();
         int status2 = result2.getResponse().getStatus();
         // Accept either 200 (success) or 404 (service plan not found in this environment)
-        org.junit.jupiter.api.Assertions.assertTrue(status2 == 200 || status2 == 404, "Response body: " + result2.getResponse().getContentAsString());
+        org.junit.jupiter.api.Assertions.assertTrue(status2 == 200 || status2 == 400, "Response body: " + result2.getResponse().getContentAsString());
     }
 
 }

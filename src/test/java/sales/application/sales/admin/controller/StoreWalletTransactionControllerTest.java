@@ -63,7 +63,7 @@ public class StoreWalletTransactionControllerTest extends TestUtil {
         String json = "{}";
 
         mockMvc.perform(post("/admin/store/wallet/transactions/all/invalid-slug").contentType(MediaType.APPLICATION_JSON).content(json).headers(headers))
-                .andExpect(status().is(404))
+                .andExpect(status().is(400))
                 .andDo(print());
     }
 

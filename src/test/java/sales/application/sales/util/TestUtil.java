@@ -78,25 +78,24 @@ public class TestUtil {
     protected GroupRepository groupRepository;
 
     @Autowired
-    protected  PermissionRepository permissionRepository;
+    protected PermissionRepository permissionRepository;
 
 
     @Autowired
-    protected  StorePermissionsRepository storePermissionRepository;
+    protected StorePermissionsRepository storePermissionRepository;
 
     @Autowired
     protected WholesalePermissionRepository wholesalePermissionRepository;
 
-    protected  Integer storeId;
+    protected Integer storeId;
 
     protected String storeSlug;
 
     protected String selfSlug;
 
 
-
-    protected String createRandomEmail(){
-       return UUID.randomUUID()+"@sales.com";
+    protected String createRandomEmail() {
+        return UUID.randomUUID() + "@sales.com";
     }
 
     protected String extractTokenFromResponse(MvcResult result) throws Exception {
@@ -104,7 +103,6 @@ public class TestUtil {
         TokenResponse tokenResponse = objectMapper.readValue(responseBody, TokenResponse.class); // Create a TokenResponse class
         return tokenResponse.getToken();
     }
-
 
 
     protected String extractSlugFromResponseViaRes(MvcResult result) throws Exception {
@@ -120,7 +118,7 @@ public class TestUtil {
         return (String) testUser.getUser().get("slug");
     }
 
-    protected Map<String,Object> extractUserFromResponseViaUser(MvcResult result) throws Exception {
+    protected Map<String, Object> extractUserFromResponseViaUser(MvcResult result) throws Exception {
         String responseBody = result.getResponse().getContentAsString();
         TestUser testUser = objectMapper.readValue(responseBody, TestUser.class); // Create a TokenResponse class
         return testUser.getUser();
@@ -140,17 +138,16 @@ public class TestUtil {
     }
 
 
-
     @Getter
     @Setter
     private static class TestResResponse {
-        private Map<String,Object> res;
+        private Map<String, Object> res;
     }
 
     @Getter
     @Setter
     private static class TestUser {
-        private Map<String,Object> user;
+        private Map<String, Object> user;
     }
 
 
@@ -175,7 +172,7 @@ public class TestUtil {
 
     protected StoreCategory createStoreCategory() {
         String slug = UUID.randomUUID().toString();
-        StoreCategory storeCategory  = StoreCategory.builder()
+        StoreCategory storeCategory = StoreCategory.builder()
                 .category("Electronic")
                 .slug(slug)
                 .isDeleted("N")
@@ -188,7 +185,7 @@ public class TestUtil {
     protected StoreSubCategory createStoreSubCategory() {
         StoreCategory storeCategory = createStoreCategory();
         String slug = UUID.randomUUID().toString();
-        StoreSubCategory storeSubCategory  = StoreSubCategory.builder()
+        StoreSubCategory storeSubCategory = StoreSubCategory.builder()
                 .categoryId(storeCategory.getId())
                 .subcategory("Laptop")
                 .slug(slug)
@@ -199,19 +196,17 @@ public class TestUtil {
     }
 
 
-
     public Address createAddress() {
         City city = createCity();
         String slug = UUID.randomUUID().toString();
         Address address = Address.builder()
                 .street("Test")
-                .state(State.builder().id(city.getStateId()).build() )
+                .state(State.builder().id(city.getStateId()).build())
                 .city(city)
                 .slug(slug)
                 .build();
         return addressRepository.save(address);
     }
-
 
 
     public Store createStore() {
@@ -235,7 +230,7 @@ public class TestUtil {
 
     public ServicePlan createServicePlan(Date currentTime) {
         ServicePlan servicePlan = ServicePlan.builder()
-                .name("Test Service plan "+UUID.randomUUID())
+                .name("Test Service plan " + UUID.randomUUID())
                 .slug(UUID.randomUUID().toString())
                 .createdAt(currentTime.getTime())
                 .price(new Random().nextLong())
@@ -250,8 +245,8 @@ public class TestUtil {
         return servicePlanRepository.save(servicePlan);
     }
 
-    public User createUser(String slug,String email, String password ,String userType) {
-        String random  = getRandomMobileNumber();
+    public User createUser(String slug, String email, String password, String userType) {
+        String random = getRandomMobileNumber();
         User user = User.builder()
                 .username("naresh")
                 .slug(slug)
@@ -265,7 +260,7 @@ public class TestUtil {
         return userRepository.save(user);
     }
 
-    public WholesalerPlans createWholesalePlan(String slug,User user,Date currentTime,Date futureDate,ServicePlan servicePlan){
+    public WholesalerPlans createWholesalePlan(String slug, User user, Date currentTime, Date futureDate, ServicePlan servicePlan) {
         WholesalerPlans wholesalerPlans = WholesalerPlans.builder()
                 .userId(user.getId())
                 .createdAt(currentTime.getTime())
@@ -278,15 +273,15 @@ public class TestUtil {
     }
 
     public String loginUser(String userType) throws Exception {
-        String email = UUID.randomUUID()+"@mocktest.in";
+        String email = UUID.randomUUID() + "@mocktest.in";
         String password = UUID.randomUUID().toString();
         String slug = UUID.randomUUID().toString();
         Date currentTime = new Date();
         Date futureDate = new Date();
         futureDate.setMonth(currentTime.getMonth() + 12);
         ServicePlan servicePlan = createServicePlan(currentTime);
-        User user = createUser(slug,email,password,userType);
-        WholesalerPlans wholesalerPlans = createWholesalePlan(slug,user,currentTime,futureDate,servicePlan);
+        User user = createUser(slug, email, password, userType);
+        WholesalerPlans wholesalerPlans = createWholesalePlan(slug, user, currentTime, futureDate, servicePlan);
         user.setActivePlan(wholesalerPlans.getId());
         Group group = createGroup();
         Set<Permission> permissions = getRequiredStaffPermissions();
@@ -299,28 +294,28 @@ public class TestUtil {
         user = userRepository.save(user);
         Set<StorePermissions> storePermission = getAllStorePermissions();
         // assign to group
-        if(userType.equals(GlobalConstantTest.WHOLESALER)){
+        if (userType.equals(GlobalConstantTest.WHOLESALER)) {
             Store store = createStore();
-            assignWholesalerPermissions(storePermission,user.getId());
+            assignWholesalerPermissions(storePermission, user.getId());
             store.setUser(user);
             storeRepository.save(store);
             storeId = store.getId();
             storeSlug = store.getSlug();
-            Map<String,String> loggedUserResponse = getWholesaleLoginBeaverSlugAndToken(email, password);
+            Map<String, String> loggedUserResponse = getWholesaleLoginBeaverSlugAndToken(email, password);
             return loggedUserResponse.get(ConstantResponseKeys.TOKEN);
         }
-        Map<String,String> loggedUserResponse = getLoginBeaverSlugAndToken(email, password);
+        Map<String, String> loggedUserResponse = getLoginBeaverSlugAndToken(email, password);
         return loggedUserResponse.get(ConstantResponseKeys.TOKEN);
     }
 
-    public Map<String,String> getLoginBeaverSlugAndToken(String email, String password) throws Exception {
+    public Map<String, String> getLoginBeaverSlugAndToken(String email, String password) throws Exception {
         String json = """
                     {
                         "email" : "{email}",
                         "password": "{password}"
                     }
                 """
-                .replace("{email}",email).replace("{password}",password);
+                .replace("{email}", email).replace("{password}", password);
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
@@ -330,22 +325,21 @@ public class TestUtil {
                 )
                 .andReturn();
 
-        Map<String,String> response = new HashMap<>();
+        Map<String, String> response = new HashMap<>();
         response.put("slug", extractSlugFromResponseViaUser(result));
-        response.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX+ extractTokenFromResponse(result));
+        response.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + extractTokenFromResponse(result));
         return response;
     }
 
 
-
-    public Map<String,String> getWholesaleLoginBeaverSlugAndToken(String email, String password) throws Exception {
+    public Map<String, String> getWholesaleLoginBeaverSlugAndToken(String email, String password) throws Exception {
         String json = """
                     {
                         "email" : "{email}",
                         "password": "{password}"
                     }
                 """
-                .replace("{email}",email).replace("{password}",password);
+                .replace("{email}", email).replace("{password}", password);
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
@@ -355,17 +349,15 @@ public class TestUtil {
                 )
                 .andReturn();
 
-        Map<String,String> response = new HashMap<>();
+        Map<String, String> response = new HashMap<>();
         response.put("slug", extractSlugFromResponseViaUser(result));
-        response.put(ConstantResponseKeys.TOKEN, extractTokenFromResponse(result));
+        response.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + extractTokenFromResponse(result));
         return response;
     }
 
 
-
-
-    public String getRandomMobileNumber(){
-        Random random  = new Random();
+    public String getRandomMobileNumber() {
+        Random random = new Random();
         String randomMobileNumber = "9";
         for (int i = 0; i < 9; i++) {
             int randomNumber = random.nextInt(9); // Generates any integer (positive or negative)
@@ -377,8 +369,8 @@ public class TestUtil {
 
     public MockMultipartFile getImageMultipartFileToUpload(String parameterName) throws IOException {
         ClassPathResource resource =
-                new ClassPathResource(GlobalConstantTest.IMAGE_FOLDER_PATH_TEST+ GlobalConstant.PATH_SEPARATOR+GlobalConstantTest.IMAGE_NAME_TEST);
-        logger.info("The file path is : {}",resource.getURL());
+                new ClassPathResource(GlobalConstantTest.IMAGE_FOLDER_PATH_TEST + GlobalConstant.PATH_SEPARATOR + GlobalConstantTest.IMAGE_NAME_TEST);
+        logger.info("The file path is : {}", resource.getURL());
         return new MockMultipartFile(
                 parameterName,
                 GlobalConstantTest.IMAGE_NAME_TEST,
@@ -391,20 +383,20 @@ public class TestUtil {
 
     protected ItemCategory createItemCategory() {
         String slug = UUID.randomUUID().toString();
-        ItemCategory itemCategory  = ItemCategory.builder()
-               .category("Electronic")
-               .slug(slug)
-               .isDeleted("N")
-               .icon("abc.png")
-               .build();
-       return itemCategoryRepository.save(itemCategory);
+        ItemCategory itemCategory = ItemCategory.builder()
+                .category("Electronic")
+                .slug(slug)
+                .isDeleted("N")
+                .icon("abc.png")
+                .build();
+        return itemCategoryRepository.save(itemCategory);
     }
 
 
     protected ItemSubCategory createItemSubCategory() {
         ItemCategory itemCategory = createItemCategory();
         String slug = UUID.randomUUID().toString();
-        ItemSubCategory itemSubCategory  = ItemSubCategory.builder()
+        ItemSubCategory itemSubCategory = ItemSubCategory.builder()
                 .categoryId(itemCategory.getId())
                 .subcategory("Laptop")
                 .slug(slug)
@@ -415,7 +407,7 @@ public class TestUtil {
     }
 
 
-    public Item createItem(Integer storeId){
+    public Item createItem(Integer storeId) {
         ItemCategory itemCategory = createItemCategory();
         ItemSubCategory itemSubCategory = createItemSubCategory();
         String slug = UUID.randomUUID().toString();
@@ -437,14 +429,14 @@ public class TestUtil {
     }
 
 
-    public void createSupportEmail () {
+    public void createSupportEmail() {
         boolean exists = false;
         for (SupportEmail supportEmail : supportEmailsRepository.findAll()) {
-            if(supportEmail.getSupportType().equals("SUPPORT")){
+            if (supportEmail.getSupportType().equals("SUPPORT")) {
                 return;
             }
         }
-        if(!exists){
+        if (!exists) {
             SupportEmail supportEmail = SupportEmail.builder()
                     .email(createRandomEmail())
                     .supportType("SUPPORT")
@@ -463,7 +455,7 @@ public class TestUtil {
         return groupRepository.save(group);
     }
 
-    public Permission createPermission(String permission, String permissionFor){
+    public Permission createPermission(String permission, String permissionFor) {
         Permission permissionObj = Permission.builder()
                 .permission(permission)
                 .permissionFor(permissionFor)
@@ -472,7 +464,7 @@ public class TestUtil {
     }
 
 
-    public StorePermissions createStorePermission(){
+    public StorePermissions createStorePermission() {
         StorePermissions permission = StorePermissions.builder()
                 .permission("Test")
                 .permissionFor("Edit")
@@ -481,8 +473,8 @@ public class TestUtil {
         return storePermissionRepository.save(permission);
     }
 
-    public WholesalerPermissions createWholesalerPermission(Integer userId){
-        Permission permission = createPermission("users.all","Users");
+    public WholesalerPermissions createWholesalerPermission(Integer userId) {
+        Permission permission = createPermission("users.all", "Users");
         WholesalerPermissions wholesalerPermissions = WholesalerPermissions.builder()
                 .permissionId(permission.getId())
                 .userId(userId)
@@ -491,7 +483,7 @@ public class TestUtil {
     }
 
 
-    public Set<Permission> getRequiredStaffPermissions(){
+    public Set<Permission> getRequiredStaffPermissions() {
         List<String> permissionsStr = List.of(
                 "dashboard.count",
                 "group.all",
@@ -503,6 +495,7 @@ public class TestUtil {
                 "item.category",
                 "item.category.edit",
                 "item.category.delete",
+                "item.category.detail",
                 "item.delete",
                 "item.detail",
                 "item.edit",
@@ -557,7 +550,7 @@ public class TestUtil {
                 "permissions.add"
         );
         Set<Permission> permissionsSet = new HashSet<>();
-        for(String permissionStr : permissionsStr){
+        for (String permissionStr : permissionsStr) {
             Permission permission = Permission.builder()
                     .permission(permissionStr)
                     .displayName(permissionStr.toUpperCase())
@@ -569,10 +562,10 @@ public class TestUtil {
     }
 
 
-    public void assignWholesalerPermissions(Set<StorePermissions> permissions ,Integer userId){
+    public void assignWholesalerPermissions(Set<StorePermissions> permissions, Integer userId) {
         Set<WholesalerPermissions> wholesalerPermissions = new HashSet<>();
         permissions.forEach(sp -> {
-                WholesalerPermissions wp = WholesalerPermissions.builder()
+                    WholesalerPermissions wp = WholesalerPermissions.builder()
                             .permissionId(sp.getId())
                             .userId(userId)
                             .build();
@@ -582,40 +575,40 @@ public class TestUtil {
         wholesalePermissionRepository.saveAll(wholesalerPermissions);
     }
 
-    public Set<StorePermissions> getAllStorePermissions(){
+    public Set<StorePermissions> getAllStorePermissions() {
         Set<StorePermissions> storePermissions = new HashSet<>();
         List<String> storePermissionsStr = List.of(
-"excel.notUpdated.absolute",
-        "remove.bg.image.download",
-        "remove.bg.image.upload",
-        "wallet.dashboard.graph",
-        "wallet.transactiona.all",
-        "wholesale.dashboard.count",
-        "wholesale.furture.plans.activate",
-        "wholesale.furture.plans.all",
-        "wholesale.item.all",
-        "wholesale.item.delete",
-        "wholesale.item.detail",
-        "wholesale.item.edit",
-        "wholesale.item.export",
-        "wholesale.item.import",
-        "wholesale.item.stock.update",
-        "wholesale.item.template.download",
-        "wholesale.my.current.plan",
-        "wholesale.pagination.all",
-        "wholesale.pagination.edit",
-        "wholesale.plan.active",
-        "wholesale.plan.all",
-        "wholesale.plan.detail",
-        "wholesale.profile.edit",
-        "wholesale.promoted.item.add",
-        "wholesale.review.all",
-        "wholesale.store.create",
-        "wholesale.store.edit",
-        "wholesale.store.notifications",
-        "wholesale.store.notifications.seen",
-        "wholesale.wallet.pay",
-        "wholesale.password.reset"
+                "excel.notUpdated.absolute",
+                "remove.bg.image.download",
+                "remove.bg.image.upload",
+                "wallet.dashboard.graph",
+                "wallet.transactiona.all",
+                "wholesale.dashboard.count",
+                "wholesale.furture.plans.activate",
+                "wholesale.furture.plans.all",
+                "wholesale.item.all",
+                "wholesale.item.delete",
+                "wholesale.item.detail",
+                "wholesale.item.edit",
+                "wholesale.item.export",
+                "wholesale.item.import",
+                "wholesale.item.stock.update",
+                "wholesale.item.template.download",
+                "wholesale.my.current.plan",
+                "wholesale.pagination.all",
+                "wholesale.pagination.edit",
+                "wholesale.plan.active",
+                "wholesale.plan.all",
+                "wholesale.plan.detail",
+                "wholesale.profile.edit",
+                "wholesale.promoted.item.add",
+                "wholesale.review.all",
+                "wholesale.store.create",
+                "wholesale.store.edit",
+                "wholesale.store.notifications",
+                "wholesale.store.notifications.seen",
+                "wholesale.wallet.pay",
+                "wholesale.password.reset"
         );
         storePermissionsStr.forEach(p -> {
             StorePermissions sp = StorePermissions.builder()
@@ -685,7 +678,6 @@ public class TestUtil {
             Assertions.fail("Unexpected response status: " + status + ", body: " + body);
         }
     }
-
 
 
 }

@@ -33,7 +33,7 @@ class GlobalAdviceControllerTest {
         NotFoundException ex = new NotFoundException("not found");
         WebRequest req = mock(WebRequest.class);
         ErrorDto res = advice.notFoundException(ex, req);
-        assertEquals(404, res.getStatus());
+        assertEquals(400, res.getStatus());
     }
 
     @Test

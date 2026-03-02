@@ -134,6 +134,9 @@ public class ItemService {
     public ItemDto findItemDtoBySlug(String slug) {
         logger.debug("Entering findItemDtoBySlug with slug: {}", slug);
         Item result = itemRepository.findItemBySlug(slug);
+        if(result == null){
+            return null;
+        }
         result.setStoreSlug(storeRepository.findStoreSlugByStoreId(result.getWholesaleId()));
         logger.debug("Exiting findItemDtoBySlug");
         return itemMapper.toDto(result);

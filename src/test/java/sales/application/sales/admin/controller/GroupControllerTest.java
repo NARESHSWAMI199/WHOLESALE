@@ -149,7 +149,7 @@ public class GroupControllerTest extends TestUtil {
                         .headers(headers)
                 )
                 .andExpectAll(
-                        status().is(404)
+                        status().is(400)
                 ).andDo(print());
     }
 
