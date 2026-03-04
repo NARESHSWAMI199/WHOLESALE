@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.ItemReviewDto;
 import com.sales.admin.services.ItemReviewService;
-import com.sales.request.ItemReviewsFilterDto;
+import com.sales.request.ItemReviewsFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("admin/item/review")
 @RequiredArgsConstructor
 @Tag(name = "Item Reviews", description = "APIs for managing item reviews")
-public class ItemReviewController  {
+public class ItemReviewController {
 
     private final ItemReviewService itemReviewService;
     private static final Logger logger = LoggerFactory.getLogger(ItemReviewController.class);
@@ -30,9 +30,9 @@ public class ItemReviewController  {
     @PostMapping("all")
     @PreAuthorize("hasAuthority('item.review.all')")
     @Operation(summary = "Get all item reviews", description = "Retrieves a paginated list of all item reviews with optional filters")
-    public ResponseEntity<Page<ItemReviewDto>> getAllReviews(@RequestBody ItemReviewsFilterDto ItemReviewsFilterDto, HttpServletRequest httpServletRequest) {
-        logger.debug("Fetching all item comments with filters: {}", ItemReviewsFilterDto);
-        Page<ItemReviewDto> itemReviewDtoPage = itemReviewService.getAllItemReview(ItemReviewsFilterDto);
+    public ResponseEntity<Page<ItemReviewDto>> getAllReviews(@RequestBody ItemReviewsFilterRequest itemReviewsFilterRequest, HttpServletRequest httpServletRequest) {
+        logger.debug("Fetching all item comments with filters: {}", itemReviewsFilterRequest);
+        Page<ItemReviewDto> itemReviewDtoPage = itemReviewService.getAllItemReview(itemReviewsFilterRequest);
         return new ResponseEntity<>(itemReviewDtoPage, HttpStatus.OK);
     }
 

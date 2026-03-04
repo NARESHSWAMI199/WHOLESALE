@@ -4,7 +4,7 @@ import com.sales.admin.repositories.AddressRepository;
 import com.sales.claims.AuthUser;
 import com.sales.request.AddressRequest;
 import com.sales.request.SearchFilters;
-import com.sales.request.StoreRequest;
+import com.sales.request.StoreCreationRequest;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
@@ -64,43 +64,43 @@ public class WholesaleStoreService  {
     String storeImagePath;
 
     @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
-    public Map<String, Object> updateStoreBySlug(StoreRequest storeRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting updateStoreBySlug method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
+    public Map<String, Object> updateStoreBySlug(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting updateStoreBySlug method with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
 
         // Validating required fields. If there we found any required field is null, this will throw an Exception
-        Utils.checkRequiredFields(storeRequest, List.of("storeName", "storeEmail", "storePhone", "categoryId", "subCategoryId"));
+        Utils.checkRequiredFields(storeCreationRequest, List.of("storeName", "storeEmail", "storePhone", "categoryId", "subCategoryId"));
 
         Map<String, Object> responseObj = new HashMap<>();
-        String storeName = Utils.isValidName(storeRequest.getStoreName(), ConstantResponseKeys.STORE);
-        storeRequest.setStoreName(storeName);
+        String storeName = Utils.isValidName(storeCreationRequest.getStoreName(), ConstantResponseKeys.STORE);
+        storeCreationRequest.setStoreName(storeName);
 
         /* '_' replaced by actual error message in mobileAndEmailValidation */
-        Utils.mobileAndEmailValidation(storeRequest.getStoreEmail(), storeRequest.getStorePhone(), "Not a valid _");
+        Utils.mobileAndEmailValidation(storeCreationRequest.getStoreEmail(), storeCreationRequest.getStorePhone(), "Not a valid _");
 
         try {
-            StoreCategory storeCategory = wholesaleCategoryRepository.findById(storeRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store category not found."));
-            storeRequest.setStoreCategory(storeCategory);
-            StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
-            storeRequest.setStoreSubCategory(storeSubCategory);
+            StoreCategory storeCategory = wholesaleCategoryRepository.findById(storeCreationRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store category not found."));
+            storeCreationRequest.setStoreCategory(storeCategory);
+            StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
+            storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
             throw new MyException("Invalid arguments for category and subcategory");
         }
         Store store = getStoreByUserId(loggedUser.getId());
         String slug = store.getSlug();
-        storeRequest.setStoreSlug(slug);
+        storeCreationRequest.setStoreSlug(slug);
 
         // before update store and store's address get address id from store
-        Integer addressId = wholesaleStoreRepository.getAddressIdBySlug(storeRequest.getStoreSlug());
+        Integer addressId = wholesaleStoreRepository.getAddressIdBySlug(storeCreationRequest.getStoreSlug());
         if (addressId == null) throw new IllegalArgumentException("No store found to update.");  // wrong wholesale slug.
-        storeRequest.setAddressId(addressId);
+        storeCreationRequest.setAddressId(addressId);
 
-        String imageName = getStoreImagePath(storeRequest.getStorePic(), slug);
+        String imageName = getStoreImagePath(storeCreationRequest.getStorePic(), slug);
         if (imageName != null) {
-            storeRequest.setStoreAvatar(imageName);
+            storeCreationRequest.setStoreAvatar(imageName);
         } else {
-            storeRequest.setStoreAvatar(store.getAvtar());
+            storeCreationRequest.setStoreAvatar(store.getAvtar());
         }
-        int isUpdated = updateStore(storeRequest, loggedUser); // Update operation
+        int isUpdated = updateStore(storeCreationRequest, loggedUser); // Update operation
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -113,19 +113,19 @@ public class WholesaleStoreService  {
     }
 
     @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
-    public int updateStore(StoreRequest storeRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting updateStore method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting updateStore method with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
         AddressRequest address = new AddressRequest();
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(storeRequest, List.of("street", "zipCode", "city", "state"));
-        address.setStreet(storeRequest.getStreet());
-        address.setZipCode(storeRequest.getZipCode());
-        address.setCity(storeRequest.getCity());
-        address.setState(storeRequest.getState());
-        address.setAddressId(storeRequest.getAddressId());
+        Utils.checkRequiredFields(storeCreationRequest, List.of("street", "zipCode", "city", "state"));
+        address.setStreet(storeCreationRequest.getStreet());
+        address.setZipCode(storeCreationRequest.getZipCode());
+        address.setCity(storeCreationRequest.getCity());
+        address.setState(storeCreationRequest.getState());
+        address.setAddressId(storeCreationRequest.getAddressId());
         int isUpdatedAddress = wholesaleAddressHbRepository.updateAddress(address, loggedUser); // Update operation
         if (isUpdatedAddress < 1) return isUpdatedAddress;
-        int isUpdatedStore = wholesaleStoreHbRepository.updateStore(storeRequest, loggedUser); // Update operation
+        int isUpdatedStore = wholesaleStoreHbRepository.updateStore(storeCreationRequest, loggedUser); // Update operation
         logger.debug("Completed updateStore method");
         return isUpdatedStore;
     }
@@ -186,42 +186,42 @@ public class WholesaleStoreService  {
     }
 
     @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class, Exception.class})
-    public Store createStore(StoreRequest storeRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting createStore method with storeRequest: {}, loggedUser: {}", storeRequest, loggedUser);
+    public Store createStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting createStore method with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
 
         // Validating required fields. If their we found any required field is null, this will throw an Exception
-        Utils.checkRequiredFields(storeRequest, List.of("storeName", "storePic", "storeEmail", "storePhone", "categoryId", "subCategoryId"));
+        Utils.checkRequiredFields(storeCreationRequest, List.of("storeName", "storePic", "storeEmail", "storePhone", "categoryId", "subCategoryId"));
 
         /* '_' replaced by actual error message in mobileAndEmailValidation */
-        Utils.mobileAndEmailValidation(storeRequest.getStoreEmail(), storeRequest.getStorePhone(), "Not a valid _");
+        Utils.mobileAndEmailValidation(storeCreationRequest.getStoreEmail(), storeCreationRequest.getStorePhone(), "Not a valid _");
 
         try {
-            StoreCategory storeCategory = wholesaleCategoryRepository.findById(storeRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store category not found."));
-            storeRequest.setStoreCategory(storeCategory);
-            StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
-            storeRequest.setStoreSubCategory(storeSubCategory);
+            StoreCategory storeCategory = wholesaleCategoryRepository.findById(storeCreationRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store category not found."));
+            storeCreationRequest.setStoreCategory(storeCategory);
+            StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
+            storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
             throw new MyException("Invalid arguments for category and subcategory");
         }
 
         /* inserting  address during create a wholesale */
-        AddressRequest addressRequest = getAddressObjFromStore(storeRequest);
+        AddressRequest addressRequest = getAddressObjFromStore(storeCreationRequest);
         // if there is any required field null then this will throw IllegalArgumentException
         Utils.checkRequiredFields(addressRequest, List.of("street", "zipCode", "city", "state"));
         Address address = insertAddress(addressRequest, loggedUser); // Create operation
 
         Store store = new Store(loggedUser);
         store.setUser(User.builder().id(loggedUser.getId()).build());
-        store.setStoreName(storeRequest.getStoreName());
-        store.setEmail(storeRequest.getStoreEmail());
+        store.setStoreName(storeCreationRequest.getStoreName());
+        store.setEmail(storeCreationRequest.getStoreEmail());
         store.setAddress(address);
-        store.setDescription(storeRequest.getDescription());
-        store.setPhone(storeRequest.getStorePhone());
+        store.setDescription(storeCreationRequest.getDescription());
+        store.setPhone(storeCreationRequest.getStorePhone());
         store.setRating(0f);
-        store.setStoreCategory(storeRequest.getStoreCategory());
-        store.setStoreSubCategory(storeRequest.getStoreSubCategory());
+        store.setStoreCategory(storeCreationRequest.getStoreCategory());
+        store.setStoreSubCategory(storeCreationRequest.getStoreSubCategory());
         Store insertedStore = wholesaleStoreRepository.save(store); // Create operation
-        String imageName = getStoreImagePath(storeRequest.getStorePic(), insertedStore.getSlug());
+        String imageName = getStoreImagePath(storeCreationRequest.getStorePic(), insertedStore.getSlug());
         if (imageName != null) {
             store.setAvtar(imageName); /** I know save function called before set this, but it will save automatically due to same transaction */
         } else {
@@ -258,15 +258,15 @@ public class WholesaleStoreService  {
         return savedAddress;
     }
 
-    public AddressRequest getAddressObjFromStore(StoreRequest storeRequest) {
-        logger.debug("Starting getAddressObjFromStore method with storeRequest: {}", storeRequest);
+    public AddressRequest getAddressObjFromStore(StoreCreationRequest storeCreationRequest) {
+        logger.debug("Starting getAddressObjFromStore method with storeCreationRequest: {}", storeCreationRequest);
         AddressRequest addressRequest = AddressRequest.builder()
-            .street(storeRequest.getStreet())
-            .zipCode(storeRequest.getZipCode())
-            .city(storeRequest.getCity())
-            .state(storeRequest.getState())
-            .latitude(storeRequest.getLatitude())
-            .altitude(storeRequest.getAltitude())
+            .street(storeCreationRequest.getStreet())
+            .zipCode(storeCreationRequest.getZipCode())
+            .city(storeCreationRequest.getCity())
+            .state(storeCreationRequest.getState())
+            .latitude(storeCreationRequest.getLatitude())
+            .altitude(storeCreationRequest.getAltitude())
             .build();
         logger.debug("Completed getAddressObjFromStore method");
         return addressRequest;
@@ -283,11 +283,11 @@ public class WholesaleStoreService  {
         return notificationsPage.map(wholesaleStoreNotificationMapper::toDto);
     }
 
-    public void updateSeen(StoreRequest storeRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Starting updateSeen method with storeRequest: {}", storeRequest);
+    public void updateSeen(StoreCreationRequest storeCreationRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Starting updateSeen method with storeCreationRequest: {}", storeCreationRequest);
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(storeRequest, List.of("seenIds"));
-        List<Long> seenIds = storeRequest.getSeenIds();
+        Utils.checkRequiredFields(storeCreationRequest, List.of("seenIds"));
+        List<Long> seenIds = storeCreationRequest.getSeenIds();
         for (long id : seenIds) {
             wholesaleStoreHbRepository.updateSeenNotifications(id); // Update operation
         }

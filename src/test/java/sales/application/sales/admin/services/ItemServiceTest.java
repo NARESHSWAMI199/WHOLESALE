@@ -4,7 +4,7 @@ import com.sales.SalesApplication;
 import com.sales.admin.dto.ItemDto;
 import com.sales.admin.services.ItemService;
 import com.sales.claims.SalesUser;
-import com.sales.request.ItemSearchFields;
+import com.sales.request.ItemFilterRequest;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.Store;
@@ -35,7 +35,7 @@ public class ItemServiceTest extends TestUtil {
     @Test
     public void testGetAllItems() {
         Store store = createStore();
-        ItemSearchFields searchFilters = new ItemSearchFields();
+        ItemFilterRequest searchFilters = new ItemFilterRequest();
         searchFilters.setStoreId(store.getId());
         User user = createUser(UUID.randomUUID().toString(), "test@example.com", "pass", GlobalConstantTest.ADMIN);
         SalesUser loggedUser = new SalesUser(user);

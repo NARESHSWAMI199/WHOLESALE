@@ -6,10 +6,13 @@ import com.sales.admin.services.ItemService;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.*;
-import com.sales.entities.*;
+import com.sales.entities.ItemCategory;
+import com.sales.entities.ItemSubCategory;
+import com.sales.entities.MeasurementUnit;
+import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.request.*;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.ReadExcel;
 import com.sales.utils.Utils;
@@ -61,7 +64,7 @@ public class ItemController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
     @Operation(summary = "Get all items", description = "Retrieves a paginated list of all items with optional search filters")
-    public ResponseEntity<Page<ItemDto>> getAllItem(Authentication authentication, @RequestBody ItemSearchFields searchFilters, HttpServletRequest request) {
+    public ResponseEntity<Page<ItemDto>> getAllItem(Authentication authentication, @RequestBody ItemFilterRequest searchFilters, HttpServletRequest request) {
         logger.debug("Fetching all items with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Page<ItemDto> alItems = itemService.getAllItems(searchFilters,loggedUser);
@@ -166,7 +169,7 @@ public class ItemController  {
     @PostMapping(value = {"/exportExcel/{wholesaleSlug}","exportExcel"})
     @PreAuthorize("hasAuthority('item.export')")
     @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
-    public ResponseEntity<Object> exportItemsFromExcel(Authentication authentication,@PathVariable(required = false) String wholesaleSlug, @RequestBody ItemSearchFields searchFilters,HttpServletRequest request) {
+    public ResponseEntity<Object> exportItemsFromExcel(Authentication authentication, @PathVariable(required = false) String wholesaleSlug, @RequestBody ItemFilterRequest searchFilters, HttpServletRequest request) {
         logger.debug("Exporting items to Excel for wholesaleSlug: {}", wholesaleSlug);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String,Object> responseObj = new HashMap<>();
@@ -238,7 +241,7 @@ public class ItemController  {
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
-            responseObj.put(ConstantResponseKeys.STATUS, 404);
+            responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
@@ -347,7 +350,7 @@ public class ItemController  {
     @PostMapping("subcategory")
     @PreAuthorize("hasAnyAuthority('item.subcategory.all','item.subcategory')")
     @Operation(summary = "Get all item subcategories", description = "Retrieves a list of all item subcategories with optional search filters")
-    public ResponseEntity<List<ItemSubCategory>> getSubCategory(@RequestBody SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<List<ItemSubCategory>> getSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all item subcategories with filters: {}", searchFilters);
         List<ItemSubCategory> itemCategories = itemService.getAllItemsSubCategories(searchFilters);
         return new ResponseEntity<>(itemCategories, HttpStatus.OK);

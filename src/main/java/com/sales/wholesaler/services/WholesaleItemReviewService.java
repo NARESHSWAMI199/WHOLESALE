@@ -1,8 +1,8 @@
 package com.sales.wholesaler.services;
 
 import com.sales.claims.AuthUser;
-import com.sales.request.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
+import com.sales.request.ItemReviewsFilterRequest;
 import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.mapper.WholesaleItemReviewMapper;
 import com.sales.wholesaler.repository.WholesaleItemReviewRepository;
@@ -28,7 +28,7 @@ public class WholesaleItemReviewService  {
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewService.class);
 
     @Transactional
-    public Page<WholesaleItemReviewDto> getAllItemReview(ItemReviewsFilterDto filters, AuthUser loggedUser) {
+    public Page<WholesaleItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters, AuthUser loggedUser) {
         logger.debug("Starting getALlItemReview method with filters: {}, loggedUser: {}", filters, loggedUser);
         if(filters.getItemId() == 0) {
             logger.error("Invalid itemId provided");

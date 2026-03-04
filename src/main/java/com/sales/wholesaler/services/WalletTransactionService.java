@@ -1,6 +1,7 @@
 package com.sales.wholesaler.services;
 
 import com.sales.request.SearchFilters;
+import com.sales.request.WalletFilterRequest;
 import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
@@ -26,29 +27,27 @@ import static com.sales.specifications.WalletTransactionSpecification.*;
 @RequiredArgsConstructor
 public class WalletTransactionService {
 
-    
+
     private static final Logger logger = LoggerFactory.getLogger(WalletTransactionService.class);
     private final WalletTransactionHbRepository WalletTransactionHbRepository;
     private final WalletTransactionRepository walletTransactionRepository;
     private final WholesaleWalletRepository wholesaleWalletRepository;
 
 
-
-    public Page<WholesaleWalletTransactionDto> getAllWalletTransactionByUserId(SearchFilters searchFilters, Integer userId){
+    public Page<WholesaleWalletTransactionDto> getAllWalletTransactionByUserId(WalletFilterRequest searchFilters, Integer userId) {
         Specification<WalletTransaction> specification = Specification.allOf(
-            hasSlug(searchFilters.getSlug())
-            .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
-            .and(lessThanOrEqualToToDate(searchFilters.getToDate())
-            .and(hasUserId(userId))
-        ));
-        Pageable pageable = getPageable(logger,searchFilters);
+                hasSlug(searchFilters.getSlug())
+                        .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
+                        .and(lessThanOrEqualToToDate(searchFilters.getToDate())
+                                .and(hasUserId(userId))
+                        ));
+        Pageable pageable = getPageable(logger, searchFilters);
         return WalletTransactionHbRepository.findAll(specification, pageable);
     }
 
 
-
     public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto, Integer userId) {
-        logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
+        logger.debug("The addWalletTransaction method started with wallTransactionDto : {}", walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())
                 .userId(userId)
@@ -57,12 +56,12 @@ public class WalletTransactionService {
                 .createdAt(Utils.getCurrentMillis())
                 .status(walletTransactionDto.getStatus())
                 .build();
-        logger.debug("The addWalletTransaction method ended with wallTransactionDto : {}",walletTransaction);
+        logger.debug("The addWalletTransaction method ended with wallTransactionDto : {}", walletTransaction);
 
-        if(!Utils.isEmpty(walletTransactionDto.getTransactionType()) && walletTransactionDto.getTransactionType().equalsIgnoreCase("CR")){
+        if (!Utils.isEmpty(walletTransactionDto.getTransactionType()) && walletTransactionDto.getTransactionType().equalsIgnoreCase("CR")) {
             Integer added = wholesaleWalletRepository.addMoneyInWallet(walletTransaction.getAmount(), userId, Utils.getCurrentMillis());
-            logger.debug("Added money in wallet rows was updated : {} ",added);
-            if(added < 1){ // if a user isn't found in wallet.
+            logger.debug("Added money in wallet rows was updated : {} ", added);
+            if (added < 1) { // if a user isn't found in wallet.
                 Wallet wallet = Wallet.builder()
                         .userId(userId)
                         .amount(walletTransaction.getAmount())
@@ -70,9 +69,9 @@ public class WalletTransactionService {
                         .build();
                 wholesaleWalletRepository.save(wallet);
             }
-        }else{
+        } else {
             Integer deducted = wholesaleWalletRepository.deductMoneyFromWallet(walletTransaction.getAmount(), userId, Utils.getCurrentMillis());
-            logger.debug("Detected money in wallet rows was updated : {} ",deducted);
+            logger.debug("Detected money in wallet rows was updated : {} ", deducted);
         }
 
         return walletTransactionRepository.save(walletTransaction);

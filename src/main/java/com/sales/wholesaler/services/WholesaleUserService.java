@@ -170,17 +170,17 @@ public class WholesaleUserService  {
         return user;
     }
 
-    public StoreRequest userDtoToStoreDto(UserRequest userRequest) {
+    public StoreCreationRequest userDtoToStoreDto(UserRequest userRequest) {
         logger.debug("Starting userDtoToStoreDto method with userRequest: {}", userRequest);
-        StoreRequest storeRequest = new StoreRequest();
-        storeRequest.setStoreName(userRequest.getStoreName());
-        storeRequest.setStoreEmail(userRequest.getStoreEmail());
-        storeRequest.setDescription(userRequest.getDescription());
-        storeRequest.setCity(userRequest.getCity());
-        storeRequest.setState(userRequest.getState());
-        storeRequest.setStorePhone(userRequest.getStorePhone());
+        StoreCreationRequest storeCreationRequest = new StoreCreationRequest();
+        storeCreationRequest.setStoreName(userRequest.getStoreName());
+        storeCreationRequest.setStoreEmail(userRequest.getStoreEmail());
+        storeCreationRequest.setDescription(userRequest.getDescription());
+        storeCreationRequest.setCity(userRequest.getCity());
+        storeCreationRequest.setState(userRequest.getState());
+        storeCreationRequest.setStorePhone(userRequest.getStorePhone());
         logger.debug("Completed userDtoToStoreDto method");
-        return storeRequest;
+        return storeCreationRequest;
     }
 
     public Map<String, Object> updateUserProfile(UserRequest userRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {

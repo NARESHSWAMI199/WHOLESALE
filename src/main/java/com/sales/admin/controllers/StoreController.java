@@ -57,7 +57,7 @@ public class StoreController {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('store.all')")
     @Operation(summary = "Get all stores", description = "Retrieves a paginated list of all stores with optional search filters")
-    public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody StoreFilterRequest searchFilters){
         logger.debug("Fetching all stores with filters: {}", searchFilters);
         Page<StoreDto> storePage =  storeService.getAllStore(searchFilters);
         return new ResponseEntity<>(storePage, HttpStatus.OK);
@@ -146,11 +146,11 @@ public class StoreController {
     @PostMapping(value = {"/add","/update"})
     @PreAuthorize("hasAnyAuthority('store.add','store.update','store.edit')")
     @Operation(summary = "Add or update store", description = "Creates a new store or updates an existing store based on the provided data")
-    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request, @Valid @ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Adding or updating store with details: {}", storeRequest);
+    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request, @Valid @ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Adding or updating store with details: {}", storeCreationRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI().toLowerCase();
-        Map<String,Object> responseObj = storeService.createOrUpdateStore(storeRequest,loggedUser,path);
+        Map<String,Object> responseObj = storeService.createOrUpdateStore(storeCreationRequest,loggedUser,path);
         return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
@@ -281,7 +281,7 @@ public class StoreController {
     @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
     @PostMapping("subcategory")
     @Operation(summary = "Get all store subcategories", description = "Retrieves a list of all store subcategories with optional filters")
-    public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@RequestBody SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all store subcategories with filters: {}", searchFilters);
         List<StoreSubCategory> storeSubCategories = storeService.getAllStoreSubCategories(searchFilters);
         return new ResponseEntity<>(storeSubCategories, HttpStatus.OK);

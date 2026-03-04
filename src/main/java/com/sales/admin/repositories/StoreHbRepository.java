@@ -1,7 +1,7 @@
 package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
-import com.sales.request.StoreRequest;
+import com.sales.request.StoreCreationRequest;
 import com.sales.entities.StoreNotifications;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
@@ -51,7 +51,7 @@ public class StoreHbRepository {
         return query.executeUpdate();
     }
 
-    public int updateStore(StoreRequest storeRequest, AuthUser loggedUser){
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
         String strQuery = """
                 update Store set
                     storeName=:name,
@@ -67,16 +67,16 @@ public class StoreHbRepository {
                 """;
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("name", storeRequest.getStoreName());
-        query.setParameter("email", storeRequest.getStoreEmail());
-        query.setParameter("phone", storeRequest.getStorePhone());
-        query.setParameter("rating", storeRequest.getRating());
-        query.setParameter("storeCategory", storeRequest.getStoreCategory());
-        query.setParameter("storeSubCategory", storeRequest.getStoreSubCategory());
-        query.setParameter("description", storeRequest.getDescription());
+        query.setParameter("name", storeCreationRequest.getStoreName());
+        query.setParameter("email", storeCreationRequest.getStoreEmail());
+        query.setParameter("phone", storeCreationRequest.getStorePhone());
+        query.setParameter("rating", storeCreationRequest.getRating());
+        query.setParameter("storeCategory", storeCreationRequest.getStoreCategory());
+        query.setParameter("storeSubCategory", storeCreationRequest.getStoreSubCategory());
+        query.setParameter("description", storeCreationRequest.getDescription());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", storeRequest.getStoreSlug());
+        query.setParameter("slug", storeCreationRequest.getStoreSlug());
         return query.executeUpdate();
     }
 

@@ -4,7 +4,7 @@ import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.DeleteRequest;
-import com.sales.request.ItemSearchFields;
+import com.sales.request.ItemFilterRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.helpers.ExcelHelper;
@@ -62,7 +62,7 @@ public class WholesaleItemController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('wholesale.item.all')")
     @Operation(summary = "Get all items for wholesaler", description = "Retrieves a paginated list of all items associated with the authenticated wholesaler's store based on search filters")
-    public ResponseEntity<Page<WholesaleItemListDto>> getAllItem(Authentication authentication, HttpServletRequest request, @RequestBody ItemSearchFields searchFilters) {
+    public ResponseEntity<Page<WholesaleItemListDto>> getAllItem(Authentication authentication, HttpServletRequest request, @RequestBody ItemFilterRequest searchFilters) {
         logger.debug("Starting getAllItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
@@ -231,7 +231,7 @@ public class WholesaleItemController  {
     @PostMapping(value = {"exportExcel"})
     @PreAuthorize("hasAuthority('wholesale.item.export')")
     @Operation(summary = "Export items to Excel", description = "Exports items to an Excel file based on search filters for the wholesaler")
-    public ResponseEntity<Object> exportItemsFromExcel(Authentication authentication,@RequestBody ItemSearchFields searchFilters ,HttpServletRequest request) {
+    public ResponseEntity<Object> exportItemsFromExcel(Authentication authentication, @RequestBody ItemFilterRequest searchFilters , HttpServletRequest request) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Exporting items to Excel for user : {}", loggedUser );
         Map<String,Object> responseObj = new HashMap<>();

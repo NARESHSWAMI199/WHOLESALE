@@ -7,28 +7,31 @@ import com.sales.admin.dto.ItemDto;
 import com.sales.admin.mapper.ItemMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
-import com.sales.global.USER_TYPES;
-import com.sales.request.*;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.global.USER_TYPES;
+import com.sales.request.*;
 import com.sales.request.enums.ITEM_LABEL;
 import com.sales.request.enums.ITEM_STOCK;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.PermissionDeniedDataAccessException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -60,7 +63,7 @@ public class ItemService {
 
 
     @Transactional
-    public Page<ItemDto> getAllItems(ItemSearchFields searchFilters, AuthUser loggedUser) {
+    public Page<ItemDto> getAllItems(ItemFilterRequest searchFilters, AuthUser loggedUser) {
         logger.debug("Entering getAllItems with searchFilters: {}", searchFilters);
         Sort sort = searchFilters.getOrder().equalsIgnoreCase("asc") ?
                 Sort.by(searchFilters.getOrderBy()).ascending() :
@@ -82,7 +85,7 @@ public class ItemService {
 
 
     @Transactional
-    public String createItemsExcelSheet(ItemSearchFields searchFilters, String wholesaleSlug, AuthUser loggedUser) throws IOException {
+    public String createItemsExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         Specification<Item> specification = Specification.allOf(
                 containsName(searchFilters.getSearchKey().trim())
@@ -554,7 +557,7 @@ public class ItemService {
     }
 
 
-    public List<ItemSubCategory> getAllItemsSubCategories(SearchFilters searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public List<ItemSubCategory> getAllItemsSubCategories(SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering getAllItemsSubCategories with searchFilters: {}", searchFilters);
         // Validating required fields if found any required field is null, this will throw IllegalArgumentException
         Utils.checkRequiredFields(searchFilters, List.of("categoryId"));

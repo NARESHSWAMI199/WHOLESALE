@@ -10,12 +10,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ServicePlanRequest extends  SearchFilters{
-
-    Integer months;
-    Long price;
-    Long discount;
-    String planName;
-    Integer id;
-    String description;
+public class ServicePlanRequest extends SearchFilters {
+    private String name;
+    private String slug;
+    private String status;
+    private Integer months;
+    private Long price;
+    private Long discount;
+    private String planName;
+    private Integer id;
+    private String description;
 }

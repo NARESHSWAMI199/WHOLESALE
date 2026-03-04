@@ -2,7 +2,7 @@ package com.sales.admin.services;
 
 
 import com.sales.admin.repositories.StoreReportRepository;
-import com.sales.request.SearchFilters;
+import com.sales.request.StoreReportFilterRequest;
 import com.sales.entities.StoreReport;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class StoreReportService {
     private static final Logger logger = LoggerFactory.getLogger(StoreReportService.class);
     private final StoreReportRepository storeReportRepository;
 
-    public Page<StoreReport> getAllReportByStoreId(SearchFilters searchFilters){
+    public Page<StoreReport> getAllReportByStoreId(StoreReportFilterRequest searchFilters){
         Pageable pageable = getPageable(logger,searchFilters);
         Specification<StoreReport> specification = Specification.allOf(hasStoreId(searchFilters.getStoreId()));
         return storeReportRepository.findAll(specification,pageable);

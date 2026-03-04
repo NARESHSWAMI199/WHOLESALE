@@ -6,6 +6,7 @@ import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.DeleteRequest;
+import com.sales.request.GroupFilterRequest;
 import com.sales.request.GroupRequest;
 import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
@@ -39,7 +40,7 @@ public class GroupController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('group.all')")
     @Operation(summary = "Get all groups", description = "Retrieves a paginated list of all groups with optional search filters")
-    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
+    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody GroupFilterRequest searchFilters) {
         logger.debug("Fetching all groups with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Page<GroupDto> groupDtoPage = groupService.getAllGroups(searchFilters, loggedUser);

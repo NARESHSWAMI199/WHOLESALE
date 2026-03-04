@@ -1,7 +1,7 @@
 package sales.application.sales.wholesaler.services;
 
 import com.sales.SalesApplication;
-import com.sales.request.ItemSearchFields;
+import com.sales.request.ItemFilterRequest;
 import com.sales.wholesaler.dto.WholesaleItemDto;
 import com.sales.wholesaler.dto.WholesaleItemListDto;
 import com.sales.entities.Item;
@@ -30,7 +30,7 @@ public class WholesaleItemServiceTest extends TestUtil {
     @Test
     public void testGetAllItems() {
         Store store = createStore();
-        ItemSearchFields searchFilters = new ItemSearchFields();
+        ItemFilterRequest searchFilters = new ItemFilterRequest();
         searchFilters.setStoreId(store.getId());
         Page<WholesaleItemListDto> items = wholesaleItemService.getAllItems(searchFilters, store.getId());
         assertNotNull(items);
