@@ -108,7 +108,7 @@ public class GroupService {
                 responseObject.put(ConstantResponseKeys.STATUS, 404);
             }
             // Evict user from redis
-            userCacheService.deleteCacheUser(loggedUser.getSlug());
+            deleteCacheUser(loggedUser.getSlug());
         } else { // Going to insert a new group
             logger.debug("We are going to create the group.");
             Group group = new Group(loggedUser);
@@ -189,5 +189,13 @@ public class GroupService {
         int result = permissionHbRepository.assignGroupsToUser(userId, userPermissionsRequest.getGroupList(), loggedUser);
         logger.debug("Exiting assignGroupsToUser with result: {}", result);
         return result;
+    }
+
+    private void deleteCacheUser(String slug){
+        try {
+            userCacheService.evictCacheUser(slug);
+        }catch (Exception e){
+            logger.warn("Facing issue when going to delete user from redis : {}",slug,e);
+        }
     }
 }

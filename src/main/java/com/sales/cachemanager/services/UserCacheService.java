@@ -44,15 +44,7 @@ public class UserCacheService {
 
     @CacheEvict(value = RedisConstants.USER_REDIS_CACHE_NAME, key = "#slug")
     public void evictCacheUser(String slug){
-        logger.debug("User delete from redis : {}",slug);
-    }
-
-    public void deleteCacheUser(String slug){
-        try {
-            evictCacheUser(slug);
-        }catch (Exception e){
-            logger.warn("Facing issue when going to delete user from redis : {}",slug,e);
-        }
+        logger.info("User delete from redis : {}",slug);
     }
 
 

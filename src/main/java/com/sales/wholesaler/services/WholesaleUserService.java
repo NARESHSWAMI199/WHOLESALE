@@ -201,7 +201,7 @@ public class WholesaleUserService  {
         int isUpdated = updateUser(userRequest, loggedUser); // Update operation
         if (isUpdated > 0) {
             //Evict wholesaler from redis
-            userCacheService.deleteCacheUser(loggedUser.getSlug());
+            deleteCacheUser(loggedUser.getSlug());
             responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully updated.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
@@ -252,7 +252,7 @@ public class WholesaleUserService  {
         int isUpdated =  wholesaleUserHbRepository.updateProfileImage(slug,imageName); // Update operation
         if(isUpdated > 0) {
             //Evict wholesaler from redis
-            userCacheService.deleteCacheUser(loggedUser.getSlug());
+            deleteCacheUser(loggedUser.getSlug());
             logger.debug("Completed updateProfileImage method");
             return imageName;
         }
@@ -383,6 +383,15 @@ public class WholesaleUserService  {
         WholesaleUserDto result = wholesaleUserMapper.toDto(insertedUser);
         logger.debug("Completed addNewUserDto method");
         return result;
+    }
+
+
+    private void deleteCacheUser(String slug){
+        try {
+            userCacheService.evictCacheUser(slug);
+        }catch (Exception e){
+            logger.warn("Facing issue when going to delete user from redis : {}",slug,e);
+        }
     }
 
 }

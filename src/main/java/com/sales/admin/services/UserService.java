@@ -336,7 +336,7 @@ public class UserService {
             }
             if (isUpdated > 0) {
                 // Evict updated user from redis
-                userCacheService.deleteCacheUser(userRequest.getSlug());
+                deleteCacheUser(userRequest.getSlug());
                 responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully updated.");
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
@@ -447,7 +447,7 @@ public class UserService {
         Utils.canUpdateAStaff(slug,user.getUserType(),loggedUser);
         if(user.getUserType().equals(USER_TYPES.WHOLESALER.getType())) storeService.deleteStoreByUserId(user.getId());
         // Evict deleted user from redis
-        userCacheService.deleteCacheUser(deleteRequest.getSlug());
+        deleteCacheUser(deleteRequest.getSlug());
         return userHbRepository.deleteUserBySlug(slug);
     }
 
@@ -472,7 +472,7 @@ public class UserService {
             switch (statusRequest.getStatus()){
                 case "A" , "D":
                     // Evict status user from redis
-                    userCacheService.deleteCacheUser(statusRequest.getSlug());
+                    deleteCacheUser(statusRequest.getSlug());
                     String status = statusRequest.getStatus();
                     /* Getting user and updating status */
                     User user = userRepository.findUserBySlug(statusRequest.getSlug());
@@ -519,7 +519,7 @@ public class UserService {
         profileImage.transferTo(new File(dirPath+imageName));
         int isUpdated =  userHbRepository.updateProfileImage(slug,imageName);
         // Evict profile user from redis
-        userCacheService.deleteCacheUser(slug);
+        deleteCacheUser(slug);
         if(isUpdated > 0) return imageName;
         return null;
     }
@@ -576,7 +576,7 @@ public class UserService {
         int isUpdated = permissionHbRepository.assignPermissionsToWholesaler(user.getId(), userRequest.getStorePermissions());
         if (isUpdated > 0) {
             // Evict wholesaler from redis
-            userCacheService.deleteCacheUser(userRequest.getSlug());
+            deleteCacheUser(userRequest.getSlug());
             responseObject.put(ConstantResponseKeys.MESSAGE, "All permissions have been updated successfully.");
             responseObject.put(ConstantResponseKeys.STATUS, 200);
         } else {
@@ -585,4 +585,14 @@ public class UserService {
         }
         return responseObject;
     }
+
+
+    private void deleteCacheUser(String slug){
+        try {
+           userCacheService.evictCacheUser(slug);
+        }catch (Exception e){
+            logger.warn("Facing issue when going to delete user from redis : {}",slug,e);
+        }
+    }
+
 }
