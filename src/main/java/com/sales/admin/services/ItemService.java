@@ -5,8 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sales.admin.dto.CategoryDto;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.dto.SubcategoryDto;
 import com.sales.admin.mapper.CategoryMapper;
 import com.sales.admin.mapper.ItemMapper;
+import com.sales.admin.mapper.SubcategoryMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
 import com.sales.entities.*;
@@ -58,6 +60,7 @@ public class ItemService {
     private final MeasurementUnitRepository measurementUnitRepository;
     private final ItemMapper itemMapper;
     private final CategoryMapper categoryMapper;
+    private final SubcategoryMapper subcategoryMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
 
@@ -140,7 +143,7 @@ public class ItemService {
     public ItemDto findItemDtoBySlug(String slug) {
         logger.debug("Entering findItemDtoBySlug with slug: {}", slug);
         Item result = itemRepository.findItemBySlug(slug);
-        if(result == null){
+        if (result == null) {
             return null;
         }
         result.setStoreSlug(storeRepository.findStoreSlugByStoreId(result.getWholesaleId()));
@@ -313,7 +316,8 @@ public class ItemService {
     @Transactional
     public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering deleteItem with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
-        if(!USER_TYPES.SUPER_ADMIN.getType().equals(loggedUser.getUserType())) throw new MyException("Only Superuser has permission to delete it.");
+        if (!USER_TYPES.SUPER_ADMIN.getType().equals(loggedUser.getUserType()))
+            throw new MyException("Only Superuser has permission to delete it.");
         String slug = deleteRequest.getSlug();
         Item item = findItemBySlug(slug);
         if (item == null) throw new NotFoundException("Item not found to delete.");
@@ -565,42 +569,36 @@ public class ItemService {
     }
 
 
-    public List<ItemSubCategory> getAllItemsSubCategories(SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public List<SubcategoryDto> getAllItemsSubCategories(SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering getAllItemsSubCategories with searchFilters: {}", searchFilters);
-        // Validating required fields if found any required field is null, this will throw IllegalArgumentException
-        Utils.checkRequiredFields(searchFilters, List.of("categoryId"));
-
         Sort sort = Sort.by(searchFilters.getOrderBy());
         sort = searchFilters.getOrder().equals("asc") ? sort.ascending() : sort.descending();
-        List<ItemSubCategory> result = itemSubCategoryRepository.getSubCategories(searchFilters.getCategoryId(), sort);
+        List<SubcategoryDto> result = itemSubCategoryRepository.getSubCategories(searchFilters.getCategoryId(), sort).stream().map(subcategoryMapper::toDto).toList();
         logger.debug("Exiting getAllItemsSubCategories with result: {}", result);
         return result;
     }
 
 
     @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
-    public ItemCategory saveOrUpdateItemCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public CategoryDto saveOrUpdateItemCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateItemCategory with categoryRequest: {}", categoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
-        Utils.checkRequiredFields(categoryRequest, List.of("category", "icon"));
         ItemCategory itemCategory = new ItemCategory();
-        if (categoryRequest.getId() != null && categoryRequest.getId() != 0) // because we are using 0 for the other category.
+        if (categoryRequest.getId() != null && categoryRequest.getId() != GlobalConstant.OTHER_CATEGORY) // because we are using 0 for the other category.
             itemCategory.setId(categoryRequest.getId());
         itemCategory.setSlug(UUID.randomUUID().toString());  // slug will also change after during update
         itemCategory.setCategory(categoryRequest.getCategory());
         itemCategory.setIcon(categoryRequest.getIcon());
         ItemCategory result = itemCategoryRepository.save(itemCategory);
         logger.debug("Exiting saveOrUpdateItemCategory with result: {}", result);
-        return result;
+        return categoryMapper.toDto(result);
     }
 
     @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
-    public ItemSubCategory saveOrUpdateItemSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public SubcategoryDto saveOrUpdateItemSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateItemSubCategory with subCategoryRequest: {}", subCategoryRequest);
-        // Validate required fields if we found any given field is null, then this will throw Exception
-        Utils.checkRequiredFields(subCategoryRequest, List.of("categoryId", "subcategory", "unit", "icon"));
         ItemSubCategory itemSubCategory = new ItemSubCategory();
-        if (subCategoryRequest.getId() != null && subCategoryRequest.getId() != 0) // because we are using 0 for the other subcategory.
+        if (subCategoryRequest.getId() != null && subCategoryRequest.getId() != GlobalConstant.OTHER_SUBCATEGORY) // because we are using 0 for the other subcategory.
             itemSubCategory.setId(subCategoryRequest.getId());
         itemSubCategory.setSlug(UUID.randomUUID().toString()); // slug will also change after during update
         itemSubCategory.setCategoryId(subCategoryRequest.getCategoryId());
@@ -610,7 +608,7 @@ public class ItemService {
         itemSubCategory.setUpdatedAt(Utils.getCurrentMillis());
         ItemSubCategory result = itemSubCategoryRepository.save(itemSubCategory);
         logger.debug("Exiting saveOrUpdateItemSubCategory with result: {}", result);
-        return result;
+        return subcategoryMapper.toDto(result);
     }
 
 

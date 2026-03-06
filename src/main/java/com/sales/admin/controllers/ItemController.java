@@ -2,6 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.CategoryDto;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.dto.SubcategoryDto;
 import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.admin.services.ItemService;
 import com.sales.admin.services.StoreService;
@@ -294,10 +295,10 @@ public class ItemController {
     @PostMapping(value = {"category/add", "category/update"})
     @PreAuthorize("hasAnyAuthority('item.category.add','item.category.update','item.category.edit')")
     @Operation(summary = "Add or update item category", description = "Creates or updates an item category")
-    public ResponseEntity<Map<String, Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> saveOrUpdateItemCategory(@Valid @RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating item category: {}", categoryRequest);
         Map<String, Object> result = new HashMap<>();
-        ItemCategory updatedItemCategory = itemService.saveOrUpdateItemCategory(categoryRequest);
+        CategoryDto updatedItemCategory = itemService.saveOrUpdateItemCategory(categoryRequest);
         if (updatedItemCategory != null) {
             result.put(ConstantResponseKeys.RES, updatedItemCategory); // during update and inserted for both
             if (categoryRequest.getId() != null && categoryRequest.getId() != 0) {
@@ -346,19 +347,19 @@ public class ItemController {
     @PostMapping("subcategory")
     @PreAuthorize("hasAnyAuthority('item.subcategory.all','item.subcategory')")
     @Operation(summary = "Get all item subcategories", description = "Retrieves a list of all item subcategories with optional search filters")
-    public ResponseEntity<List<ItemSubCategory>> getSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<List<SubcategoryDto>> getSubCategory(@Valid @RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all item subcategories with filters: {}", searchFilters);
-        List<ItemSubCategory> itemCategories = itemService.getAllItemsSubCategories(searchFilters);
+        List<SubcategoryDto> itemCategories = itemService.getAllItemsSubCategories(searchFilters);
         return new ResponseEntity<>(itemCategories, HttpStatus.OK);
     }
 
     @PostMapping(value = {"subcategory/add", "subcategory/update"})
     @PreAuthorize("hasAnyAuthority('item.subcategory.add','item.subcategory.update','item.subcategory.edit')")
     @Operation(summary = "Add or update item subcategory", description = "Creates or updates an item subcategory")
-    public ResponseEntity<Map<String, Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> saveOrUpdateItemSubCategory(@Valid @RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating item subcategory: {}", subCategoryRequest);
         Map<String, Object> result = new HashMap<>();
-        ItemSubCategory updateItemSubCategory = itemService.saveOrUpdateItemSubCategory(subCategoryRequest);
+        SubcategoryDto updateItemSubCategory = itemService.saveOrUpdateItemSubCategory(subCategoryRequest);
         if (updateItemSubCategory != null) {
             result.put(ConstantResponseKeys.RES, updateItemSubCategory); // during update and inserted for both
             if (subCategoryRequest.getId() != null) {

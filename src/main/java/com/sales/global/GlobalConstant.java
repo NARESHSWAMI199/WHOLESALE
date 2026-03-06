@@ -10,6 +10,8 @@ public class GlobalConstant {
     public static String secretKey = "asdfghj123456789";
     public static int suId =1;
     public  static  int groupId = 1;
+    public static int OTHER_CATEGORY = 0;
+    public static int OTHER_SUBCATEGORY = 0;
     public static final String WHOLESALER_IMAGE_PATH = "/wholesale/auth/profile/";
     public static final String PATH_SEPARATOR = "/";
     public static final String STAFF_IMAGE_PATH = "/admin/auth/profile/";
