@@ -3,7 +3,9 @@ package com.sales.admin.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sales.admin.dto.CategoryDto;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.mapper.CategoryMapper;
 import com.sales.admin.mapper.ItemMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
@@ -55,6 +57,7 @@ public class ItemService {
     private final StoreHbRepository storeHbRepository;
     private final MeasurementUnitRepository measurementUnitRepository;
     private final ItemMapper itemMapper;
+    private final CategoryMapper categoryMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
 
@@ -504,16 +507,21 @@ public class ItemService {
     }
 
 
-    public List<ItemCategory> getAllCategory(SearchFilters searchFilters) {
+    public List<CategoryDto> getAllCategory(SearchFilters searchFilters) {
         logger.debug("Entering getAllCategory with searchFilters: {}", searchFilters);
-        Sort sort = searchFilters.getOrder().equals("asc") ?
-                Sort.by(searchFilters.getOrderBy()).ascending() :
-                Sort.by(searchFilters.getOrderBy()).descending();
+        Sort sort = searchFilters.getOrder().equals("asc") ? Sort.by(searchFilters.getOrderBy()).ascending() : Sort.by(searchFilters.getOrderBy()).descending();
         List<ItemCategory> result = itemCategoryRepository.findAll(sort);
         logger.debug("Exiting getAllCategory with result: {}", result);
-        return result;
+        return result.stream().map(categoryMapper::toDto).toList();
     }
 
+
+    public CategoryDto getItemCategoryDtoById(int categoryId) {
+        logger.debug("Entering getItemCategoryDtoById with categoryId: {}", categoryId);
+        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Item category not found."));
+        logger.debug("Exiting getItemCategoryDtoById with result: {}", result);
+        return categoryMapper.toDto(result);
+    }
 
     public ItemCategory getItemCategoryById(int categoryId) {
         logger.debug("Entering getItemCategoryById with categoryId: {}", categoryId);
