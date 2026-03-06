@@ -101,9 +101,9 @@ public class ItemService {
                         .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
                         .and(lessThanOrEqualToToDate(searchFilters.getToDate()))
         );
-        List<Item> itemsList = itemRepository.findAll(specification);
+        List<ItemDto> itemsList = itemRepository.findAll(specification).stream().map(itemMapper::toDto).toList();
         Map<String, List<Object>> result = new HashMap<>();
-        for (Item item : itemsList) {
+        for (ItemDto item : itemsList) {
             Gson itemsGson = new GsonBuilder().serializeNulls().create();
             String items = itemsGson.toJson(item);
             Map<String, Object> itemMap = new Gson().fromJson(items, Map.class);

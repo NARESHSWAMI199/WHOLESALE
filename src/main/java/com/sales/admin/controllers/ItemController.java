@@ -14,6 +14,7 @@ import com.sales.entities.MeasurementUnit;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.ReadExcel;
@@ -177,7 +178,7 @@ public class ItemController {
         Map<String, Object> responseObj = new HashMap<>();
         try {
             Store wholesale = storeService.getStoreDetails(wholesaleSlug);
-            if (wholesale != null || loggedUser.getUserType().equals("S") || loggedUser.getUserType().equals("SA")) {
+            if (wholesale != null || loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || loggedUser.getUserType().equals("SA")) {
                 if (wholesale != null) {
                     searchFilters.setStoreId(wholesale.getId());
                 } else {
