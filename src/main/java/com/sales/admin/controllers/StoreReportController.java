@@ -2,7 +2,7 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.services.StoreReportService;
-import com.sales.request.SearchFilters;
+import com.sales.request.StoreReportFilterRequest;
 import com.sales.entities.StoreReport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ public class StoreReportController  {
     @PreAuthorize("hasAuthority('store.report.all')")
     @PostMapping("all")
     @Operation(summary = "Get all store reports", description = "Retrieves a paginated list of all store reports with optional search filters")
-    public ResponseEntity<Page<StoreReport>> findAllItemsReports(@RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<StoreReport>> findAllItemsReports(@RequestBody StoreReportFilterRequest searchFilters){
         Page<StoreReport> storeReports = storeReportService.getAllReportByStoreId(searchFilters);
         return new ResponseEntity<>(storeReports, HttpStatusCode.valueOf(200));
     }

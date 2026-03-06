@@ -3,6 +3,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.ItemReportDto;
 import com.sales.admin.services.ItemReportService;
+import com.sales.request.ItemReportFilterRequest;
 import com.sales.request.SearchFilters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,10 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ItemReportController {
 
     private final ItemReportService itemReportService;
+
     @PostMapping("all")
     @PreAuthorize("hasAuthority('item.report.all')")
     @Operation(summary = "Get all item reports", description = "Retrieves a paginated list of all item reports with optional search filters")
-    public ResponseEntity<Page<ItemReportDto>> findAllItemsReports(@RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<ItemReportDto>> findAllItemsReports(@RequestBody ItemReportFilterRequest searchFilters) {
         Page<ItemReportDto> itemReports = itemReportService.getAllReportDtoByItemId(searchFilters);
         return new ResponseEntity<>(itemReports, HttpStatusCode.valueOf(200));
     }

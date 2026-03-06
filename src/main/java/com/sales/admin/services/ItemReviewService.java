@@ -3,8 +3,8 @@ package com.sales.admin.services;
 import com.sales.admin.dto.ItemReviewDto;
 import com.sales.admin.mapper.ItemReviewMapper;
 import com.sales.admin.repositories.ItemReviewRepository;
-import com.sales.request.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
+import com.sales.request.ItemReviewsFilterRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class ItemReviewService {
   private static final Logger logger = LoggerFactory.getLogger(ItemReviewService.class);
 
     @Transactional(readOnly = true)
-    public Page<ItemReviewDto> getAllItemReview(ItemReviewsFilterDto filters) {
+    public Page<ItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters) {
         logger.debug("Entering getALlItemReview with filters: {}", filters);
         Specification<ItemReviews> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))

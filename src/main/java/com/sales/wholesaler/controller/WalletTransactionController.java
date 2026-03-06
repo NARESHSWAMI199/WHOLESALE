@@ -4,6 +4,7 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.SearchFilters;
+import com.sales.request.WalletFilterRequest;
 import com.sales.wholesaler.dto.WholesaleWalletTransactionDto;
 import com.sales.wholesaler.services.WalletTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,22 +20,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("wholesale/wallet/transactions/")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Wallet Transaction Management", description = "APIs for managing wallet transactions for wholesalers")
-public class WalletTransactionController  {
+public class WalletTransactionController {
 
     private final WalletTransactionService walletTransactionService;
 
     @PostMapping("all")
     @PreAuthorize("hasAuthority('wallet.transactiona.all')")
     @Operation(summary = "Get all wallet transactions", description = "Retrieves a paginated list of all wallet transactions for the authenticated wholesaler")
-    public ResponseEntity<Page<WholesaleWalletTransactionDto>> getAllWalletTransactionsByUserId(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<WholesaleWalletTransactionDto>> getAllWalletTransactionsByUserId(Authentication authentication, HttpServletRequest request, @RequestBody WalletFilterRequest searchFilters) {
         //AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Page<WholesaleWalletTransactionDto> transactions = walletTransactionService.getAllWalletTransactionByUserId(searchFilters, loggedUser.getId());
-        return new ResponseEntity<>(transactions,HttpStatus.valueOf(200));
+        return new ResponseEntity<>(transactions, HttpStatus.valueOf(200));
     }
 
 

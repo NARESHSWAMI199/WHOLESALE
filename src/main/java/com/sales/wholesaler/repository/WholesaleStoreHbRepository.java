@@ -1,7 +1,7 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
-import com.sales.request.StoreRequest;
+import com.sales.request.StoreCreationRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -16,7 +16,7 @@ public class WholesaleStoreHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateStore(StoreRequest storeRequest, AuthUser loggedUser){
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
         String strQuery = "update Store set " +
                 "storeName=:name , " +
                 "email=:email, "+
@@ -30,16 +30,16 @@ public class WholesaleStoreHbRepository {
                 "where slug =:slug";
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("name", storeRequest.getStoreName());
-        query.setParameter("email", storeRequest.getStoreEmail());
-        query.setParameter("phone", storeRequest.getStorePhone());
-        query.setParameter("storeCategory", storeRequest.getStoreCategory());
-        query.setParameter("storeSubCategory", storeRequest.getStoreSubCategory());
-        query.setParameter("avtar", storeRequest.getStoreAvatar());
-        query.setParameter("description", storeRequest.getDescription());
+        query.setParameter("name", storeCreationRequest.getStoreName());
+        query.setParameter("email", storeCreationRequest.getStoreEmail());
+        query.setParameter("phone", storeCreationRequest.getStorePhone());
+        query.setParameter("storeCategory", storeCreationRequest.getStoreCategory());
+        query.setParameter("storeSubCategory", storeCreationRequest.getStoreSubCategory());
+        query.setParameter("avtar", storeCreationRequest.getStoreAvatar());
+        query.setParameter("description", storeCreationRequest.getDescription());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", storeRequest.getStoreSlug());
+        query.setParameter("slug", storeCreationRequest.getStoreSlug());
         return query.executeUpdate();
     }
 

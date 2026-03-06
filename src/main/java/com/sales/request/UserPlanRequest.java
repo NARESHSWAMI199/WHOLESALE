@@ -11,6 +11,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 public class UserPlanRequest extends SearchFilters {
+    String slug;
+    String status;
     Long createdFromDate;
     Long createdToDate;
     Long expiredFromDate;

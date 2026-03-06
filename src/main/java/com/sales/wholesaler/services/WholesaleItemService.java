@@ -9,7 +9,7 @@ import com.sales.claims.AuthUser;
 import com.sales.global.STATUS;
 import com.sales.request.DeleteRequest;
 import com.sales.request.GraphRequest;
-import com.sales.request.ItemSearchFields;
+import com.sales.request.ItemFilterRequest;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.ItemSubCategory;
@@ -77,7 +77,7 @@ public class WholesaleItemService {
     private final WholesaleUserRepository wholesaleUserRepository;
 
 
-    public Page<WholesaleItemListDto> getAllItems(ItemSearchFields searchFilters, Integer storeId) {
+    public Page<WholesaleItemListDto> getAllItems(ItemFilterRequest searchFilters, Integer storeId) {
         logger.debug("Starting getAllItems method with searchFilters: {}, storeId: {}", searchFilters, storeId);
         Sort sort = searchFilters.getOrder().equalsIgnoreCase("asc") ?
                 Sort.by(searchFilters.getOrderBy()).ascending() :
@@ -441,7 +441,7 @@ public class WholesaleItemService {
 
 
     @Transactional
-    public String createItemsExcelSheet(ItemSearchFields searchFilters, AuthUser loggedUser) throws IOException {
+    public String createItemsExcelSheet(ItemFilterRequest searchFilters, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         int wholesaleId = searchFilters.getStoreId();
         Specification<Item> specification = Specification.allOf(

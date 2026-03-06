@@ -233,21 +233,21 @@ public class UserService {
 
 
 
-    public StoreRequest userDtoToStoreDto(UserRequest userRequest){
-        logger.debug("Converting UserRequest to StoreRequest: {}", userRequest);
-        StoreRequest storeRequest = new StoreRequest();
-        storeRequest.setStreet(userRequest.getStreet());
-        storeRequest.setZipCode(userRequest.getZipCode());
-        storeRequest.setStoreName(userRequest.getStoreName());
-        storeRequest.setStoreEmail(userRequest.getStoreEmail());
-        storeRequest.setDescription(userRequest.getDescription());
-        storeRequest.setCity(userRequest.getCity());
-        storeRequest.setState(userRequest.getState());
-        storeRequest.setStorePhone(userRequest.getStorePhone());
-/*        storeRequest.setStoreSlug(userRequest.getStoreSlug());*/
-        storeRequest.setSubCategoryId(userRequest.getSubCategoryId());
-        storeRequest.setCategoryId(userRequest.getCategoryId());
-        return storeRequest;
+    public StoreCreationRequest userDtoToStoreDto(UserRequest userRequest){
+        logger.debug("Converting UserRequest to StoreCreationRequest: {}", userRequest);
+        StoreCreationRequest storeCreationRequest = new StoreCreationRequest();
+        storeCreationRequest.setStreet(userRequest.getStreet());
+        storeCreationRequest.setZipCode(userRequest.getZipCode());
+        storeCreationRequest.setStoreName(userRequest.getStoreName());
+        storeCreationRequest.setStoreEmail(userRequest.getStoreEmail());
+        storeCreationRequest.setDescription(userRequest.getDescription());
+        storeCreationRequest.setCity(userRequest.getCity());
+        storeCreationRequest.setState(userRequest.getState());
+        storeCreationRequest.setStorePhone(userRequest.getStorePhone());
+/*        storeCreationRequest.setStoreSlug(userRequest.getStoreSlug());*/
+        storeCreationRequest.setSubCategoryId(userRequest.getSubCategoryId());
+        storeCreationRequest.setCategoryId(userRequest.getCategoryId());
+        return storeCreationRequest;
     }
 
 
@@ -298,7 +298,7 @@ public class UserService {
     public Map<String, Object> createOrUpdateUser(UserRequest userRequest, AuthUser loggedUser,String path) throws MyException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Creating or updating user: {}", userRequest);
         Map<String, Object> responseObj = new HashMap<>();
-        StoreRequest storeRequest;
+        StoreCreationRequest storeCreationRequest;
         // condition for create or update superuser
         if((loggedUser.getId() !=GlobalConstant.suId &&
                 userRequest.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) &&
@@ -330,9 +330,9 @@ public class UserService {
 
              // if request user is a Wholesaler
             if (userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType())){
-                storeRequest =  userDtoToStoreDto(userRequest);
-                storeRequest.setUserSlug(userRequest.getSlug());
-                storeService.createOrUpdateStore(storeRequest, loggedUser,path);
+                storeCreationRequest =  userDtoToStoreDto(userRequest);
+                storeCreationRequest.setUserSlug(userRequest.getSlug());
+                storeService.createOrUpdateStore(storeCreationRequest, loggedUser,path);
             }
             if (isUpdated > 0) {
                 // Evict updated user from redis
@@ -356,9 +356,9 @@ public class UserService {
             // if logged user not same to request user and make sure request user must be Wholesaler
             if((userRequest.getUserId() != loggedUser.getId()) &&  userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType()))
             {
-                storeRequest =  userDtoToStoreDto(userRequest);
-                storeRequest.setUserSlug(updatedUser.getSlug());
-                storeService.createOrUpdateStore(storeRequest,loggedUser,path);
+                storeCreationRequest =  userDtoToStoreDto(userRequest);
+                storeCreationRequest.setUserSlug(updatedUser.getSlug());
+                storeService.createOrUpdateStore(storeCreationRequest,loggedUser,path);
 
                 // Providing default permissions to wholesaler
                 List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();

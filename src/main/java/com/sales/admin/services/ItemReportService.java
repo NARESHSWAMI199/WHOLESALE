@@ -4,8 +4,8 @@ package com.sales.admin.services;
 import com.sales.admin.dto.ItemReportDto;
 import com.sales.admin.mapper.ItemReportMapper;
 import com.sales.admin.repositories.ItemReportRepository;
-import com.sales.request.SearchFilters;
 import com.sales.entities.ItemReport;
+import com.sales.request.ItemReportFilterRequest;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class ItemReportService {
     private final ItemReportMapper itemReportMapper;
 
     @Transactional
-    public Page<ItemReportDto> getAllReportDtoByItemId(SearchFilters searchFilters){
+    public Page<ItemReportDto> getAllReportDtoByItemId(ItemReportFilterRequest searchFilters){
         Pageable pageable = getPageable(logger,searchFilters);
         Specification<ItemReport> specification = Specification.allOf(hasItemId(searchFilters.getItemId()));
         Page<ItemReport> itemReports = itemReportRepository.findAll(specification, pageable);

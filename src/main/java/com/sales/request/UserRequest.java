@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class UserRequest extends StoreRequest {
+public class UserRequest extends StoreCreationRequest {
     private String email;
     private String password;
     private String username;

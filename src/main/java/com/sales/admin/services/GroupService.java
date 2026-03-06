@@ -8,10 +8,7 @@ import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.request.DeleteRequest;
-import com.sales.request.GroupRequest;
-import com.sales.request.SearchFilters;
-import com.sales.request.UserPermissionsRequest;
+import com.sales.request.*;
 import com.sales.entities.Group;
 import com.sales.entities.Permission;
 import com.sales.exceptions.NotFoundException;
@@ -52,7 +49,7 @@ public class GroupService {
     private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
     @Transactional(readOnly = true)
-    public Page<GroupDto> getAllGroups(SearchFilters filters, AuthUser loggedUser) {
+    public Page<GroupDto> getAllGroups(GroupFilterRequest filters, AuthUser loggedUser) {
         logger.debug("Entering getAllGroups with filters: {}, loggedUser: {}", filters, loggedUser);
         Specification<Group> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))

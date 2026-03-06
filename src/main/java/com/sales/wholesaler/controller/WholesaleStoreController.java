@@ -4,7 +4,7 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.SearchFilters;
-import com.sales.request.StoreRequest;
+import com.sales.request.StoreCreationRequest;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
@@ -70,10 +70,10 @@ public class WholesaleStoreController  {
     @PostMapping(value = {"/update"})
     @PreAuthorize("hasAnyAuthority('wholesale.store.udpate','wholesale.store.edit')")
     @Operation(summary = "Update store", description = "Updates store information for the authenticated wholesaler")
-    public ResponseEntity<Map<String, Object>> updateStore(Authentication authentication,HttpServletRequest request, @ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> updateStore(Authentication authentication,HttpServletRequest request, @ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStore method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> responseObj = wholesaleStoreService.updateStoreBySlug(storeRequest, loggedUser);
+        Map<String,Object> responseObj = wholesaleStoreService.updateStoreBySlug(storeCreationRequest, loggedUser);
         logger.debug("Completed updateStore method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
@@ -104,9 +104,9 @@ public class WholesaleStoreController  {
     @PostMapping(value = {"update/notifications"})
     @PreAuthorize("hasAuthority('wholesale.store.notifications.seen')")
     @Operation(summary = "Update store notifications", description = "Marks specified notifications as seen for the wholesaler's store")
-    public ResponseEntity<String> updateStoreNotification(@RequestBody StoreRequest storeRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<String> updateStoreNotification(@RequestBody StoreCreationRequest storeCreationRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStoreNotification method");
-        wholesaleStoreService.updateSeen(storeRequest);
+        wholesaleStoreService.updateSeen(storeCreationRequest);
         logger.debug("Completed updateStoreNotification method");
         return new ResponseEntity<>(ConstantResponseKeys.SUCCESS, HttpStatus.valueOf(200));
     }
@@ -154,11 +154,11 @@ public class WholesaleStoreController  {
 //    @PreAuthorize("hasAnyAuthority('wholesale.store.add','wholesale.store.create')")
     @Transactional
     @Operation(summary = "Add new store", description = "Creates a new store for the authenticated wholesaler")
-    public ResponseEntity<Map<String,Object>> addNewStore(HttpServletRequest request,@ModelAttribute StoreRequest storeRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String,Object>> addNewStore(HttpServletRequest request,@ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewStore method");
         Map<String,Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        Store isInserted = wholesaleStoreService.createStore(storeRequest,loggedUser);
+        Store isInserted = wholesaleStoreService.createStore(storeCreationRequest,loggedUser);
         if(isInserted.getId() > 0){
             result.put(ConstantResponseKeys.MESSAGE,"Store created successfully. Welcome in Swami Sales");
             result.put(ConstantResponseKeys.STATUS,200);
