@@ -178,12 +178,11 @@ public class ItemController {
         Map<String, Object> responseObj = new HashMap<>();
         try {
             Store wholesale = storeService.getStoreDetails(wholesaleSlug);
-            if (wholesale != null || loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || loggedUser.getUserType().equals("SA")) {
+            if (wholesale != null || loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || loggedUser.getUserType().equals(USER_TYPES.STAFF.getType())) {
                 if (wholesale != null) {
-                    searchFilters.setStoreId(wholesale.getId());
+                    searchFilters.setStoreSlug(wholesaleSlug);
                 } else {
                     logger.debug("Wholesale is not found and wholesaleSlug : {} so that's why we using logged user slug : {} instead wholesale slug ", wholesaleSlug, loggedUser.getSlug());
-                    wholesaleSlug = loggedUser.getSlug();
                 }
                 String filePath = itemService.createItemsExcelSheet(searchFilters, wholesaleSlug, loggedUser);
                 Path path = Paths.get(filePath);

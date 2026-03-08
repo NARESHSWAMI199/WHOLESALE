@@ -236,7 +236,6 @@ public class WholesaleItemController  {
         logger.debug("Exporting items to Excel for user : {}", loggedUser );
         Map<String,Object> responseObj = new HashMap<>();
         try {
-            searchFilters.setStoreId(wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId()));
             String filePath = wholesaleItemService.createItemsExcelSheet(searchFilters,loggedUser);
             Path path = Paths.get(filePath);
             Resource resource = new UrlResource(path.toUri());

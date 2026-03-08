@@ -443,7 +443,8 @@ public class WholesaleItemService {
     @Transactional
     public String createItemsExcelSheet(ItemFilterRequest searchFilters, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
-        int wholesaleId = searchFilters.getStoreId();
+        Integer wholesaleId = storeRepository.getStoreIdByUserId(loggedUser.getId());
+        if(Objects.isNull(wholesaleId)) throw new IllegalArgumentException("Logged user store's entry not found.");
         Specification<Item> specification = Specification.allOf(
                 (containsName(searchFilters.getSearchKey().trim())
                         .or(hasSlug(searchFilters.getSearchKey())))

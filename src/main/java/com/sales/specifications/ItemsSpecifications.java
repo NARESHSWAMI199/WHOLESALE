@@ -2,6 +2,7 @@ package com.sales.specifications;
 
 import com.sales.entities.Item;
 import com.sales.entities.Item_;
+import com.sales.global.USER_TYPES;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +23,6 @@ public class ItemsSpecifications {
             return criteriaBuilder.equal(root.get(Item_.ITEM_CATEGORY), category);
         };
     }*/
-
-
     public static Specification<Item> isWholesale(Integer wholesaleId) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(Item_.wholesaleId), wholesaleId);
     }
@@ -31,8 +30,13 @@ public class ItemsSpecifications {
 
     public static Specification<Item> isWholesale(Integer wholesaleId, String userType) {
         return (root, query, criteriaBuilder) -> {
-            if((wholesaleId == null || wholesaleId == 0) && (userType.equals("S") || userType.equals("SA"))) return null;
-            return criteriaBuilder.equal(root.get(Item_.wholesaleId), wholesaleId);
+            if ((wholesaleId == null || wholesaleId == 0) && (userType.equals(USER_TYPES.STAFF.getType()) || userType.equals(USER_TYPES.SUPER_ADMIN.getType()))) {
+                return null;
+            } else if (wholesaleId == null || wholesaleId == 0) {
+                throw new IllegalArgumentException("The store's id can't be null or 0.");
+            } else {
+                return criteriaBuilder.equal(root.get(Item_.wholesaleId), wholesaleId);
+            }
         };
     }
 
@@ -46,7 +50,7 @@ public class ItemsSpecifications {
 
     public static Specification<Item> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(Item_.CREATED_AT), fromDate);
         };
     }
@@ -60,10 +64,10 @@ public class ItemsSpecifications {
 
 
     public static Specification<Item> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
             if (status == null || !statusList.contains(status)) return null;
-            return criteriaBuilder.equal(root.get(Item_.STATUS),status);
+            return criteriaBuilder.equal(root.get(Item_.STATUS), status);
         };
     }
 
@@ -71,15 +75,15 @@ public class ItemsSpecifications {
     public static Specification<Item> isLabel(String label) {
         return (root, query, criteriaBuilder) -> {
             if (label == null) return null;
-            return criteriaBuilder.equal(root.get(Item_.LABEL),label);
+            return criteriaBuilder.equal(root.get(Item_.LABEL), label);
         };
     }
 
     public static Specification<Item> inStock(String inStock) {
-        List<String> stocks = List.of("Y","N");
+        List<String> stocks = List.of("Y", "N");
         return (root, query, criteriaBuilder) -> {
             if (inStock == null || !stocks.contains(inStock)) return null;
-            return criteriaBuilder.equal(root.get(Item_.IN_STOCK),inStock);
+            return criteriaBuilder.equal(root.get(Item_.IN_STOCK), inStock);
         };
     }
 
@@ -89,7 +93,6 @@ public class ItemsSpecifications {
             return criteriaBuilder.lessThanOrEqualTo(root.get(Item_.price), price);
         };
     }
-
 
 
     public static Specification<Item> hasSlug(String slug) {

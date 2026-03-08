@@ -71,13 +71,14 @@ public class ItemService {
     @Transactional
     public Page<ItemDto> getAllItems(ItemFilterRequest searchFilters, AuthUser loggedUser) {
         logger.debug("Entering getAllItems with searchFilters: {}", searchFilters);
+        Integer storeId = storeRepository.getStoreIdByStoreSlug(searchFilters.getStoreSlug());
         Sort sort = searchFilters.getOrder().equalsIgnoreCase("asc") ?
                 Sort.by(searchFilters.getOrderBy()).ascending() :
                 Sort.by(searchFilters.getOrderBy()).descending();
         Specification<Item> specification = Specification.allOf(
                 containsName(searchFilters.getSearchKey().trim())
                         .and(hasSlug(searchFilters.getSlug()))
-                        .and(isWholesale(searchFilters.getStoreId(), loggedUser.getUserType()))
+                        .and(isWholesale(storeId, loggedUser.getUserType()))
                         .and(isStatus(searchFilters.getStatus()))
                         .and(inStock(searchFilters.getInStock()))
                         .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
@@ -93,9 +94,11 @@ public class ItemService {
     @Transactional
     public String createItemsExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
+
+        Integer storeId = wholesaleSlug != null ? storeRepository.getStoreIdByStoreSlug(wholesaleSlug) : null;
         Specification<Item> specification = Specification.allOf(
                 containsName(searchFilters.getSearchKey().trim())
-                        .and(isWholesale(searchFilters.getStoreId(), loggedUser.getUserType()))
+                        .and(isWholesale(storeId, loggedUser.getUserType()))
                         .and(isStatus(searchFilters.getStatus()))
                         .and(inStock(searchFilters.getInStock()))
                         .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
@@ -120,7 +123,7 @@ public class ItemService {
             });
         }
         int totalItem = itemsList.size();
-        String folderName = wholesaleSlug;
+        String folderName = wholesaleSlug != null ? wholesaleSlug : loggedUser.getSlug();
         // When we're creating all items, excel without a specific user wholesale or store from admin pannel
         if (folderName == null) folderName = loggedUser.getSlug();
         String filePath = writeExcel.createExcelSheet(result, totalItem, GlobalConstant.HEADERS_FOR_ITEMS, folderName);
@@ -267,7 +270,7 @@ public class ItemService {
         item.setName(itemRequest.getName());
         item.setPrice(itemRequest.getPrice());
         item.setDiscount(itemRequest.getDiscount());
-        item.setRating(itemRequest.getRating());
+        item.setRating(0f);
         item.setDescription(itemRequest.getDescription());
         item.setInStock(itemRequest.getInStock());
         item.setUpdatedAt(Utils.getCurrentMillis());
@@ -290,6 +293,7 @@ public class ItemService {
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
         logger.info("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = findItemBySlug(itemRequest.getSlug());
+        if(item == null) throw new NotFoundException("Item not found.");
         String title = "Item " + item.getName() + " updated.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " updated by admin previous data was " +
                 item.toString()
