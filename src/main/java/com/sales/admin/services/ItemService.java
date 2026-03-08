@@ -395,7 +395,7 @@ public class ItemService {
         itemDetailMap.put("CAPACITY", capacityList.get(index));
         itemDetailMap.put("PRICE", priceList.get(index));
         itemDetailMap.put("DISCOUNT", discountList.get(index));
-        itemDetailMap.put("IN-ITEM_STOCK", inStockList.get(index));
+        itemDetailMap.put("IN-STOCK", inStockList.get(index));
         return itemDetailMap;
     }
 
@@ -407,7 +407,7 @@ public class ItemService {
         ItemHbRepository.ItemUpdateError itemUpdateError = new ItemHbRepository.ItemUpdateError();
         List<ItemHbRepository.ItemUpdateError> errorsList = new ArrayList<>();
         List<String> nameList = itemsData.get("NAME"), labelList = itemsData.get("LABEL"), slugList = itemsData.get("TOKEN"),
-                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-ITEM_STOCK");
+                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-STOCK");
 
         for (int i = 0; i < nameList.size(); i++) {
             Map<String, Object> itemStringDetail = null;

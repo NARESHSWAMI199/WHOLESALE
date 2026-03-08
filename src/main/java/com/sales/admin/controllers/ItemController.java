@@ -152,7 +152,7 @@ public class ItemController {
                     responseObj.put("fileUrl", Utils.getHostUrl(request) + GlobalConstant.ITEMS_NOT_UPDATED_PATH_FOR_ADMIN + wholesaleSlug +
                             GlobalConstant.PATH_SEPARATOR + fileName);
                     responseObj.put(ConstantResponseKeys.MESSAGE, "Some items are not updated.");
-                    responseObj.put(ConstantResponseKeys.STATUS, 201);
+                    responseObj.put(ConstantResponseKeys.STATUS, 200);
                     logger.debug("Some items are not updated : {} ", updateItemsError);
                 }
 

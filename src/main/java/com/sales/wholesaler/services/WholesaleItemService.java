@@ -506,7 +506,7 @@ public class WholesaleItemService {
         ItemHbRepository.ItemUpdateError itemUpdateError = new ItemHbRepository.ItemUpdateError();
         List<ItemHbRepository.ItemUpdateError> errorsList = new ArrayList<>();
         List<String> nameList = itemsData.get("NAME"), labelList = itemsData.get("LABEL"), slugList = itemsData.get("TOKEN"),
-                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-ITEM_STOCK");
+                capacityList = itemsData.get("CAPACITY"), priceList = itemsData.get("PRICE"), discountList = itemsData.get("DISCOUNT"), inStockList = itemsData.get("IN-STOCK");
         if (Objects.isNull(nameList) ||
                 Objects.isNull(labelList) ||
                 Objects.isNull(slugList) ||
