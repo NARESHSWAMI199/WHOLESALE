@@ -1,5 +1,7 @@
 package com.sales.admin.controllers;
 
+import com.sales.admin.dto.CategoryDto;
+import com.sales.admin.dto.SubcategoryDto;
 import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
@@ -223,9 +225,9 @@ public class StoreController {
     @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
     @PostMapping("category")
     @Operation(summary = "Get all store categories", description = "Retrieves a list of all store categories with optional filters")
-    public ResponseEntity<List<StoreCategory>> getAllStoreCategory(@RequestBody SearchFilters searchFilters) {
+    public ResponseEntity<List<CategoryDto>> getAllStoreCategory(@RequestBody SearchFilters searchFilters) {
         logger.debug("Fetching all store categories with filters: {}", searchFilters);
-        List<StoreCategory> storeCategories = storeService.getAllStoreCategory(searchFilters);
+        List<CategoryDto> storeCategories = storeService.getAllStoreCategory(searchFilters);
         return new ResponseEntity<>(storeCategories, HttpStatus.OK);
     }
 
@@ -252,9 +254,9 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('store.category.detail')")
     @GetMapping("category/{categoryId}")
     @Operation(summary = "Get store category details", description = "Retrieves details of a specific store category by ID")
-    public ResponseEntity<StoreCategory> getAllCategory(@PathVariable Integer categoryId) {
+    public ResponseEntity<CategoryDto> getAllCategory(@PathVariable Integer categoryId) {
         logger.debug("Fetching store category with ID: {}", categoryId);
-        StoreCategory storeCategory = storeService.getStoreCategoryById(categoryId);
+        CategoryDto storeCategory = storeService.getStoreCategoryById(categoryId);
         return new ResponseEntity<>(storeCategory, HttpStatus.OK);
     }
 
@@ -281,9 +283,9 @@ public class StoreController {
     @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
     @PostMapping("subcategory")
     @Operation(summary = "Get all store subcategories", description = "Retrieves a list of all store subcategories with optional filters")
-    public ResponseEntity<List<StoreSubCategory>> getStoreSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<List<SubcategoryDto>> getStoreSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Fetching all store subcategories with filters: {}", searchFilters);
-        List<StoreSubCategory> storeSubCategories = storeService.getAllStoreSubCategories(searchFilters);
+        List<SubcategoryDto> storeSubCategories = storeService.getAllStoreSubCategories(searchFilters);
         return new ResponseEntity<>(storeSubCategories, HttpStatus.OK);
     }
 

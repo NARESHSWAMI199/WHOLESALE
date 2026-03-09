@@ -36,7 +36,7 @@ public class ItemServiceTest extends TestUtil {
     public void testGetAllItems() {
         Store store = createStore();
         ItemFilterRequest searchFilters = new ItemFilterRequest();
-        searchFilters.setStoreId(store.getId());
+        searchFilters.setStoreSlug(store.getSlug());
         User user = createUser(UUID.randomUUID().toString(), "test@example.com", "pass", GlobalConstantTest.ADMIN);
         SalesUser loggedUser = new SalesUser(user);
         Page<ItemDto> items = itemService.getAllItems(searchFilters, loggedUser);

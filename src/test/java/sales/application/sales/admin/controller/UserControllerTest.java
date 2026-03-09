@@ -90,7 +90,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -107,7 +107,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andExpect(jsonPath("$.message", is("Invalid Credentials !")))
                 .andDo(print());
     }
@@ -122,7 +122,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -722,7 +722,7 @@ public void updateUserWrongStatus() throws Exception {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-            status().is(500)
+            status().is(401)
         );
     }
 

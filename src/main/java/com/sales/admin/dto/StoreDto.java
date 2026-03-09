@@ -13,6 +13,7 @@ public record StoreDto(
         String phone,
         String description,
         Float rating,
+        UserDto user,
         String status,
         String isDeleted,
         Long createdAt,

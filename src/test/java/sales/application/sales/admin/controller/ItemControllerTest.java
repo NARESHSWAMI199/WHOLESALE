@@ -258,7 +258,7 @@ public class ItemControllerTest extends TestUtil {
                 .content(json)
                 .headers(headers)
         ).andExpectAll(
-                status().is(406)
+                status().is(400)
         );
     }
 

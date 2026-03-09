@@ -31,7 +31,7 @@ public class WholesaleItemServiceTest extends TestUtil {
     public void testGetAllItems() {
         Store store = createStore();
         ItemFilterRequest searchFilters = new ItemFilterRequest();
-        searchFilters.setStoreId(store.getId());
+        searchFilters.setStoreSlug(store.getSlug());
         Page<WholesaleItemListDto> items = wholesaleItemService.getAllItems(searchFilters, store.getId());
         assertNotNull(items);
     }
