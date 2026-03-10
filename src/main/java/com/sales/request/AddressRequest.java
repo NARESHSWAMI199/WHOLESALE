@@ -11,7 +11,9 @@ import lombok.*;
 @AllArgsConstructor
 public class AddressRequest {
     private Integer addressId;
+    @NotNull
     private String street;
+    @NotNull
     private String zipCode;
     @NotNull
     private Integer city;
