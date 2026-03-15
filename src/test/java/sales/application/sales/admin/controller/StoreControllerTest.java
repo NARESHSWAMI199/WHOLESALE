@@ -3,10 +3,7 @@ package sales.application.sales.admin.controller;
 
 import com.google.gson.Gson;
 import com.sales.SalesApplication;
-import com.sales.entities.Store;
-import com.sales.entities.StoreCategory;
-import com.sales.entities.StoreSubCategory;
-import com.sales.entities.User;
+import com.sales.entities.*;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,25 +48,30 @@ public class StoreControllerTest extends TestUtil {
         String randomPhone = getRandomMobileNumber();
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION , token);
-        createStoreSubCategory();
+        StoreSubCategory storeSubCategory = createStoreSubCategory();
+        City city = createCity();
         String json = """
                 {
                     "userSlug" : "{userSlug}",
                     "storeName" : "Mock test store",
                     "storeEmail" : "{storeEmail}",
                     "description" : "test",
-                    "categoryId" : "1",
-                    "subCategoryId"  : "1",
+                    "categoryId" : "{categoryId}",
+                    "subCategoryId"  : "{subCategoryId}",
                     "storePhone" : "{storePhone}",
                     "zipCode" : "302013",
-                    "city" : "1",
-                    "state" : "1",
+                    "city" :  "{city}",
+                    "state" : "{state}",
                     "street" : "1 Mock test jaipur"
                 }
             """
             .replace("{userSlug}",selfSlug)
             .replace("{storeEmail}",randomEmail)
-            .replace("{storePhone}",randomPhone);
+            .replace("{storePhone}",randomPhone)
+            .replace("{city}",String.valueOf(city.getId()))
+            .replace("{state}",String.valueOf(city.getStateId()))
+            .replace("{subCategoryId}",String.valueOf(storeSubCategory.getId()))
+            .replace("{categoryId}",String.valueOf(storeSubCategory.getCategoryId()));
 
         Map<String,String> params = new Gson().fromJson(json,Map.class);
         MockMultipartHttpServletRequestBuilder requestBuilder  = multipart("/admin/store/add");

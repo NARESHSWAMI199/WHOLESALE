@@ -30,7 +30,6 @@ public class StoreCreationRequest extends AddressRequest {
     @NotNull
     private String description;
     private String storeAvatar;
-    @NotNull
     private MultipartFile storePic;
     private List<Long> seenIds ;
     @NotNull
