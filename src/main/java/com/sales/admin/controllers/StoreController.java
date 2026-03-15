@@ -237,7 +237,7 @@ public class StoreController {
     public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating store category with details: {}", categoryRequest);
         Map<String,Object> result = new HashMap<>();
-        StoreCategory updatedStoreCategory = storeService.saveOrUpdateStoreCategory(categoryRequest);
+        CategoryDto updatedStoreCategory = storeService.saveOrUpdateStoreCategory(categoryRequest);
         if(updatedStoreCategory != null) {
              result.put(ConstantResponseKeys.RES,updatedStoreCategory);
             if(categoryRequest.getId() !=null && categoryRequest.getId() != 0) {
@@ -314,7 +314,7 @@ public class StoreController {
     public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating store subcategory with details: {}", subCategoryRequest);
         Map<String,Object> result = new HashMap<>();
-        StoreSubCategory updatedStoreSubCategory = storeService.saveOrUpdateStoreSubCategory(subCategoryRequest);
+        SubcategoryDto updatedStoreSubCategory = storeService.saveOrUpdateStoreSubCategory(subCategoryRequest);
         if(updatedStoreSubCategory != null) {
             result.put(ConstantResponseKeys.RES,updatedStoreSubCategory);
             if(subCategoryRequest.getId() != null) {

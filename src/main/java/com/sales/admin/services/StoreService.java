@@ -261,8 +261,11 @@ public class StoreService {
     }
 
     @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class})
-    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) {
-        logger.debug("Entering updateStore with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.info("Entering updateStore with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
+        AddressRequest addressRequest = getAddressObjFromStore(storeCreationRequest);
+        // if there is any required field null then this will throw IllegalArgumentException
+        validateRequiredFieldsForCreateAddress(addressRequest);
         AddressRequest address = new AddressRequest();
         address.setStreet(storeCreationRequest.getStreet());
         address.setZipCode(storeCreationRequest.getZipCode());
@@ -273,7 +276,7 @@ public class StoreService {
         int isUpdatedAddress = addressHbRepository.updateAddress(address, loggedUser);
         if (isUpdatedAddress < 1) return isUpdatedAddress;
         int result = storeHbRepository.updateStore(storeCreationRequest, loggedUser);
-        logger.debug("Exiting updateStore");
+        logger.info("Exiting updateStore");
         return result;
     }
 
@@ -402,7 +405,7 @@ public class StoreService {
 
 
     @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class})
-    public StoreCategory saveOrUpdateStoreCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public CategoryDto saveOrUpdateStoreCategory(CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateStoreCategory with categoryRequest: {}", categoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
         Utils.checkRequiredFields(categoryRequest, List.of("category", "icon"));
@@ -414,11 +417,11 @@ public class StoreService {
         storeCategory.setIcon(categoryRequest.getIcon());
         StoreCategory result = storeCategoryRepository.save(storeCategory);
         logger.debug("Exiting saveOrUpdateStoreCategory");
-        return result;
+        return categoryMapper.toDto(storeCategory);
     }
 
     @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class})
-    public StoreSubCategory saveOrUpdateStoreSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public SubcategoryDto saveOrUpdateStoreSubCategory(SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering saveOrUpdateStoreSubCategory with subCategoryRequest: {}", subCategoryRequest);
         // Validate required fields if we found any given field is null, then this will throw Exception
         Utils.checkRequiredFields(subCategoryRequest, List.of("categoryId", "subcategory", "icon"));
@@ -431,7 +434,7 @@ public class StoreService {
         storeSubCategory.setUpdatedAt(Utils.getCurrentMillis());
         StoreSubCategory result = storeSubCategoryRepository.save(storeSubCategory);
         logger.debug("Exiting saveOrUpdateStoreSubCategory");
-        return result;
+        return subcategoryMapper.toDto(result);
     }
 
 
