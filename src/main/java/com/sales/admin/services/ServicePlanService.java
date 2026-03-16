@@ -2,20 +2,18 @@ package com.sales.admin.services;
 
 
 import com.sales.admin.dto.PlanDto;
+import com.sales.admin.dto.ServicePlanDto;
 import com.sales.admin.mapper.PlanMapper;
 import com.sales.admin.mapper.ServicePlanMapper;
 import com.sales.admin.repositories.ServicePlanHbRepository;
 import com.sales.admin.repositories.ServicePlanRepository;
 import com.sales.admin.repositories.WholesalerPlansRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.DeleteRequest;
-import com.sales.admin.dto.ServicePlanDto;
-import com.sales.request.ServicePlanRequest;
-import com.sales.request.StatusRequest;
-import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.USER_TYPES;
+import com.sales.request.*;
 import com.sales.specifications.PlansSpecifications;
 import com.sales.specifications.ServicePlanSpecification;
 import com.sales.utils.Utils;
@@ -47,16 +45,16 @@ public class ServicePlanService {
   private static final Logger logger = LoggerFactory.getLogger(ServicePlanService.class);
 
     @Transactional(readOnly = true)
-    public Page<ServicePlanDto> getALlServicePlan(ServicePlanRequest servicePlanRequest){
-        logger.debug("Entering getALlServicePlan with servicePlanDto: {}", servicePlanRequest);
+    public Page<ServicePlanDto> getALlServicePlan(ServicePlanFilterRequest servicePlanFilterRequest){
+        logger.debug("Entering getALlServicePlan with servicePlanDto: {}", servicePlanFilterRequest);
         Specification<ServicePlan> specification = Specification.allOf(
-                ServicePlanSpecification.containsName(servicePlanRequest.getName())
-                        .and(ServicePlanSpecification.hasSlug(servicePlanRequest.getSlug()))
-                        .and(ServicePlanSpecification.isStatus(servicePlanRequest.getStatus()))
-                        .and(ServicePlanSpecification.greaterThanOrEqualFromDate(servicePlanRequest.getFromDate()))
-                        .and(ServicePlanSpecification.lessThanOrEqualToToDate(servicePlanRequest.getToDate()))
+                ServicePlanSpecification.containsName(servicePlanFilterRequest.getName())
+                        .and(ServicePlanSpecification.hasSlug(servicePlanFilterRequest.getSlug()))
+                        .and(ServicePlanSpecification.isStatus(servicePlanFilterRequest.getStatus()))
+                        .and(ServicePlanSpecification.greaterThanOrEqualFromDate(servicePlanFilterRequest.getFromDate()))
+                        .and(ServicePlanSpecification.lessThanOrEqualToToDate(servicePlanFilterRequest.getToDate()))
         );
-        Pageable pageable = getPageable(logger,servicePlanRequest);
+        Pageable pageable = getPageable(logger,servicePlanFilterRequest);
         Page<ServicePlan> result = servicePlanRepository.findAll(specification,pageable);
         logger.debug("Exiting getALlServicePlan");
         return result.map(servicePlanMapper::toDto);
@@ -106,7 +104,7 @@ public class ServicePlanService {
 
 
     @Transactional
-    public ServicePlan insertServicePlan(AuthUser loggedUser, ServicePlanRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ServicePlan insertServicePlan(AuthUser loggedUser, ServicePlanCreateRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering insertServicePlan with loggedUser: {}, servicePlanDto: {}", loggedUser, servicePlanRequest);
         if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action. Contact to your administrator.",new Exception());
 
@@ -142,8 +140,8 @@ public class ServicePlanService {
 
         String status = statusRequest.getStatus();
         Map<String, Object> result = new HashMap<>();
-        if (!loggedUser.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator",new Exception());
+        if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
+            throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator.",new Exception());
 
         switch (status) {
             case "A", "D":
