@@ -2,7 +2,9 @@ package com.sales.admin.services;
 
 
 import com.sales.admin.dto.GroupDto;
+import com.sales.admin.dto.PermissionDto;
 import com.sales.admin.mapper.GroupMapper;
+import com.sales.admin.mapper.PermissionMapper;
 import com.sales.admin.repositories.GroupRepository;
 import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
@@ -45,7 +47,8 @@ public class GroupService {
     private final PermissionHbRepository permissionHbRepository;
     private final UserCacheService userCacheService;
     private final GroupMapper groupMapper;
-    
+    private final PermissionMapper permissionMapper;
+
     private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
     @Transactional(readOnly = true)
@@ -58,7 +61,7 @@ public class GroupService {
                         .and(hasSlug(filters.getSlug()))
                         .and(notSuperAdmin(loggedUser))
         );
-        Pageable pageable = getPageable(logger,filters);
+        Pageable pageable = getPageable(logger, filters);
         Page<Group> result = groupRepository.findAll(specification, pageable);
         logger.debug("Exiting getAllGroups with result: {}", result);
         return result.map(groupMapper::toDto);
@@ -81,7 +84,8 @@ public class GroupService {
         validateRequiredFieldsForGroup(groupRequest);
 
         //Only super admin can create or update a group.
-        if(!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType())) throw new PermissionDeniedDataAccessException("You don't have permission to create or update a group. Please contact a super admin",new Exception());
+        if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
+            throw new PermissionDeniedDataAccessException("You don't have permission to create or update a group. Please contact a super admin", new Exception());
 
         if (!Utils.isEmpty(groupRequest.getSlug()) || path.contains("update")) {
             logger.debug("We are going to update the group.");
@@ -90,11 +94,12 @@ public class GroupService {
 
             Group group = groupRepository.findGroupBySlug(groupRequest.getSlug());
             if (group == null) throw new NotFoundException("No group found to update.");
-            if(group.getId() == GlobalConstant.groupId && loggedUser.getId() != GlobalConstant.suId) throw  new NotFoundException("There is nothing to update.");
+            if (group.getId() == GlobalConstant.groupId && loggedUser.getId() != GlobalConstant.suId)
+                throw new NotFoundException("There is nothing to update.");
 
             // Going to update existing group.
-            int isUpdated = permissionHbRepository.updateGroup(groupRequest, group.getId(),loggedUser.getId() == GlobalConstant.suId);
-            if (isUpdated > 0 && group.getId() == GlobalConstant.groupId ) {
+            int isUpdated = permissionHbRepository.updateGroup(groupRequest, group.getId(), loggedUser.getId() == GlobalConstant.suId);
+            if (isUpdated > 0 && group.getId() == GlobalConstant.groupId) {
                 responseObject.put(ConstantResponseKeys.MESSAGE, "The group has been updated successfully. But dear " + loggedUser.getUsername() + " ji We are not able to remove permissions. from " + group.getName() + " New permissions updated.");
                 responseObject.put(ConstantResponseKeys.STATUS, 200);
             } else if (isUpdated > 0) {
@@ -113,7 +118,7 @@ public class GroupService {
             Group insertedGroup = groupRepository.save(group);
             // Updating given permissions.
             permissionHbRepository.updatePermissions(insertedGroup.getId(), groupRequest.getPermissions());
-            responseObject.put(ConstantResponseKeys.RES, insertedGroup);
+            responseObject.put(ConstantResponseKeys.RES, groupMapper.toDto(group));
             responseObject.put(ConstantResponseKeys.MESSAGE, groupRequest.getName() + " successfully created.");
             responseObject.put(ConstantResponseKeys.STATUS, 201);
         }
@@ -144,10 +149,10 @@ public class GroupService {
 
     public Map<String, List<Object>> getAllPermissions() {
         logger.debug("Entering getAllPermissions");
-        List<Permission> permissionList = permissionRepository.findAll();
+        List<PermissionDto> permissionList = permissionRepository.findAll().stream().map(permissionMapper::toDto).toList();
         Map<String, List<Object>> formattedPermissions = new HashMap<>();
-        for (Permission permission : permissionList) {
-            String key = permission.getPermissionFor();
+        for (PermissionDto permission : permissionList) {
+            String key = permission.permissionFor();
             if (formattedPermissions.containsKey(key)) {
                 List<Object> addedPermissions = formattedPermissions.get(key);
                 addedPermissions.add(permission);
@@ -175,7 +180,7 @@ public class GroupService {
         String slug = deleteRequest.getSlug();
         Group group = groupRepository.findGroupBySlug(slug);
         if (group == null) throw new NotFoundException("No group found to delete");
-        int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(),(loggedUser.getId() == GlobalConstant.suId));
+        int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(), (loggedUser.getId() == GlobalConstant.suId));
         logger.debug("Exiting deleteGroupBySlug with result: {}", result);
         return result;
     }
@@ -188,11 +193,11 @@ public class GroupService {
         return result;
     }
 
-    private void deleteCacheUser(String slug){
+    private void deleteCacheUser(String slug) {
         try {
             userCacheService.evictCacheUser(slug);
-        }catch (Exception e){
-            logger.warn("Facing issue when going to delete user from redis : {}",slug,e);
+        } catch (Exception e) {
+            logger.warn("Facing issue when going to delete user from redis : {}", slug, e);
         }
     }
 }

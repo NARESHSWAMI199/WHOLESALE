@@ -13,9 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupRequest {
-    Integer groupId;
     String name;
     String slug;
     List<Integer> permissions;
-
 }

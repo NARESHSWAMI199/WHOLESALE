@@ -43,7 +43,7 @@ public class Group implements Serializable {
     @Column(name = "updated_by")
     Integer updatedBy;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_permissions",
             joinColumns = @JoinColumn(name = "group_id" , referencedColumnName = "id"),

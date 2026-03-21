@@ -1,15 +1,13 @@
 package com.sales.admin.controllers;
 
-import com.sales.admin.dto.CategoryDto;
-import com.sales.admin.dto.ItemDto;
-import com.sales.admin.dto.SubcategoryDto;
+import com.sales.admin.dto.*;
 import com.sales.admin.repositories.ItemHbRepository;
+import com.sales.admin.services.ItemReportService;
+import com.sales.admin.services.ItemReviewService;
 import com.sales.admin.services.ItemService;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.entities.ItemCategory;
-import com.sales.entities.ItemSubCategory;
 import com.sales.entities.MeasurementUnit;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
@@ -33,10 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +56,8 @@ public class ItemController {
     private final ItemService itemService;
     private final StoreService storeService;
     private final ReadExcel readExcel;
+    private final ItemReportService itemReportService;
+    private final ItemReviewService itemReviewService;
 
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
@@ -435,6 +432,25 @@ public class ItemController {
         headers.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")); // For .xlsx
         headers.setContentDispositionFormData("attachment", "update_item_template.xlsx");
         return new ResponseEntity<>(resource.getContentAsByteArray(), headers, org.springframework.http.HttpStatus.OK);
+    }
+
+
+    @PostMapping("report/all")
+    @PreAuthorize("hasAuthority('item.report.all')")
+    @Operation(summary = "Get all item reports", description = "Retrieves a paginated list of all item reports with optional search filters")
+    public ResponseEntity<Page<ItemReportDto>> findAllItemsReports(@RequestBody ItemReportFilterRequest searchFilters) {
+        Page<ItemReportDto> itemReports = itemReportService.getAllReportDtoByItemId(searchFilters);
+        return new ResponseEntity<>(itemReports, HttpStatusCode.valueOf(200));
+    }
+
+
+    @PostMapping("review/all")
+    @PreAuthorize("hasAuthority('item.review.all')")
+    @Operation(summary = "Get all item reviews", description = "Retrieves a paginated list of all item reviews with optional filters")
+    public ResponseEntity<Page<ItemReviewDto>> getAllReviews(@RequestBody ItemReviewsFilterRequest itemReviewsFilterRequest, HttpServletRequest httpServletRequest) {
+        logger.debug("Fetching all item comments with filters: {}", itemReviewsFilterRequest);
+        Page<ItemReviewDto> itemReviewDtoPage = itemReviewService.getAllItemReview(itemReviewsFilterRequest);
+        return new ResponseEntity<>(itemReviewDtoPage, HttpStatus.OK);
     }
 
 
