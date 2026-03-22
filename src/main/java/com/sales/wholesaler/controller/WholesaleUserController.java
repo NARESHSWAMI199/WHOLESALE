@@ -153,7 +153,7 @@ public class WholesaleUserController {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String, Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
-            responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
+            responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ConstantResponseKeys.SUCCESS);
             responseObj.put(ConstantResponseKeys.USER, userDto);
             responseObj.put(ConstantResponseKeys.STORE, store);
@@ -290,7 +290,7 @@ public class WholesaleUserController {
                                 {
                                     "email" : "string",
                                     "username" : "string",
-                                    "password' : "string",
+                                    "password" : "string",
                                     "contact" : "string"
                                 }
                             """)

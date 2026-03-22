@@ -34,6 +34,6 @@ build/
 
 
 ### db
-src/main/resources/db/migration/V64__insert_support_emails_table.sql
+src/main/resources/db/migration/V71__insert__support_emails_table.sql
 test.sql
 src/main/resources/public

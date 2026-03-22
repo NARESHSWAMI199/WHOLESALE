@@ -16,10 +16,10 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/test1
     username: root
+    password: password
+#    url: jdbc:mysql://db:3306/sales #docker
+#    username: root
 #    password: password
-    #    url: jdbc:mysql://db:3306/sales #docker
-    #    username: sales
-    #    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -44,6 +44,9 @@ default:
 jwt:
   secret: saleispower
 
+
+aes:
+  key : opiuytghjklmnbvcdfg1243567787654
 
 management:
   endpoints:

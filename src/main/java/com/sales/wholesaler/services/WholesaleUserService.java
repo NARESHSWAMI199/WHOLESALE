@@ -10,6 +10,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.utils.SecureAesUtil;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleUserDto;
 import com.sales.wholesaler.mapper.WholesaleUserMapper;
@@ -53,8 +54,12 @@ public class WholesaleUserService  {
     private final WholesaleSupportEmailsRepository wholesaleSupportEmailsRepository;
     private final WholesaleServicePlanRepository wholesaleServicePlanRepository;
     private final WholesaleUserMapper wholesaleUserMapper;
+
     @Value("${profile.absolute}")
     String profilePath;
+
+    @Value("${aes.key}")
+    String key;
 
 
     @Value("${default.password}")
@@ -118,11 +123,12 @@ public class WholesaleUserService  {
             throw new InternalError("Support email is not found. please contact administrator.");
         }
         String sender = supportEmail.getEmail();
+        String pKey = SecureAesUtil.decrypt(new String(Base64.getDecoder().decode(supportEmail.getPasswordKey())), key);
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication()
             {
-                return new PasswordAuthentication(sender, supportEmail.getPasswordKey());
+                return new PasswordAuthentication(sender, pKey);
             }
         });
         try
