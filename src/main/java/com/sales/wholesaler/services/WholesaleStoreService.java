@@ -1,6 +1,8 @@
 package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.AddressRepository;
+import com.sales.admin.repositories.PermissionHbRepository;
+import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.claims.AuthUser;
 import com.sales.request.AddressRequest;
 import com.sales.request.SearchFilters;
@@ -58,6 +60,10 @@ public class WholesaleStoreService  {
     private final WholesaleStoreNotificationMapper wholesaleStoreNotificationMapper;
     private final WholesaleCategoryMapper wholesaleCategoryMapper;
     private final WholesaleSubcategoryMapper wholesaleSubCategoryMapper;
+    private final PermissionHbRepository permissionHbRepository;
+    private final StorePermissionsRepository storePermissionsRepository;
+
+
     private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
 
     @Value("${store.absolute}")
@@ -228,6 +234,12 @@ public class WholesaleStoreService  {
             throw new MyException("Store image can't be blank.");
         }
         logger.debug("Completed createStore method");
+
+        // Providing default permissions to wholesaler
+        List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();
+        int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(loggedUser.getId(), defaultPermissions);
+        if (isAssigned < 1)
+            throw new MyException("Something went wrong during update wholesaler's permissions. please contact to administrator.");
         return insertedStore;
     }
 

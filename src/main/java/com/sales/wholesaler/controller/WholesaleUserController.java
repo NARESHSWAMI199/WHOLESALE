@@ -111,7 +111,7 @@ public class WholesaleUserController {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
-            responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
+            responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
             Map<String, Object> pagination = wholesalePaginationService.findUserPaginationByUserId(new SalesUser(user));
             WholesaleUserDto userDto = wholesaleUserService.convertUserToDto(user);
@@ -170,6 +170,14 @@ public class WholesaleUserController {
     }
 
 
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
+            example = """
+                    {
+                        "slug" : "optional",
+                        "email" : "optional"
+                    }
+                    """
+    )))
     @PostMapping("sendOtp")
     @Operation(summary = "Send OTP", description = "Sends an OTP to the user's email for verification")
     public ResponseEntity<Map<String, Object>> sendOtp(HttpServletRequest request, @RequestBody UserRequest userRequest) {
