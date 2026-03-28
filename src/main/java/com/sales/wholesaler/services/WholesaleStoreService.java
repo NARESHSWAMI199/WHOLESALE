@@ -60,8 +60,8 @@ public class WholesaleStoreService  {
     private final WholesaleStoreNotificationMapper wholesaleStoreNotificationMapper;
     private final WholesaleCategoryMapper wholesaleCategoryMapper;
     private final WholesaleSubcategoryMapper wholesaleSubCategoryMapper;
-    private final PermissionHbRepository permissionHbRepository;
-    private final StorePermissionsRepository storePermissionsRepository;
+    private final WholesalePermissionHbRepository permissionHbRepository;
+    private final WholsaleStorePermissionsRepository storePermissionsRepository;
 
 
     private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);

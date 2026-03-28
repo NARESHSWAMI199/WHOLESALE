@@ -65,22 +65,12 @@ public class UserController  {
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 
-
-    // Required params for login in swagger ui
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        content = @Content(schema = @Schema(example = """
-                    {
-                       "email" : "string",
-                       "password" : "string"
-                    }
-                    """)
-    ))
     @PostMapping("/login")
     @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token along with user details")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody UserRequest userDetails) {
-        logger.debug("Admin login attempt with email: {}", userDetails.getEmail());
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+        logger.debug("Admin login attempt with email: {}", loginRequest.getEmail());
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDetails.getEmail(),userDetails.getPassword()
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword()
         ));
         SalesUser user = (SalesUser) authentication.getPrincipal();
         Map<String, Object> responseObj = new HashMap<>();
@@ -100,21 +90,11 @@ public class UserController  {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
-    // Required params for otp login in swagger ui
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        content = @Content(schema = @Schema(example = """
-                {
-                   "email" : "string",
-                   "password" : "(otp) string"
-                }
-                """)
-    ))
     @PostMapping("/login/otp")
-    public ResponseEntity<Map<String, Object>> findUserByOtp(@RequestBody UserRequest userDetails) {
-        logger.debug("Admin OTP login attempt with email: {}", userDetails.getEmail());
+    public ResponseEntity<Map<String, Object>> findUserByOtp(@RequestBody LoginRequest loginRequest) {
+        logger.debug("Admin OTP login attempt with email: {}", loginRequest.getEmail());
         Map<String, Object> responseObj = new HashMap<>();
-        AuthUser user = userService.findUserByOtpAndEmail(userDetails);
+        AuthUser user = userService.findUserByOtpAndEmail(loginRequest.getEmail(),loginRequest.getPassword());
         if (user == null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
             responseObj.put(ConstantResponseKeys.STATUS, 401);

@@ -9,6 +9,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.STATUS;
 import com.sales.jwtUtils.JwtToken;
+import com.sales.request.LoginRequest;
 import com.sales.request.PasswordDto;
 import com.sales.request.UserRequest;
 import com.sales.request.UserSearchFilters;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +72,10 @@ public class WholesaleUserController {
     )))
     @PostMapping("/login")
     @Operation(summary = "Login wholesaler", description = "Authenticates a wholesaler user with email and password credentials")
-    public ResponseEntity<Map<String, Object>> loginWholesaler(@RequestBody Map<String, String> param) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> loginWholesaler(@RequestBody @Valid LoginRequest loginRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting loginWholesaler method");
         Map<String, Object> responseObj = new HashMap<>();
-        User user = wholesaleUserService.findByEmailAndPassword(param);
+        User user = wholesaleUserService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
         String message;
         if (user == null) {
             message = "invalid credentials.";
@@ -103,10 +105,10 @@ public class WholesaleUserController {
 
     @PostMapping("/login/otp")
     @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
-    public ResponseEntity<Map<String, Object>> loginUserViaOtp(@RequestBody UserRequest userDetails) {
+    public ResponseEntity<Map<String, Object>> loginUserViaOtp(@RequestBody LoginRequest loginRequest) {
         logger.debug("Starting loginUserViaOtp method");
         Map<String, Object> responseObj = new HashMap<>();
-        User user = wholesaleUserService.findUserByOtpAndEmail(userDetails);
+        User user = wholesaleUserService.findUserByOtpAndEmail(loginRequest.getEmail(), loginRequest.getPassword());
         if (user == null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
             responseObj.put(ConstantResponseKeys.STATUS, 401);

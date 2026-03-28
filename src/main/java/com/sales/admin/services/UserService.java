@@ -6,7 +6,6 @@ import com.sales.admin.mapper.UserMapper;
 import com.sales.admin.repositories.*;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.request.*;
 import com.sales.entities.Store;
 import com.sales.entities.StorePermissions;
 import com.sales.entities.SupportEmail;
@@ -16,6 +15,7 @@ import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
+import com.sales.request.*;
 import com.sales.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -74,10 +74,10 @@ public class UserService {
         return userRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new UsernameNotFoundException("User not fond."));
     }
 
-    public User findUserByOtpAndEmail(UserRequest userRequest) {
-        logger.debug("Finding user by OTP and email: {}", userRequest.getEmail());
+    public User findUserByOtpAndEmail(String email, String password) {
+        logger.debug("Finding user by OTP and email: {}",email);
         // Here password key has otp
-        return userRepository.findUserByOtpAndEmail(userRequest.getEmail(), userRequest.getPassword());
+        return userRepository.findUserByOtpAndEmail(email, password);
     }
 
 
