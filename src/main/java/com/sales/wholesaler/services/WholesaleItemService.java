@@ -228,10 +228,8 @@ public class WholesaleItemService {
 
         // Getting category and subcategory from database behalf on provided Ids.
         ItemCategory itemCategory = wholesaleItemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store item category not found."));
-        if (itemCategory == null) throw new IllegalArgumentException("Invalid categoryId.");
         itemRequest.setItemCategory(itemCategory);
         ItemSubCategory itemSubCategory = wholesaleItemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store item subcategory not found."));
-        if (itemSubCategory == null) throw new IllegalArgumentException("Invalid subCategoryId.");
         itemRequest.setItemSubCategory(itemSubCategory);
 
         Map<String, Object> responseObj = new HashMap<>();
@@ -260,9 +258,9 @@ public class WholesaleItemService {
         } else {  // Going to crate Item
             // if there is any required field null then this will throw IllegalArgumentException
             validateRequiredFieldsBeforeCreateItem(itemRequest);
-
             Item createdItem = createItem(itemRequest, loggedUser); // Create operation
-            responseObj.put(ConstantResponseKeys.RES, createdItem);
+            WholesaleItemDto wholesaleItemDto = wholesaleItemMapper.toDto(createdItem);
+            responseObj.put(ConstantResponseKeys.RES, wholesaleItemDto);
             responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully inserted.");
             responseObj.put(ConstantResponseKeys.STATUS, 201);
         }
@@ -372,7 +370,8 @@ public class WholesaleItemService {
             throw new IllegalArgumentException("Can't delete deactivated items.");
         // Make sure the right user deleting the items.
         Integer storeOwnerId = wholesaleStoreRepository.findUserIdByStoreId(item.getWholesaleId());
-        if (loggedUser.getId() != storeOwnerId) throw new PermissionDeniedDataAccessException("You are not authorized to delete this item.",new Exception());
+        if (loggedUser.getId() != storeOwnerId)
+            throw new PermissionDeniedDataAccessException("You are not authorized to delete this item.", new Exception());
         int deleteCount = wholesaleItemHbRepository.deleteItem(deleteRequest.getSlug());
         logger.debug("Completed deleteItem method");
         return deleteCount;
@@ -444,7 +443,7 @@ public class WholesaleItemService {
     public String createItemsExcelSheet(ItemFilterRequest searchFilters, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         Integer wholesaleId = storeRepository.getStoreIdByUserId(loggedUser.getId());
-        if(Objects.isNull(wholesaleId)) throw new IllegalArgumentException("Logged user store's entry not found.");
+        if (Objects.isNull(wholesaleId)) throw new IllegalArgumentException("Logged user store's entry not found.");
         Specification<Item> specification = Specification.allOf(
                 (containsName(searchFilters.getSearchKey().trim())
                         .or(hasSlug(searchFilters.getSearchKey())))

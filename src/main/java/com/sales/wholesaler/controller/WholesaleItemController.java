@@ -93,6 +93,7 @@ public class WholesaleItemController  {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
                     {
+                      "slug" : "during update",
                       "name": "string",
                       "price": 0,
                       "discount": 0,
@@ -100,7 +101,6 @@ public class WholesaleItemController  {
                       "label": "string",
                       "capacity": 0,
                       "itemImage": "string",
-                      "storeId": 0,
                       "categoryId": 0,
                       "subCategoryId": 0,
                       "inStock" : "Y|N",

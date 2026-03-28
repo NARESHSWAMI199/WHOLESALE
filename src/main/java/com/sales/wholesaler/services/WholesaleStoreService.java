@@ -47,7 +47,7 @@ import static com.sales.utils.Utils.getCurrentMillis;
 
 @Service
 @RequiredArgsConstructor
-public class WholesaleStoreService  {
+public class WholesaleStoreService {
 
     private final WholesaleCategoryRepository wholesaleCategoryRepository;
     private final WholesaleSubCategoryRepository wholesaleSubCategoryRepository;
@@ -73,7 +73,7 @@ public class WholesaleStoreService  {
     public Map<String, Object> updateStoreBySlug(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStoreBySlug method with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
 
-        // Validating required fields. If there we found any required field is null, this will throw an Exception
+        // Validating required fields. If their we found any required field is null, this will throw an Exception
         Utils.checkRequiredFields(storeCreationRequest, List.of("storeName", "storeEmail", "storePhone", "categoryId", "subCategoryId"));
 
         Map<String, Object> responseObj = new HashMap<>();
@@ -97,7 +97,8 @@ public class WholesaleStoreService  {
 
         // before update store and store's address get address id from store
         Integer addressId = wholesaleStoreRepository.getAddressIdBySlug(storeCreationRequest.getStoreSlug());
-        if (addressId == null) throw new IllegalArgumentException("No store found to update.");  // wrong wholesale slug.
+        if (addressId == null)
+            throw new IllegalArgumentException("No store found to update.");  // wrong wholesale slug.
         storeCreationRequest.setAddressId(addressId);
 
         String imageName = getStoreImagePath(storeCreationRequest.getStorePic(), slug);
@@ -247,24 +248,24 @@ public class WholesaleStoreService  {
     public Address insertAddress(AddressRequest addressRequest, AuthUser loggedUser) {
         logger.debug("Starting insertAddress method with addressRequest: {}, loggedUser: {}", addressRequest, loggedUser);
         Address address = Address.builder()
-            .slug(UUID.randomUUID().toString())
-            .street(addressRequest.getStreet())
-            .zipCode(addressRequest.getZipCode())
-            .city(City.builder()
-                    .id(addressRequest.getCity())
-                    .build()
-            )
-            .state(State.builder()
-                    .id(addressRequest.getState())
-                    .build()
-            )
-            .latitude(addressRequest.getLatitude())
-            .altitude(addressRequest.getAltitude())
-            .createdAt(getCurrentMillis())
-            .createdBy(loggedUser.getId())
-            .updatedAt(getCurrentMillis())
-            .updatedBy(loggedUser.getId())
-            .build();
+                .slug(UUID.randomUUID().toString())
+                .street(addressRequest.getStreet())
+                .zipCode(addressRequest.getZipCode())
+                .city(City.builder()
+                        .id(addressRequest.getCity())
+                        .build()
+                )
+                .state(State.builder()
+                        .id(addressRequest.getState())
+                        .build()
+                )
+                .latitude(addressRequest.getLatitude())
+                .altitude(addressRequest.getAltitude())
+                .createdAt(getCurrentMillis())
+                .createdBy(loggedUser.getId())
+                .updatedAt(getCurrentMillis())
+                .updatedBy(loggedUser.getId())
+                .build();
         Address savedAddress = addressRepository.save(address); // Create operation
         logger.debug("Completed insertAddress method");
         return savedAddress;
@@ -273,13 +274,13 @@ public class WholesaleStoreService  {
     public AddressRequest getAddressObjFromStore(StoreCreationRequest storeCreationRequest) {
         logger.debug("Starting getAddressObjFromStore method with storeCreationRequest: {}", storeCreationRequest);
         AddressRequest addressRequest = AddressRequest.builder()
-            .street(storeCreationRequest.getStreet())
-            .zipCode(storeCreationRequest.getZipCode())
-            .city(storeCreationRequest.getCity())
-            .state(storeCreationRequest.getState())
-            .latitude(storeCreationRequest.getLatitude())
-            .altitude(storeCreationRequest.getAltitude())
-            .build();
+                .street(storeCreationRequest.getStreet())
+                .zipCode(storeCreationRequest.getZipCode())
+                .city(storeCreationRequest.getCity())
+                .state(storeCreationRequest.getState())
+                .latitude(storeCreationRequest.getLatitude())
+                .altitude(storeCreationRequest.getAltitude())
+                .build();
         logger.debug("Completed getAddressObjFromStore method");
         return addressRequest;
     }
@@ -289,7 +290,7 @@ public class WholesaleStoreService  {
         logger.debug("Starting getAllStoreNotification method with filters: {}, loggedUser: {}", filters, loggedUser);
         Integer storeId = wholesaleStoreRepository.getStoreIdByUserId(loggedUser.getId());
         Specification<StoreNotifications> specification = Specification.allOf(isUserId(loggedUser.getId()).or(isWholesaleId(storeId)));
-        Pageable pageable = getPageable(logger,filters);
+        Pageable pageable = getPageable(logger, filters);
         Page<StoreNotifications> notificationsPage = wholesaleNotificationRepository.findAll(specification, pageable);
         logger.debug("Completed getAllStoreNotification method");
         return notificationsPage.map(wholesaleStoreNotificationMapper::toDto);

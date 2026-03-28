@@ -17,17 +17,19 @@ public class WholesaleStoreHbRepository {
     private final EntityManager entityManager;
 
     public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
-        String strQuery = "update Store set " +
-                "storeName=:name , " +
-                "email=:email, "+
-                "avtar=:avtar, "+
-                "phone=:phone, "+
-                "storeCategory =:storeCategory,"+
-                "storeSubCategory =:storeSubCategory,"+
-                "description=:description, "+
-                "updatedAt=:updatedAt, "+
-                "updatedBy=:updatedBy "+
-                "where slug =:slug";
+        String strQuery = """ 
+                update Store set 
+                    storeName=:name,
+                    email=:email,
+                    avtar=:avtar,
+                    phone=:phone,
+                    storeCategory =:storeCategory,
+                    storeSubCategory =:storeSubCategory,
+                    description=:description,
+                    updatedAt=:updatedAt,
+                    updatedBy=:updatedBy
+                where slug =:slug
+            """;
 
         Query query = entityManager.createQuery(strQuery);
         query.setParameter("name", storeCreationRequest.getStoreName());

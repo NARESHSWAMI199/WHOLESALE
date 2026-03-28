@@ -73,8 +73,9 @@ public class ItemsSpecifications {
 
 
     public static Specification<Item> isLabel(String label) {
+        List<String> labelList = List.of("N", "O");
         return (root, query, criteriaBuilder) -> {
-            if (label == null) return null;
+            if (label == null || !labelList.contains(label)) return null;
             return criteriaBuilder.equal(root.get(Item_.LABEL), label);
         };
     }
