@@ -37,7 +37,7 @@ public class ChatRoom implements Serializable {
     Long updatedAt;
 
     // One-to-many relationship with RoomUser
-    @OneToMany(mappedBy = "roomId", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "roomId", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
     List<ChatRoomUser> chatRoomUsers;
 
 }

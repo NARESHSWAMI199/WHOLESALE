@@ -2,9 +2,10 @@ package sales.application.sales.admin.services;
 
 
 import com.sales.SalesApplication;
+import com.sales.admin.dto.UserDto;
 import com.sales.admin.services.UserService;
 import com.sales.claims.SalesUser;
-import com.sales.dto.UserSearchFilters;
+import com.sales.request.UserSearchFilters;
 import com.sales.entities.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -78,15 +79,14 @@ public class UserServiceTest extends TestUtil {
         SalesUser loggedUser = new SalesUser(admin);
         UserSearchFilters filters = new UserSearchFilters();
         filters.setUserType("A"); // Set userType to avoid NPE
-        Page<User> users = userService.getAllUser(filters, loggedUser);
+        Page<UserDto> users = userService.getAllUser(filters, loggedUser);
         Assertions.assertNotNull(users);
     }
 
     @Test
     public void testGetUserDetail() {
         User user = createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.ADMIN);
-        SalesUser loggedUser = new SalesUser(user);
-        User detail = userService.getUserDetail(user.getSlug(), loggedUser);
+        User detail = userService.getUserDetail(user.getSlug());
         Assertions.assertNotNull(detail);
         Assertions.assertEquals(user.getSlug(), detail.getSlug());
     }

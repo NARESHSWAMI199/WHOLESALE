@@ -62,11 +62,11 @@ public class Store implements Serializable {
     @Transient
     Integer totalStoreItems;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     StoreCategory storeCategory;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory_id", referencedColumnName = "id")
     StoreSubCategory storeSubCategory;
 

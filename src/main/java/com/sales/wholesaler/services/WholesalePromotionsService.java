@@ -2,7 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StorePromotionDto;
+import com.sales.request.StorePromotionRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.repository.WholesaleHbPromotionRepository;
 import com.sales.wholesaler.repository.WholesaleStoreRepository;
@@ -22,12 +22,12 @@ public class WholesalePromotionsService  {
     private final WholesaleHbPromotionRepository wholesaleHbPromotionRepository;
     private static final Logger logger = LoggerFactory.getLogger(WholesalePromotionsService.class);
 
-    public Map<String,Object> insertItemPromotion(StorePromotionDto storePromotionDto, AuthUser loggedUser) {
-        logger.debug("Starting insertItemPromotion method with storePromotionDto: {}, loggedUser: {}", storePromotionDto, loggedUser);
+    public Map<String,Object> insertItemPromotion(StorePromotionRequest storePromotionRequest, AuthUser loggedUser) {
+        logger.debug("Starting insertItemPromotion method with storePromotionRequest: {}, loggedUser: {}", storePromotionRequest, loggedUser);
         Map<String,Object> response = new HashMap<>();
         Integer storeId = wholesaleStoreRepository.getStoreIdByUserId(loggedUser.getId());
-        storePromotionDto.setStoreId(storeId);
-        int isInserted = wholesaleHbPromotionRepository.insertStorePromotions(storePromotionDto,loggedUser); // Create operation
+        storePromotionRequest.setStoreId(storeId);
+        int isInserted = wholesaleHbPromotionRepository.insertStorePromotions(storePromotionRequest,loggedUser); // Create operation
         if(isInserted > 0){
             response.put(ConstantResponseKeys.MESSAGE,"Your item is going to promote.");
             response.put(ConstantResponseKeys.STATUS,200);

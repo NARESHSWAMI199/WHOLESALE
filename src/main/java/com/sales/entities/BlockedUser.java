@@ -21,7 +21,7 @@ public class BlockedUser implements Serializable {
     int id;
     @Column(name = "user_id")
     Integer userId;
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_user_id")
     User blockedUser;
     @Column(name = "created_at")

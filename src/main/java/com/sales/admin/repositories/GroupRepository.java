@@ -29,4 +29,14 @@ public interface GroupRepository extends JpaRepository<Group,Integer> , JpaSpeci
     List<Map<String,Object>> findGroupAndPermissionsByGroupId(@Param("groupId") Integer groupId);
 
 
+    @Query(value = """
+            select 
+                p.id as id
+            from Group g
+            left join g.permissions p
+            where g.id =:groupId
+            """)
+    List<Integer> findALlPermissionsIdByGroupId(@Param("groupId") Integer groupId);
+
+
 }

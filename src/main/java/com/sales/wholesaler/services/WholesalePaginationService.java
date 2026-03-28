@@ -3,18 +3,18 @@ package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.PaginationRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPaginationDto;
+import com.sales.request.UserPaginationRequest;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
 import com.sales.entities.UserPagination;
-import com.sales.exceptions.NotFoundException;
 import com.sales.global.USER_TYPES;
 import com.sales.specifications.PaginationSpecification;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.mapper.WholesaleUserPaginationMapper;
 import com.sales.wholesaler.repository.WholesalePaginationHbRepository;
 import com.sales.wholesaler.repository.WholesalePaginationRepository;
 import com.sales.wholesaler.repository.WholesaleUserPaginationsRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,21 +33,22 @@ public class WholesalePaginationService {
     private final WholesalePaginationRepository wholesalePaginationRepository;
     private final WholesalePaginationHbRepository wholesalePaginationHbRepository;
     private final PaginationRepository paginationRepository;
+    private final WholesaleUserPaginationMapper wholesaleUserPaginationMapper;
 
-    public List<UserPagination> findAllUserPaginations(){
+    public List<UserPagination> findAllUserPagination(){
         return wholesaleUserPaginationsRepository.findAll();
     }
 
-    public Map<String,Object> findUserPaginationsByUserId(AuthUser loggedUser){
-        List<UserPagination> userPaginations = wholesaleUserPaginationsRepository.getUserPaginationByUserId(loggedUser.getId());
+    public Map<String,Object> findUserPaginationByUserId(AuthUser loggedUser){
+        List<UserPagination> userPaginationList = wholesaleUserPaginationsRepository.getUserPaginationByUserId(loggedUser.getId());
         Map<String,Object> result = new LinkedHashMap<>();
-        for(UserPagination userPagination : userPaginations) {
-            Pagination pagination = paginationRepository.findById(userPagination.getPaginationId()).orElseThrow(() -> new NotFoundException("Pagination not found."));
+        for(UserPagination userPagination : userPaginationList) {
+            Pagination pagination = userPagination.getPagination();
             String key = pagination.getFieldFor();
             // remove all whitespaces and changed with uppercase like:
             // abc d → ABCD
             key = key.replaceAll("\\s+", "").toUpperCase();
-            result.put(key,userPagination);
+            result.put(key,wholesaleUserPaginationMapper.toDto(userPagination));
         }
         return result;
     }
@@ -58,7 +59,7 @@ public class WholesalePaginationService {
     }
 
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public void setUserDefaultPaginationForSettings(User user) {
         Specification<Pagination> specification = Specification.allOf(PaginationSpecification.whoCanSee("B")
                 .or(PaginationSpecification.whoCanSee(USER_TYPES.WHOLESALER.getType()))
@@ -71,11 +72,11 @@ public class WholesalePaginationService {
         }
     }
 
-    @Transactional(rollbackOn = {InternalException.class, RuntimeException.class,Exception.class })
+    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class,Exception.class })
     public UserPagination insertUserPagination(Pagination pagination,AuthUser loggedUser,Integer rowNumbers) {
         UserPagination userPagination = new UserPagination();
         Pagination savedPagination = paginationRepository.save(pagination);
-        userPagination.setPaginationId(savedPagination.getId());
+        userPagination.setPagination(savedPagination);
         userPagination.setUserId(loggedUser.getId());
         userPagination.setRowsNumber(rowNumbers);
         return wholesaleUserPaginationsRepository.save(userPagination);
@@ -83,11 +84,11 @@ public class WholesalePaginationService {
 
 
 
-    public int updateUserPaginationRowsNumber(UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public int updateUserPaginationRowsNumber(UserPaginationRequest userPaginationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // Check required fields are not null
-        Utils.checkRequiredFields(userPaginationDto,List.of("paginationId","userId","rowsNumber"));
+        Utils.checkRequiredFields(userPaginationRequest,List.of("paginationId","rowsNumber"));
         // check pagination field available or not
-        return wholesalePaginationHbRepository.updateUserPaginations(userPaginationDto.getPaginationId(),userPaginationDto);
+        return wholesalePaginationHbRepository.updateUserPaginations(userPaginationRequest,loggedUser);
     }
 
 }

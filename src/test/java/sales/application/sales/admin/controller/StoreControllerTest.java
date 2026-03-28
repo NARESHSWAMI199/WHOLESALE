@@ -3,10 +3,7 @@ package sales.application.sales.admin.controller;
 
 import com.google.gson.Gson;
 import com.sales.SalesApplication;
-import com.sales.entities.Store;
-import com.sales.entities.StoreCategory;
-import com.sales.entities.StoreSubCategory;
-import com.sales.entities.User;
+import com.sales.entities.*;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,25 +48,30 @@ public class StoreControllerTest extends TestUtil {
         String randomPhone = getRandomMobileNumber();
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION , token);
-        createStoreSubCategory();
+        StoreSubCategory storeSubCategory = createStoreSubCategory();
+        City city = createCity();
         String json = """
                 {
                     "userSlug" : "{userSlug}",
                     "storeName" : "Mock test store",
                     "storeEmail" : "{storeEmail}",
                     "description" : "test",
-                    "categoryId" : "1",
-                    "subCategoryId"  : "1",
+                    "categoryId" : "{categoryId}",
+                    "subCategoryId"  : "{subCategoryId}",
                     "storePhone" : "{storePhone}",
                     "zipCode" : "302013",
-                    "city" : "1",
-                    "state" : "1",
+                    "city" :  "{city}",
+                    "state" : "{state}",
                     "street" : "1 Mock test jaipur"
                 }
             """
             .replace("{userSlug}",selfSlug)
             .replace("{storeEmail}",randomEmail)
-            .replace("{storePhone}",randomPhone);
+            .replace("{storePhone}",randomPhone)
+            .replace("{city}",String.valueOf(city.getId()))
+            .replace("{state}",String.valueOf(city.getStateId()))
+            .replace("{subCategoryId}",String.valueOf(storeSubCategory.getId()))
+            .replace("{categoryId}",String.valueOf(storeSubCategory.getCategoryId()));
 
         Map<String,String> params = new Gson().fromJson(json,Map.class);
         MockMultipartHttpServletRequestBuilder requestBuilder  = multipart("/admin/store/add");
@@ -109,8 +111,8 @@ public class StoreControllerTest extends TestUtil {
                 .replace("{storeSlug}",store.getSlug())
                 .replace("{storeEmail}",randomEmail)
                 .replace("{storePhone}",randomPhone)
-                .replace("{city}",String.valueOf(store.getAddress().getCity()))
-                .replace("{state}",String.valueOf(store.getAddress().getState()))
+                .replace("{city}",String.valueOf(store.getAddress().getCity().getId()))
+                .replace("{state}",String.valueOf(store.getAddress().getState().getId()))
                 .replace("{categoryId}",String.valueOf(store.getStoreCategory().getId()))
                 .replace("{subCategoryId}",String.valueOf(store.getStoreSubCategory().getId()))
                 ;
@@ -191,7 +193,7 @@ public class StoreControllerTest extends TestUtil {
         mockMvc.perform(get("/admin/store/detailbyuser/"+GlobalConstantTest.WHOLESALER_SLUG+"ddsf")
                 .headers(headers)
         ).andExpectAll(
-                status().is(404)
+                status().is(400)
         ).andDo(print());
 
     }
@@ -260,7 +262,7 @@ public class StoreControllerTest extends TestUtil {
                 .content(json)
                 .headers(headers)
         ).andExpectAll(
-                status().is(404)
+                status().is(400)
         ).andDo(print());
 
     }
@@ -342,8 +344,8 @@ public class StoreControllerTest extends TestUtil {
 
         List categoryList = extractCategoryListFromResponse(result);
         if(!categoryList.isEmpty()) {
-            Map<String, Object> categoryDto = (Map<String, Object>) categoryList.get(0);
-            Integer categoryId = (Integer) categoryDto.get("id");
+            Map<String, Object> categoryRequest = (Map<String, Object>) categoryList.get(0);
+            Integer categoryId = (Integer) categoryRequest.get("id");
 
             // Getting subcategories also
             headers.set(GlobalConstant.AUTHORIZATION, token);

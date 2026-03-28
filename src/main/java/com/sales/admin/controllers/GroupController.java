@@ -1,18 +1,19 @@
 package com.sales.admin.controllers;
 
 
+import com.sales.admin.dto.GroupDto;
 import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.DeleteDto;
-import com.sales.dto.GroupDto;
-import com.sales.dto.SearchFilters;
-import com.sales.entities.Group;
+import com.sales.request.DeleteRequest;
+import com.sales.request.GroupFilterRequest;
+import com.sales.request.GroupRequest;
+import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,11 @@ public class GroupController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('group.all')")
     @Operation(summary = "Get all groups", description = "Retrieves a paginated list of all groups with optional search filters")
-    public ResponseEntity<Page<Group>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
+    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody GroupFilterRequest searchFilters) {
         logger.debug("Fetching all groups with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Page<Group> storePage = groupService.getAllGroups(searchFilters, loggedUser);
-        return new ResponseEntity<>(storePage, HttpStatus.OK);
+        Page<GroupDto> groupDtoPage = groupService.getAllGroups(searchFilters, loggedUser);
+        return new ResponseEntity<>(groupDtoPage, HttpStatus.OK);
     }
 
     @GetMapping("/permissions/all")
@@ -59,11 +60,11 @@ public class GroupController  {
     @PostMapping(value = {"create", "update"})
     @PreAuthorize("hasAnyAuthority('group.permission.add','group.permission.update','group.permission.edit')")
     @Operation(summary = "Create or update group", description = "Creates a new group or updates an existing group based on the provided data")
-    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication,HttpServletRequest request, @RequestBody GroupDto groupDto) throws Exception {
-        logger.debug("Creating or updating group: {}", groupDto);
+    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication,HttpServletRequest request, @RequestBody GroupRequest groupRequest) throws Exception {
+        logger.debug("Creating or updating group: {}", groupRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
-        Map<String, Object> response = groupService.createOrUpdateGroup(groupDto, loggedUser, path);
+        Map<String, Object> response = groupService.createOrUpdateGroup(groupRequest, loggedUser, path);
         return new ResponseEntity<>(response, HttpStatus.valueOf((Integer) response.get(ConstantResponseKeys.STATUS)));
     }
 
@@ -83,11 +84,11 @@ public class GroupController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('group.delete')")
     @Operation(summary = "Delete group", description = "Deletes a group by its slug")
-    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteDto deleteDto) throws Exception {
-        logger.debug("Deleting group with slug: {}", deleteDto);
+    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws Exception {
+        logger.debug("Deleting group with slug: {}", deleteRequest);
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = groupService.deleteGroupBySlug(deleteDto, loggedUser);
+        int isUpdated = groupService.deleteGroupBySlug(deleteRequest, loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, "User has been successfully deleted.");
             responseObj.put(ConstantResponseKeys.STATUS, 200);

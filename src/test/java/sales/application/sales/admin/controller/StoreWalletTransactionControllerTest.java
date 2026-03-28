@@ -1,6 +1,7 @@
 package sales.application.sales.admin.controller;
 
 import com.sales.SalesApplication;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.WalletTransaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class StoreWalletTransactionControllerTest extends TestUtil {
         var user = createUser(slug, createRandomEmail(), "pw", "W");
 
         // add a transaction
-        WalletTransaction wt = storeWalletTransactionService.addWalletTransaction(com.sales.dto.WalletTransactionDto.builder().amount(100f).transactionType("CR").status("S").build(), user.getId());
+        WalletTransaction wt = storeWalletTransactionService.addWalletTransaction(WalletTransactionRequest.builder().amount(100f).transactionType("CR").status("S").build(), user.getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, token);
@@ -62,7 +63,7 @@ public class StoreWalletTransactionControllerTest extends TestUtil {
         String json = "{}";
 
         mockMvc.perform(post("/admin/store/wallet/transactions/all/invalid-slug").contentType(MediaType.APPLICATION_JSON).content(json).headers(headers))
-                .andExpect(status().is(404))
+                .andExpect(status().is(400))
                 .andDo(print());
     }
 

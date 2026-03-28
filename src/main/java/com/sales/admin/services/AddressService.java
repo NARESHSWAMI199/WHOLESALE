@@ -3,11 +3,11 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.AddressHbRepository;
 import com.sales.admin.repositories.AddressRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressDto;
+import com.sales.request.AddressRequest;
 import com.sales.entities.Address;
 import com.sales.entities.City;
 import com.sales.entities.State;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +28,25 @@ public class AddressService {
     private static final Logger logger = LoggerFactory.getLogger(AddressService.class);
 
     @Transactional
-    public Address insertAddress(AddressDto addressDto, AuthUser loggedUser) {
-        logger.debug("Entering insertAddress with addressDto: {}, loggedUser: {}", addressDto, loggedUser);
+    public Address insertAddress(AddressRequest addressRequest, AuthUser loggedUser) {
+        logger.debug("Entering insertAddress with addressRequest: {}, loggedUser: {}", addressRequest, loggedUser);
         Address address = new Address();
         address.setSlug(UUID.randomUUID().toString());
 
-        address.setStreet(addressDto.getStreet());
-        address.setZipCode(addressDto.getZipCode());
-        address.setCity(addressDto.getCity());
-        address.setState(addressDto.getState());
-        address.setLatitude(addressDto.getLatitude());
-        address.setAltitude(addressDto.getAltitude());
+        address.setStreet(addressRequest.getStreet());
+        address.setZipCode(addressRequest.getZipCode());
+
+        address.setCity(City.builder()
+                .id(addressRequest.getCity())
+                .build()
+        );
+        address.setState(State.builder()
+                .id(addressRequest.getState())
+                .build()
+        );
+
+        address.setLatitude(addressRequest.getLatitude());
+        address.setAltitude(addressRequest.getAltitude());
 
         address.setCreatedAt(getCurrentMillis());
         address.setCreatedBy(loggedUser.getId());

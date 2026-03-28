@@ -1,7 +1,7 @@
 package com.sales.exceptions;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.sales.dto.ErrorDto;
+import com.sales.request.ErrorDto;
 import org.hibernate.ObjectNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,7 +33,7 @@ class GlobalAdviceControllerTest {
         NotFoundException ex = new NotFoundException("not found");
         WebRequest req = mock(WebRequest.class);
         ErrorDto res = advice.notFoundException(ex, req);
-        assertEquals(404, res.getStatus());
+        assertEquals(400, res.getStatus());
     }
 
     @Test

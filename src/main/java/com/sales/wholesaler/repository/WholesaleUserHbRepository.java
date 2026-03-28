@@ -1,12 +1,12 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.MessageDto;
-import com.sales.dto.UserDto;
+import com.sales.request.MessageDto;
+import com.sales.request.UserRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class WholesaleUserHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateUser(UserDto userDto, AuthUser loggedUser){
+    public int updateUser(UserRequest userRequest, AuthUser loggedUser){
         String strQuery = "update User set " +
                 "username=:username , " +
                 "email=:email,"+
@@ -27,12 +27,12 @@ public class WholesaleUserHbRepository {
                 "where slug =:slug";
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("username", userDto.getUsername());
-        query.setParameter("email", userDto.getEmail());
-        query.setParameter("contact", userDto.getContact());
+        query.setParameter("username", userRequest.getUsername());
+        query.setParameter("email", userRequest.getEmail());
+        query.setParameter("contact", userRequest.getContact());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", userDto.getSlug());
+        query.setParameter("slug", userRequest.getSlug());
         return query.executeUpdate();
     }
 

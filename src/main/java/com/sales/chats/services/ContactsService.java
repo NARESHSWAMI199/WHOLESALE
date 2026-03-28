@@ -12,7 +12,7 @@ import com.sales.global.GlobalConstant;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class ContactsService  {
         return savedContact;
     }
 
-    @Transactional(rollbackOn = {Exception.class, RuntimeException.class})
+    @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
     public int removeContact(AuthUser loggedUser,String contactUserSlug,Boolean deleteChats) {
         logger.debug("Going to remove contact from contact list with loggedUser  {} : and contactUserSlug {} ",loggedUser,contactUserSlug);
         User contactUser = wholesaleUserRepository.findUserBySlug(contactUserSlug);

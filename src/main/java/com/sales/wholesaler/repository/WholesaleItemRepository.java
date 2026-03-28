@@ -1,28 +1,21 @@
 package com.sales.wholesaler.repository;
 
 
+import com.sales.commons.repositories.ItemCommonRepository;
 import com.sales.entities.Item;
+import com.sales.entities.Item_;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface WholesaleItemRepository extends JpaRepository<Item, Integer> , JpaSpecificationExecutor<Item> {
+public interface WholesaleItemRepository extends JpaRepository<Item, Integer> , JpaSpecificationExecutor<Item> , ItemCommonRepository {
 
-
-
-   @Query("from Item where wholesaleId=:wholesaleId and createdAt >= :fromDate and createdAt <= :toDate")
-   List<Item> getAllItemsWithFilters(@Param("wholesaleId")Integer wholesaleId,
-                                     @Param("fromDate") Long fromDate,
-                                     @Param("toDate") Long toDate);
-
-
+   @EntityGraph(attributePaths = {Item_.ITEM_CATEGORY,Item_.ITEM_SUB_CATEGORY},type = EntityGraph.EntityGraphType.FETCH)
    Item findItemBySlug(String slug);
-
 
    @Query(value = "select status from Item where slug=:slug")
    String getItemStatus(String slug);

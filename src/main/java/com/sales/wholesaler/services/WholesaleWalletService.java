@@ -2,18 +2,20 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.StoreNotifications;
 import com.sales.entities.User;
 import com.sales.entities.Wallet;
 import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesaleWalletDto;
+import com.sales.wholesaler.mapper.WholesaleWalletMapper;
 import com.sales.wholesaler.repository.WholesaleNotificationRepository;
 import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleStoreRepository;
 import com.sales.wholesaler.repository.WholesaleWalletRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,11 @@ public class WholesaleWalletService  {
     private final WalletTransactionService walletTransactionService;
     private final WholesaleServicePlanService wholesaleServicePlanService;
     private final WholesaleNotificationRepository wholesaleNotificationRepository;
+    private final WholesaleWalletMapper wholesaleWalletMapper;
 
-    public Wallet getWalletDetail(Integer userId){
-        return wholesaleWalletRepository.findByUserId(userId);
+    public WholesaleWalletDto getWalletDetail(Integer userId){
+        Wallet wallet = wholesaleWalletRepository.findByUserId(userId);
+        return wholesaleWalletMapper.toDto(wallet);
     }
 
 
@@ -63,7 +67,7 @@ public class WholesaleWalletService  {
         float walletAmount = wallet != null ? wallet.getAmount() : 0;
 
         // Preparing wallet transaction.
-        WalletTransactionDto walletTransactionDto = WalletTransactionDto.builder()
+        WalletTransactionRequest walletTransactionDto = WalletTransactionRequest.builder()
                 .amount(planPrice.floatValue())
                 .transactionType("DR")
                 .status("F") // Default assuming it failed.

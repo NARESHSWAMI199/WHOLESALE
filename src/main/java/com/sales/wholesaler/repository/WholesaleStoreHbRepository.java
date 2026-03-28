@@ -1,11 +1,11 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StoreDto;
+import com.sales.request.StoreCreationRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,30 +16,32 @@ public class WholesaleStoreHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateStore(StoreDto storeDto, AuthUser loggedUser){
-        String strQuery = "update Store set " +
-                "storeName=:name , " +
-                "email=:email, "+
-                "avtar=:avtar, "+
-                "phone=:phone, "+
-                "storeCategory =:storeCategory,"+
-                "storeSubCategory =:storeSubCategory,"+
-                "description=:description, "+
-                "updatedAt=:updatedAt, "+
-                "updatedBy=:updatedBy "+
-                "where slug =:slug";
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
+        String strQuery = """ 
+                update Store set 
+                    storeName=:name,
+                    email=:email,
+                    avtar=:avtar,
+                    phone=:phone,
+                    storeCategory =:storeCategory,
+                    storeSubCategory =:storeSubCategory,
+                    description=:description,
+                    updatedAt=:updatedAt,
+                    updatedBy=:updatedBy
+                where slug =:slug
+            """;
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("name", storeDto.getStoreName());
-        query.setParameter("email", storeDto.getStoreEmail());
-        query.setParameter("phone", storeDto.getStorePhone());
-        query.setParameter("storeCategory", storeDto.getStoreCategory());
-        query.setParameter("storeSubCategory", storeDto.getStoreSubCategory());
-        query.setParameter("avtar", storeDto.getStoreAvatar());
-        query.setParameter("description", storeDto.getDescription());
+        query.setParameter("name", storeCreationRequest.getStoreName());
+        query.setParameter("email", storeCreationRequest.getStoreEmail());
+        query.setParameter("phone", storeCreationRequest.getStorePhone());
+        query.setParameter("storeCategory", storeCreationRequest.getStoreCategory());
+        query.setParameter("storeSubCategory", storeCreationRequest.getStoreSubCategory());
+        query.setParameter("avtar", storeCreationRequest.getStoreAvatar());
+        query.setParameter("description", storeCreationRequest.getDescription());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", storeDto.getStoreSlug());
+        query.setParameter("slug", storeCreationRequest.getStoreSlug());
         return query.executeUpdate();
     }
 

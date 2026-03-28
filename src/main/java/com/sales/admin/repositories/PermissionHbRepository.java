@@ -2,16 +2,16 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.GroupDto;
+import com.sales.request.GroupRequest;
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,26 +22,33 @@ import java.util.List;
 public class PermissionHbRepository {
 
     private final EntityManager entityManager;
+    private final GroupRepository permissionRepository;
 
-
-    public int updateGroup(GroupDto groupDto,int groupId,boolean isSuperAdmin){
+    public int updateGroup(GroupRequest groupRequest,int groupId,boolean isSuperAdmin){
         // deleting all group's exists permissions
         deleteGroupPermissionByGroupId(groupId,isSuperAdmin);
 
         String hql = "update Group set name=:name where slug = :slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("name", groupDto.getName());
-        query.setParameter("slug",groupDto.getSlug());
+        query.setParameter("name", groupRequest.getName());
+        query.setParameter("slug",groupRequest.getSlug());
 
         // update permissions if there provided
-        List<Integer> permissions = groupDto.getPermissions();
-        if(permissions !=null && !permissions.isEmpty()) updatePermissions(groupId,permissions);
+        List<Integer> permissions = groupRequest.getPermissions();
+        updatePermissions(groupId,permissions);
         return query.executeUpdate();
     }
 
 
     public int updatePermissions(int groupId, List<Integer> permissions){
-        if(permissions ==null || permissions.isEmpty()) return 0;
+
+        if(permissions ==null) return 0;
+        // If the group is super admin
+        if(groupId == GlobalConstant.groupId){
+            List<Integer> superAdminPermissions = permissionRepository.findALlPermissionsIdByGroupId(groupId);
+            permissions.removeAll(superAdminPermissions);
+        }
+        if(permissions.isEmpty()) return 0;
         String values = "";
         for(int i=0; i < permissions.size(); i++){
             values +="("+groupId+","+permissions.get(i)+")";
@@ -65,7 +72,7 @@ public class PermissionHbRepository {
 
     public int deleteGroupPermissionByGroupId(int groupId,boolean isSuperAdmin){
         // If group is a super group do nothing.
-        if (groupId == GlobalConstant.groupId && !isSuperAdmin) return  0;
+        if (groupId == GlobalConstant.groupId) return  0;
         String sql = "delete from group_permissions where group_id = :groupId";
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("groupId",groupId);

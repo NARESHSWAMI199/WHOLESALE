@@ -21,6 +21,7 @@ INSERT IGNORE INTO `permissions` (`permission`, `display_name`, `permission_for`
 ('item.status',                    'Change Item Status',                  'Item'),
 ('item.image',                     'Manage Item Images',                  'Item'),
 ('item.category',                  'Manage Item Categories',              'Item'),
+('item.category.detail',           'View Item category Detail',           'Item'),
 ('item.category.edit',             'Edit Item Categories',                'Item'),
 ('item.category.delete',           'Delete Item Category',                'Item Category'),
 ('item.subcategory',               'Manage Item Subcategories',           'Item Subcategory'),

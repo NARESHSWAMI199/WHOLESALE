@@ -16,19 +16,24 @@ import java.io.Serializable;
 public class WholesalerPlans implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
     @Column(name = "slug")
-    String slug;
+    private String slug;
     @Column(name = "user_id")
-    Integer userId;
-    @Column(name = "plan_id")
-    Integer servicePlanId;
+    private Integer userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id", referencedColumnName = "id")
+    private ServicePlan servicePlan;
     @Column(name = "created_at")
-    Long createdAt;
+    private Long createdAt;
     @Column(name = "expiry_date")
-    Long expiryDate;
+    private Long expiryDate;
     @Column(name = "created_by")
-    Integer createdBy;
+    private Integer createdBy;
+
+    @Column(name = "plan_id",insertable = false,updatable = false)
+    private Integer planId;
 
     @Transient
     boolean isExpired;

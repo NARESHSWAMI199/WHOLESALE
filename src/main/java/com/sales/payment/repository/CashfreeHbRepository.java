@@ -1,10 +1,10 @@
 package com.sales.payment.repository;
 
 
-import com.sales.dto.CashfreeDto;
+import com.sales.request.CashfreeRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class CashfreeHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateCashfreePaymentDetail(CashfreeDto cashfreeDto, Integer userId){
+    public int updateCashfreePaymentDetail(CashfreeRequest cashfreeRequest, Integer userId){
         String hql = """
             update CashfreeTrans
             set
@@ -34,17 +34,17 @@ public class CashfreeHbRepository {
         """;
         Query query = entityManager.createQuery(hql);
         query.setParameter("userId",String.valueOf(userId));
-        query.setParameter("orderId",String.valueOf(cashfreeDto.getOrderId()));
-        query.setParameter("amount",String.valueOf(cashfreeDto.getAmount()));
-        query.setParameter("cfPaymentId",cashfreeDto.getCfPaymentId());
-        query.setParameter("status",cashfreeDto.getStatus());
-        query.setParameter("currency",cashfreeDto.getCurrency());
-        query.setParameter("message",cashfreeDto.getMessage());
-        query.setParameter("paymentTime",cashfreeDto.getPaymentTime());
-        query.setParameter("paymentType",cashfreeDto.getPaymentType());
-        query.setParameter("paymentMethod",cashfreeDto.getPaymentMethod());
-        query.setParameter("actualResponse",cashfreeDto.getActualResponse());
-        query.setParameter("slug",cashfreeDto.getSlug());
+        query.setParameter("orderId",String.valueOf(cashfreeRequest.getOrderId()));
+        query.setParameter("amount",String.valueOf(cashfreeRequest.getAmount()));
+        query.setParameter("cfPaymentId",cashfreeRequest.getCfPaymentId());
+        query.setParameter("status",cashfreeRequest.getStatus());
+        query.setParameter("currency",cashfreeRequest.getCurrency());
+        query.setParameter("message",cashfreeRequest.getMessage());
+        query.setParameter("paymentTime",cashfreeRequest.getPaymentTime());
+        query.setParameter("paymentType",cashfreeRequest.getPaymentType());
+        query.setParameter("paymentMethod",cashfreeRequest.getPaymentMethod());
+        query.setParameter("actualResponse",cashfreeRequest.getActualResponse());
+        query.setParameter("slug",cashfreeRequest.getSlug());
         return query.executeUpdate();
     }
 

@@ -1,18 +1,18 @@
 package com.sales.dao;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.ItemDto;
-import com.sales.dto.SearchFilters;
+import com.sales.request.SearchFilters;
 import com.sales.entities.Item;
+import com.sales.requests.ItemRequest;
 import org.springframework.data.domain.Page;
 
 public interface ItemsDao {
 
     Page<Item> getAllItems(SearchFilters searchFilters);
 
-    int updateItem(ItemDto itemDto, AuthUser loggedUser);
+    int updateItem(ItemRequest itemRequest, AuthUser loggedUser);
 
-    Item createItem(ItemDto itemDto, AuthUser loggedUser) throws Exception;
+    Item createItem(ItemRequest itemRequest, AuthUser loggedUser) throws Exception;
 
     Item findItemBySLug(String slug);
 

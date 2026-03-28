@@ -2,8 +2,9 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.services.StoreWalletTransactionService;
-import com.sales.dto.SearchFilters;
+import com.sales.request.SearchFilters;
 import com.sales.entities.WalletTransaction;
+import com.sales.request.WalletFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class StoreWalletTransactionController  {
     @PreAuthorize("hasAuthority('wallet.transactions')")
     @PostMapping("all/{userSlug}")
     @Operation(summary = "Get wallet transactions by user", description = "Retrieves a paginated list of wallet transactions for a specific user")
-    public ResponseEntity<Page<WalletTransaction>> getAllWalletTransactionsByUserId(@PathVariable String userSlug, HttpServletRequest request, @RequestBody SearchFilters searchFilters){
+    public ResponseEntity<Page<WalletTransaction>> getAllWalletTransactionsByUserId(@PathVariable String userSlug, HttpServletRequest request, @RequestBody WalletFilterRequest searchFilters){
         Page<WalletTransaction> transactions = storeWalletTransactionService.getAllWalletTransactionByUserId(searchFilters, userSlug);
         return new ResponseEntity<>(transactions,HttpStatus.valueOf(200));
     }

@@ -4,14 +4,14 @@ package com.sales.chats.services;
 import com.sales.chats.repositories.ChatRoomHbRepository;
 import com.sales.chats.repositories.ChatRoomRepository;
 import com.sales.claims.AuthUser;
-import com.sales.dto.ChatRoomDto;
+import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.entities.ChatRoomUser;
 import com.sales.entities.User;
 import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class ChatRoomService  {
     }
 
 
-    @Transactional(rollbackOn = {NotFoundException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {NotFoundException.class, RuntimeException.class,Exception.class})
     public ChatRoom createRoom(ChatRoomDto chatRoomDto) {
         // saving room
         ChatRoom chatRoom = ChatRoom.builder()

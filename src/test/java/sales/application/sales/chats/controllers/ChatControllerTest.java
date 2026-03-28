@@ -1,7 +1,7 @@
 package sales.application.sales.chats.controllers;
 
 import com.sales.SalesApplication;
-import com.sales.dto.MessageDto;
+import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import com.sales.entities.User;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class ChatControllerTest extends TestUtil {
         principalUser.setAuthorities(java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_WHOLESALER")));
         var auth = new org.springframework.security.authentication.TestingAuthenticationToken(new com.sales.claims.SalesUser(principalUser), null, "ROLE_WHOLESALER");
 
-        when(chatService.getAllChatBySenderAndReceiverKey(org.mockito.ArgumentMatchers.any(com.sales.dto.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class))).thenReturn(Map.of());
+        when(chatService.getAllChatBySenderAndReceiverKey(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class))).thenReturn(Map.of());
 
         String json = "{\"receiver\":\"abc\", \"createdAt\": 0}";
 
@@ -57,7 +57,7 @@ public class ChatControllerTest extends TestUtil {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
-        verify(chatService, times(1)).getAllChatBySenderAndReceiverKey(org.mockito.ArgumentMatchers.any(com.sales.dto.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class));
+        verify(chatService, times(1)).getAllChatBySenderAndReceiverKey(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class));
     }
 
     @Test
@@ -87,11 +87,11 @@ public class ChatControllerTest extends TestUtil {
         User receiver = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
         when(wholesaleUserService.findUserBySlug(org.mockito.ArgumentMatchers.anyString())).thenReturn(receiver);
         when(chatService.verifyBeforeSend(org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class), org.mockito.ArgumentMatchers.anyString())).thenReturn(true);
-        when(chatService.saveAllImages(org.mockito.ArgumentMatchers.any(com.sales.dto.MessageDto.class), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class))).thenReturn(List.of("img.png"));
+        when(chatService.saveAllImages(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class))).thenReturn(List.of("img.png"));
 
         MessageDto returned = new MessageDto();
         returned.setId(123L);
-        when(chatService.addImagesList(org.mockito.ArgumentMatchers.any(com.sales.dto.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class), org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class), org.mockito.ArgumentMatchers.anyString())).thenReturn(returned);
+        when(chatService.addImagesList(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class), org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class), org.mockito.ArgumentMatchers.anyString())).thenReturn(returned);
 
         MockMultipartFile image = new MockMultipartFile("images", "img.png", "image/png", "abc".getBytes());
 
@@ -106,7 +106,7 @@ public class ChatControllerTest extends TestUtil {
         String body = res.getResponse().getContentAsString();
         assertThat(body).contains("All images successfully sent");
 
-        verify(chatService, times(1)).saveAllImages(org.mockito.ArgumentMatchers.any(com.sales.dto.MessageDto.class), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class));
+        verify(chatService, times(1)).saveAllImages(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class));
         verify(messagingTemplate, times(1)).convertAndSendToUser(anyString(), anyString(), any());
     }
 

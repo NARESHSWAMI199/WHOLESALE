@@ -32,42 +32,42 @@ public class User implements AuthUser,Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    int id;
+    private int id;
     @Column(name = "slug")
-    String slug;
+    private String slug;
     @Column(name = "otp")
-    String otp;
+    private String otp;
     @Column(name = "avtar")
-    String avatar;
+    private String avatar;
     @Column(name = "username")
-    String username;
+    private String username;
     @JsonIgnore
     @Column(name = "password")
-    String password;
+    private String password;
     @Column(name = "email")
-    String email;
+    private String email;
     @Column(name = "contact",length = 12 , nullable = true)
-    String contact;
+    private String contact;
     @Column(name = "user_type")
-    String userType;
+    private String userType;
     @Column(name = "status")
-    String status;
+    private String status;
     @JsonIgnore
     @Column(name = "is_deleted")
-    String isDeleted;
+    private String isDeleted;
     @Column(name = "created_at")
-    Long createdAt;
+    private Long createdAt;
     @Column(name = "updated_at")
-    Long updatedAt;
+    private Long updatedAt;
     @Column(name = "created_by")
-    Integer createdBy;
+    private Integer createdBy;
     @Column(name = "updated_by")
-    Integer updatedBy;
+    private Integer updatedBy;
     @Column(name = "active_plan")
-    Integer activePlan;
+    private Integer activePlan;
 
     @Column(name = "last_seen")
-    Long lastSeen;
+    private Long lastSeen;
 
     @ManyToMany
     @JoinTable(
@@ -117,6 +117,6 @@ public class User implements AuthUser,Serializable{
 
     @Override
     public boolean isEnabled() {
-        return this.status.equals("A");
+        return "A".equals(this.status);
     }
 }

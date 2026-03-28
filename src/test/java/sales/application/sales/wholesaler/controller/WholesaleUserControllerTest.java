@@ -117,7 +117,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-                status().is(500)
+                status().is(400)
         ).andDo(print()).andReturn();
     }
 
@@ -127,7 +127,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
         String randomPhone = getRandomMobileNumber();
         String json = """
                     {
-                        "slug" : "provide your slug (optional)"
+                        "slug" : "provide your slug (optional)",
                         "email" : "{email}",
                         "username" : "Mock test update wholesaler",
                         "password" : "123456",
@@ -141,7 +141,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         );
 
     }
@@ -161,7 +161,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/auth/last-seen")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         );
     }
 
@@ -171,7 +171,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/chat/users")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         );
     }
 
@@ -181,7 +181,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
             mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/password")
                     .contentType(MediaType.APPLICATION_JSON)
             ).andExpectAll(
-                    status().is(403)
+                    status().is(401)
             );
     }
 

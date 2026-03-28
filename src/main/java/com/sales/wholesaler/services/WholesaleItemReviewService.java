@@ -1,8 +1,10 @@
 package com.sales.wholesaler.services;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
+import com.sales.request.ItemReviewsFilterRequest;
+import com.sales.wholesaler.dto.WholesaleItemReviewDto;
+import com.sales.wholesaler.mapper.WholesaleItemReviewMapper;
 import com.sales.wholesaler.repository.WholesaleItemReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.ItemReviewSpecifications.*;
@@ -21,9 +24,11 @@ import static com.sales.specifications.ItemReviewSpecifications.*;
 public class WholesaleItemReviewService  {
 
     private final WholesaleItemReviewRepository wholesaleItemReviewRepository;
+    private final WholesaleItemReviewMapper wholesaleItemReviewMapper;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewService.class);
 
-    public Page<ItemReviews> getAllItemReview(ItemReviewsFilterDto filters, AuthUser loggedUser) {
+    @Transactional
+    public Page<WholesaleItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters, AuthUser loggedUser) {
         logger.debug("Starting getALlItemReview method with filters: {}, loggedUser: {}", filters, loggedUser);
         if(filters.getItemId() == 0) {
             logger.error("Invalid itemId provided");
@@ -38,7 +43,8 @@ public class WholesaleItemReviewService  {
                         .and(isParentComment(filters.getParentId()))
         );
         Pageable pageable = getPageable(logger,filters);
-        return wholesaleItemReviewRepository.findAll(specification,pageable);
+            Page<ItemReviews> all = wholesaleItemReviewRepository.findAll(specification, pageable);
+            return all.map(wholesaleItemReviewMapper::toDto);
     }
 
 

@@ -1,12 +1,11 @@
 package com.sales.filters;
 
-import com.sales.admin.repositories.GroupRepository;
-import com.sales.admin.repositories.PermissionRepository;
 import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
+import com.sales.config.UnAuthorizedPaths;
 import com.sales.entities.User;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
@@ -24,13 +23,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -41,8 +38,17 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final StorePermissionsRepository storePermissionsRepository;
     private final UserCacheService userCacheService;
-    private final PermissionRepository permissionRepository;
-    private final GroupRepository groupRepository;
+
+
+
+    private final AntPathMatcher matcher = new AntPathMatcher();
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return Arrays.stream(UnAuthorizedPaths.unAuthorizePaths)
+                .anyMatch(pattern -> matcher.match(pattern, path));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

@@ -90,7 +90,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -107,7 +107,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andExpect(jsonPath("$.message", is("Invalid Credentials !")))
                 .andDo(print());
     }
@@ -122,7 +122,7 @@ public class UserControllerTest extends TestUtil {
         mockMvc.perform(post("/admin/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().is(500))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -140,7 +140,7 @@ public class UserControllerTest extends TestUtil {
                     "email" : "{email}",
                     "username" : "naresh swami",
                     "userType"  : "R",
-                    "contact" : "{contact}",
+                    "contact" : "{contact}"
                 }
                 """
                 .replace("{email}",randomEmail)
@@ -150,7 +150,7 @@ public class UserControllerTest extends TestUtil {
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().is(403))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -339,8 +339,8 @@ public class UserControllerTest extends TestUtil {
 
     @Test
     public void getRetailerWithoutLogin () throws Exception {
-        mockMvc.perform(get("/auth/admin/detail/"+GlobalConstantTest.RETAILER_SLUG))
-                .andExpect(status().is(403))
+        mockMvc.perform(get("/admin/auth/detail/"+GlobalConstantTest.RETAILER_SLUG))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -515,7 +515,7 @@ public class UserControllerTest extends TestUtil {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
-                .andExpect(status().is(403))
+                .andExpect(status().is(401))
                 .andDo(print());
     }
 
@@ -657,7 +657,7 @@ public void updateUserWrongStatus() throws Exception {
                         .headers(headers)
                 )
                 .andExpectAll(
-                        status().is(404)
+                        status().is(400)
                 )
                 .andDo(print());
     }
@@ -722,7 +722,7 @@ public void updateUserWrongStatus() throws Exception {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-            status().is(500)
+            status().is(401)
         );
     }
 

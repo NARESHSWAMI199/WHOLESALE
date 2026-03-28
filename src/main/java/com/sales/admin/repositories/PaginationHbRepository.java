@@ -1,10 +1,11 @@
 package com.sales.admin.repositories;
 
 
-import com.sales.dto.UserPaginationDto;
+import com.sales.claims.AuthUser;
+import com.sales.request.UserPaginationRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,16 +17,16 @@ public class PaginationHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateUserPaginations(Integer paginationId, UserPaginationDto userPaginationDto){
+    public int updateUserPaginations(UserPaginationRequest userPaginationRequest, AuthUser loggedUser){
         String hql = """
                 update UserPagination 
                 set rowsNumber =:rowsNumber
-                where userId = :userId and paginationId = :paginationId
+                where userId = :userId and pagination.id = :paginationId
                 """;
         Query query = entityManager.createQuery(hql);
-        query.setParameter("rowsNumber", userPaginationDto.getRowsNumber());
-        query.setParameter("userId", userPaginationDto.getUserId());
-        query.setParameter("paginationId", paginationId);
+        query.setParameter("rowsNumber", userPaginationRequest.getRowsNumber());
+        query.setParameter("userId", loggedUser.getId());
+        query.setParameter("paginationId", userPaginationRequest.getPaginationId());
         return query.executeUpdate();
     }
 

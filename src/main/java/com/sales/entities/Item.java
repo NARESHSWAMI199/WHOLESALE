@@ -51,12 +51,15 @@ public class Item implements Serializable {
     String isDeleted="N";
     @Column(name = "created_at")
     Long createdAt;
-    @Column(name = "created_by")
-    Integer createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by" , referencedColumnName = "user_id")
+    User createdBy;
     @Column(name = "updated_at")
     Long updatedAt;
-    @Column(name = "updated_by")
-    Integer updatedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by", referencedColumnName = "user_id")
+    User updatedBy;
     @Column(name = "slug")
     String slug;
     @Column(name = "in_stock")
@@ -66,14 +69,17 @@ public class Item implements Serializable {
     Integer wholesaleId;
 
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category", referencedColumnName = "id")
     ItemCategory itemCategory;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory", referencedColumnName = "id")
     ItemSubCategory itemSubCategory;
 
+
+    @Transient
+    String storeSlug;
 
 //    @ManyToOne
 //    @JoinColumn(name = "wholesale_id")

@@ -5,8 +5,8 @@ import com.cashfree.ApiException;
 import com.cashfree.model.OrderEntity;
 import com.google.gson.Gson;
 import com.sales.admin.services.ServicePlanService;
-import com.sales.dto.CashfreeDto;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.request.CashfreeRequest;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.User;
 import com.sales.entities.WalletTransaction;
@@ -51,19 +51,19 @@ public class CashFreePgController {
     @ResponseBody
     @PostMapping(value = {"sessionId/{paymentFor}"})
     public ResponseEntity<Map<String,Object>> getPaymentSessionId (HttpServletRequest request,@RequestParam(value = "redirectUri", required = false) String redirectUri,
-                                                                   @RequestBody CashfreeDto cashfreeDto,@PathVariable String paymentFor) {
-        User loggedUser = wholesaleUserService.findUserBySlug(cashfreeDto.getUserSlug());
+                                                                   @RequestBody CashfreeRequest cashfreeRequest,@PathVariable String paymentFor) {
+        User loggedUser = wholesaleUserService.findUserBySlug(cashfreeRequest.getUserSlug());
         if(loggedUser == null) throw new NotFoundException("No logged user found.");
         Map<String,Object> result = new HashMap<>();
         OrderEntity orderEntity = null;
             try {
                 if(!paymentFor.equalsIgnoreCase("wallet")) {
-                    logger.debug("Received request to get payment session ID for service slug : {} and username : {} and user slug : {}", cashfreeDto.getServicePlanSlug(), loggedUser.getUsername(), loggedUser.getSlug());
-                    ServicePlan servicePlan = servicePlanService.findBySlug(cashfreeDto.getServicePlanSlug());
+                    logger.debug("Received request to get payment session ID for service slug : {} and username : {} and user slug : {}", cashfreeRequest.getServicePlanSlug(), loggedUser.getUsername(), loggedUser.getSlug());
+                    ServicePlan servicePlan = servicePlanService.findBySlug(cashfreeRequest.getServicePlanSlug());
                     if (servicePlan == null) throw new NotFoundException("No service plan found.");
-                    orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForPlans(request, cashfreeDto, loggedUser, servicePlan, redirectUri, env);
+                    orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForPlans(request, cashfreeRequest, loggedUser, servicePlan, redirectUri, env);
                 }else {
-                    orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForWallet(request, cashfreeDto, loggedUser,cashfreeDto.getAmount(), redirectUri, env);
+                    orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForWallet(request, cashfreeRequest, loggedUser,cashfreeRequest.getAmount(), redirectUri, env);
                 }
                 result.put(ConstantResponseKeys.RES, orderEntity);
                 result.put(ConstantResponseKeys.STATUS, 201);
@@ -115,7 +115,7 @@ public class CashFreePgController {
                 Float amount =  Float.valueOf(String.valueOf(payment.get("payment_amount")));
                 String paymentStatus = payment.getString("payment_status");
                 paymentStatus = paymentStatus.equals("SUCCESS") ? "S" : "F";
-                WalletTransactionDto walletTransactionDto = WalletTransactionDto.builder()
+                WalletTransactionRequest walletTransactionDto = WalletTransactionRequest.builder()
                         .userId(userId)
                         .amount(amount)
                         .transactionType("CR")

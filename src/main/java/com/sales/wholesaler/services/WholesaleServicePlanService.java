@@ -2,12 +2,16 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.UserPlanDto;
+import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerFuturePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.exceptions.NotFoundException;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesalerPlanDto;
+import com.sales.wholesaler.dto.WholesaleServicePlanDto;
+import com.sales.wholesaler.mapper.WholesaleServicePlanMapper;
+import com.sales.wholesaler.mapper.WholesalerPlanMapper;
 import com.sales.wholesaler.repository.WholesaleFuturePlansRepository;
 import com.sales.wholesaler.repository.WholesaleServicePlanRepository;
 import com.sales.wholesaler.repository.WholesaleUserHbRepository;
@@ -17,10 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -29,28 +33,32 @@ import static com.sales.specifications.PlansSpecifications.*;
 
 @Service
 @RequiredArgsConstructor
-public class WholesaleServicePlanService  {
+public class WholesaleServicePlanService {
 
     private final EntityManager entityManager;
     private final WholesaleServicePlanRepository wholesaleServicePlanRepository;
     private final WholesaleUserPlansRepository wholesaleUserPlansRepository;
     private final WholesaleUserHbRepository wholesaleUserHbRepository;
     private final WholesaleFuturePlansRepository wholesaleFuturePlansRepository;
-      
-  private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanService.class);
+    private final WholesaleServicePlanMapper wholesaleServicePlanMapper;
+    private final WholesalerPlanMapper wholesalerPlanMapper;
 
-    public List<ServicePlan> getAllServicePlan() {
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanService.class);
+
+    @Transactional
+    public List<WholesaleServicePlanDto> getAllServicePlan() {
         logger.debug("Starting getALlServicePlan method");
-        List<ServicePlan> servicePlans = wholesaleServicePlanRepository.findAll().stream().filter(servicePlan -> servicePlan.getPrice() > 0).toList();
+        List<WholesaleServicePlanDto> servicePlans = wholesaleServicePlanRepository.findAll().stream().filter(servicePlan -> servicePlan.getPrice() > 0).map(wholesaleServicePlanMapper::toDto).toList();
         logger.debug("Completed getALlServicePlan method");
         return servicePlans;
     }
 
-    public ServicePlan findBySlug(String slug) {
+    @Transactional
+    public WholesaleServicePlanDto findBySlug(String slug) {
         logger.debug("Starting findBySlug method with params: {}", slug);
         ServicePlan servicePlan = wholesaleServicePlanRepository.findBySlug(slug);
         logger.debug("Completed findBySlug method");
-        return servicePlan;
+        return wholesaleServicePlanMapper.toDto(servicePlan);
     }
 
     public boolean isPlanActive(Integer userPlanId) {
@@ -73,10 +81,10 @@ public class WholesaleServicePlanService  {
         logger.debug("Starting assignOrAddFuturePlans method with userId: {}, servicePlanId: {}", userId, servicePlanId);
         Long currentMillis = Utils.getCurrentMillis();
         // Checking user last plan expired or not.
-        WholesalerPlans lastPlan = wholesaleUserPlansRepository.findLastPlanByUserId(userId,entityManager);
+        WholesalerPlans lastPlan = wholesaleUserPlansRepository.findLastPlanByUserId(userId, entityManager);
         ServicePlan plan = wholesaleServicePlanRepository.findById(servicePlanId).orElseThrow(() -> new NotFoundException("Plan not found."));
 
-        if(lastPlan !=null && lastPlan.getExpiryDate() > currentMillis){ // if last plans is not expired.
+        if (lastPlan != null && lastPlan.getExpiryDate() > currentMillis) { // if last plans is not expired.
             logger.debug("Going to adding this plan as future plan.");
             WholesalerFuturePlan wholesalerFuturePlan = WholesalerFuturePlan.builder()
                     .userId(userId)
@@ -86,12 +94,11 @@ public class WholesaleServicePlanService  {
                     .createdAt(Utils.getCurrentMillis())
                     .build();
             wholesaleFuturePlansRepository.save(wholesalerFuturePlan);
-        }else { // Going to assign plan directly to user.
-            assignUserPlan(userId,plan);
+        } else { // Going to assign plan directly to user.
+            assignUserPlan(userId, plan);
         }
         logger.debug("Completed assignOrAddFuturePlans method");
     }
-
 
 
     public void assignUserPlan(int userId, ServicePlan plan) {
@@ -106,7 +113,7 @@ public class WholesaleServicePlanService  {
         WholesalerPlans userPlans = WholesalerPlans.builder()
                 .slug(UUID.randomUUID().toString())
                 .userId(userId)
-                .servicePlanId(plan.getId())
+                .servicePlan(plan)
                 .createdAt(currentMillis)
                 .expiryDate(expiryDate)
                 .createdBy(userId)
@@ -125,50 +132,49 @@ public class WholesaleServicePlanService  {
         logger.debug("Starting assignUserPlan(int userId, int servicePlanId) method with userId: {}, servicePlanId: {}", userId, servicePlanId);
         Long currentMillis = Utils.getCurrentMillis();
         ServicePlan plan = wholesaleServicePlanRepository.findById(servicePlanId).orElseThrow(() -> new NotFoundException("Service plan not found."));
-            logger.debug("Going to assign this plan as user current plan : {}.",servicePlanId);
-            Integer months = plan.getMonths();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(currentMillis);
-            calendar.add(Calendar.MONTH, months);
-            long expiryDate = calendar.getTimeInMillis();
-            WholesalerPlans userPlans = WholesalerPlans.builder()
-                    .slug(UUID.randomUUID().toString())
-                    .userId(userId)
-                    .servicePlanId(servicePlanId)
-                    .createdAt(currentMillis)
-                    .expiryDate(expiryDate)
-                    .createdBy(userId)
-                    .build();
-            WholesalerPlans userPlan = wholesaleUserPlansRepository.save(userPlans); // Create operation
-            int updated = wholesaleUserHbRepository.updateUserActivePlan(userId, userPlan.getId());// Update operation
-            if (updated < 1) {
-                throw new NotFoundException("No user found. to assign this plan.");
-            }
+        logger.debug("Going to assign this plan as user current plan : {}.", servicePlanId);
+        Integer months = plan.getMonths();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(currentMillis);
+        calendar.add(Calendar.MONTH, months);
+        long expiryDate = calendar.getTimeInMillis();
+        WholesalerPlans userPlans = WholesalerPlans.builder()
+                .slug(UUID.randomUUID().toString())
+                .userId(userId)
+                .servicePlan(plan)
+                .createdAt(currentMillis)
+                .expiryDate(expiryDate)
+                .createdBy(userId)
+                .build();
+        WholesalerPlans userPlan = wholesaleUserPlansRepository.save(userPlans); // Create operation
+        int updated = wholesaleUserHbRepository.updateUserActivePlan(userId, userPlan.getId());// Update operation
+        if (updated < 1) {
+            throw new NotFoundException("No user found. to assign this plan.");
+        }
         logger.debug("Completed assignUserPlan method.");
     }
 
 
-    public Page<WholesalerPlans> getAllUserPlans(AuthUser loggedUser, UserPlanDto searchFilters) {
+    @Transactional
+    public Page<WholesalerPlanDto> getAllUserPlans(AuthUser loggedUser, UserPlanRequest searchFilters) {
         logger.debug("Starting getAllUserPlans method with loggedUser: {}, searchFilters: {}", loggedUser, searchFilters);
         Specification<WholesalerPlans> specification = Specification.allOf(
                 hasSlug(searchFilters.getSlug())
-                .and(greaterThanOrEqualCreatedFromDate(searchFilters.getCreatedFromDate()))
-                .and(lessThanOrEqualToCreatedToDate(searchFilters.getCreatedToDate()))
-                .and(greaterThanOrEqualExpiredFromDate(searchFilters.getExpiredFromDate()))
-                .and(lessThanOrEqualToExpiredToDate(searchFilters.getExpiredToDate()))
-                .and(isStatus(searchFilters.getStatus()))
-                .and(isUserId(loggedUser.getId()))
+                        .and(greaterThanOrEqualCreatedFromDate(searchFilters.getCreatedFromDate()))
+                        .and(lessThanOrEqualToCreatedToDate(searchFilters.getCreatedToDate()))
+                        .and(greaterThanOrEqualExpiredFromDate(searchFilters.getExpiredFromDate()))
+                        .and(lessThanOrEqualToExpiredToDate(searchFilters.getExpiredToDate()))
+                        .and(isStatus(searchFilters.getStatus()))
+                        .and(isUserId(loggedUser.getId()))
         );
-        Pageable pageable = getPageable(logger,searchFilters);
-        Page<WholesalerPlans> userPlans = wholesaleUserPlansRepository.findAll(specification,pageable);
-        List<WholesalerPlans> userPlansList = userPlans.getContent().stream().map(wholesalerPlan -> {
-            if(Objects.nonNull(wholesalerPlan)) {
+        Pageable pageable = getPageable(logger, searchFilters);
+        Page<WholesalerPlans> userPlans = wholesaleUserPlansRepository.findAll(specification, pageable);
+        Page<WholesalerPlanDto> wholesalerPlans = userPlans.map(wholesalerPlan -> {
+            if (Objects.nonNull(wholesalerPlan)) {
                 wholesalerPlan.setExpired(wholesalerPlan.getExpiryDate() < Utils.getCurrentMillis());
             }
-            return wholesalerPlan;
-        }).toList();
-        long totalElements = userPlans.getTotalElements();
-        Page<WholesalerPlans> wholesalerPlans = new PageImpl<>(userPlansList,pageable,totalElements);
+            return wholesalerPlanMapper.toDto(wholesalerPlan);
+        });
         logger.debug("Completed getAllUserPlans method");
         return wholesalerPlans;
     }
@@ -181,12 +187,12 @@ public class WholesaleServicePlanService  {
     }
 
 
-    public int updatedUserCurrentPlan(String plansSlug,AuthUser loggedUser) {
+    public int updatedUserCurrentPlan(String plansSlug, AuthUser loggedUser) {
         logger.debug("Starting updatedUserCurrentPlan method.");
-        Integer wholesaleUserPlanId = wholesaleUserPlansRepository.getWholesaleUserPlanId(loggedUser.getId(),plansSlug);
-        if(wholesaleUserPlanId == null) throw new IllegalArgumentException("Not a valid active plan.");
-        int isUpdated = wholesaleUserHbRepository.updateUserActivePlan(loggedUser.getId(),wholesaleUserPlanId);
-        logger.debug("Completed updatedUserCurrentPlan method with isUpdated  : {}.",isUpdated);
+        Integer wholesaleUserPlanId = wholesaleUserPlansRepository.getWholesaleUserPlanId(loggedUser.getId(), plansSlug);
+        if (wholesaleUserPlanId == null) throw new IllegalArgumentException("Not a valid active plan.");
+        int isUpdated = wholesaleUserHbRepository.updateUserActivePlan(loggedUser.getId(), wholesaleUserPlanId);
+        logger.debug("Completed updatedUserCurrentPlan method with isUpdated  : {}.", isUpdated);
         return isUpdated;
     }
 

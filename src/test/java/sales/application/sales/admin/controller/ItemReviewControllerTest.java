@@ -39,7 +39,7 @@ public class ItemReviewControllerTest extends TestUtil {
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         ).andDo(print());
     }
 

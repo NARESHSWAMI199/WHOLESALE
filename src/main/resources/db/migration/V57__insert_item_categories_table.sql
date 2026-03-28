@@ -1,4 +1,5 @@
 INSERT IGNORE INTO item_categories (id, slug, category, icon, is_deleted) VALUES
+(0,'other','Other',NULL,'N'),
 (1,'groceries','Groceries',NULL,'N'),
 (2,'fruits-vegetables','Fruits & Vegetables',NULL,'N'),
 (3,'dairy-bakery','Dairy & Bakery',NULL,'N'),

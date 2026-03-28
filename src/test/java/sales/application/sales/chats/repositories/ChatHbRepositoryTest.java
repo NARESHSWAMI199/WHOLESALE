@@ -3,7 +3,7 @@ package sales.application.sales.chats.repositories;
 import com.sales.SalesApplication;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
-import com.sales.dto.MessageDto;
+import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

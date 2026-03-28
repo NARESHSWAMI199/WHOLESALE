@@ -1,12 +1,12 @@
 package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.StoreDto;
+import com.sales.request.StoreCreationRequest;
 import com.sales.entities.StoreNotifications;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -51,7 +51,7 @@ public class StoreHbRepository {
         return query.executeUpdate();
     }
 
-    public int updateStore(StoreDto storeDto, AuthUser loggedUser){
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
         String strQuery = """
                 update Store set
                     storeName=:name,
@@ -67,16 +67,16 @@ public class StoreHbRepository {
                 """;
 
         Query query = entityManager.createQuery(strQuery);
-        query.setParameter("name", storeDto.getStoreName());
-        query.setParameter("email", storeDto.getStoreEmail());
-        query.setParameter("phone", storeDto.getStorePhone());
-        query.setParameter("rating", storeDto.getRating());
-        query.setParameter("storeCategory", storeDto.getStoreCategory());
-        query.setParameter("storeSubCategory", storeDto.getStoreSubCategory());
-        query.setParameter("description", storeDto.getDescription());
+        query.setParameter("name", storeCreationRequest.getStoreName());
+        query.setParameter("email", storeCreationRequest.getStoreEmail());
+        query.setParameter("phone", storeCreationRequest.getStorePhone());
+        query.setParameter("rating", storeCreationRequest.getRating());
+        query.setParameter("storeCategory", storeCreationRequest.getStoreCategory());
+        query.setParameter("storeSubCategory", storeCreationRequest.getStoreSubCategory());
+        query.setParameter("description", storeCreationRequest.getDescription());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
         query.setParameter("updatedBy", loggedUser.getId());
-        query.setParameter("slug", storeDto.getStoreSlug());
+        query.setParameter("slug", storeCreationRequest.getStoreSlug());
         return query.executeUpdate();
     }
 

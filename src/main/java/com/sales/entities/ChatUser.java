@@ -23,7 +23,7 @@ public class ChatUser implements Serializable {
     @Column(name = "user_id")
     Integer userId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "chat_user_id")
     User chatUser;
 

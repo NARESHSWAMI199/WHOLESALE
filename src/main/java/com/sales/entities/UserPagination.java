@@ -1,5 +1,6 @@
 package com.sales.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,11 +22,13 @@ public class UserPagination implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @JsonIgnore
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name="pagination_id")
-    private Integer paginationId;
+    @ManyToOne
+    @JoinColumn(name="pagination_id")
+    private Pagination pagination;
 
     @Column(name="rows_number")
     private Integer rowsNumber;

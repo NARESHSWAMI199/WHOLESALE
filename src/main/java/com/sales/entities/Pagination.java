@@ -1,5 +1,6 @@
 package com.sales.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,8 @@ public class Pagination implements Serializable {
     int id;
     @Column(name = "field_for")
     String fieldFor;
+
+    @JsonIgnore
     @Column(name = "can_see")
     String canSee;
 

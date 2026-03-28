@@ -24,11 +24,11 @@ public class ItemReport implements Serializable {
     @Column(name = "item_id")
     Long itemId;
 
-    @OneToOne(fetch=FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "category_id")
     ReportCategory reportCategory;
 
-    @OneToOne(fetch =FetchType.EAGER )
+    @ManyToOne(fetch =FetchType.LAZY )
     @JoinColumn(name = "user_id")
     User user;
 

@@ -1,8 +1,10 @@
 package com.sales.admin.services;
 
+import com.sales.admin.dto.ItemReviewDto;
+import com.sales.admin.mapper.ItemReviewMapper;
 import com.sales.admin.repositories.ItemReviewRepository;
-import com.sales.dto.ItemReviewsFilterDto;
 import com.sales.entities.ItemReviews;
+import com.sales.request.ItemReviewsFilterRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.ItemReviewSpecifications.*;
@@ -20,11 +23,12 @@ import static com.sales.specifications.ItemReviewSpecifications.*;
 public class ItemReviewService {
 
     private final ItemReviewRepository itemReviewRepository;
-
+    private final ItemReviewMapper itemReviewMapper;
   
   private static final Logger logger = LoggerFactory.getLogger(ItemReviewService.class);
 
-    public Page<ItemReviews> getAllItemReview(ItemReviewsFilterDto filters) {
+    @Transactional(readOnly = true)
+    public Page<ItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters) {
         logger.debug("Entering getALlItemReview with filters: {}", filters);
         Specification<ItemReviews> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))
@@ -35,7 +39,8 @@ public class ItemReviewService {
                         .and(isParentComment(filters.getParentId()))
         );
         Pageable pageable = getPageable(logger,filters);
-        return itemReviewRepository.findAll(specification,pageable);
+        Page<ItemReviews> itemReviewsPage = itemReviewRepository.findAll(specification,pageable);
+        return itemReviewsPage.map(itemReviewMapper::toDto);
     }
 
 

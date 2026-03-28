@@ -2,11 +2,11 @@ package com.sales.wholesaler.controller;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.SearchFilters;
-import com.sales.entities.WholesalerFuturePlan;
+import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
+import com.sales.wholesaler.dto.WholesalerFuturePlanDto;
 import com.sales.wholesaler.services.WholesaleFuturePlansService;
 import com.sales.wholesaler.services.WholesaleUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,9 +40,9 @@ public class WholesaleFuturePlansController  {
     @PostMapping("/")
 //    @PreAuthorize("hasAuthority('wholesale.furture.plans.all')")
     @Operation(summary = "Get all future plans", description = "Retrieves a paginated list of all future plans for the wholesaler")
-    public ResponseEntity<Page<WholesalerFuturePlan>> getAllWholesalerFuturePlans(HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
+    public ResponseEntity<Page<WholesalerFuturePlanDto>> getAllWholesalerFuturePlans(HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
         AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken, wholesaleUserService);
-        Page<WholesalerFuturePlan> wholesalerFuturePlans = wholesaleFuturePlansService.getWholesalerFuturePlans(loggedUser,searchFilters);
+        Page<WholesalerFuturePlanDto> wholesalerFuturePlans = wholesaleFuturePlansService.getWholesalerFuturePlans(loggedUser,searchFilters);
         return new ResponseEntity<>(wholesalerFuturePlans, HttpStatusCode.valueOf(200));
     }
 

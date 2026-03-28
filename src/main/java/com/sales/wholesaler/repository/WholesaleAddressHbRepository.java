@@ -2,13 +2,13 @@ package com.sales.wholesaler.repository;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.dto.AddressDto;
+import com.sales.request.AddressRequest;
 import com.sales.entities.City;
 import com.sales.entities.State;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,23 +21,25 @@ public class WholesaleAddressHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateAddress(AddressDto addressDto, AuthUser loggedUser){
-        String hqQuery ="update Address set " +
-                "city =:city,"+
-                "state =:state," +
-                "latitude =:latitude," +
-                "altitude =:altitude, " +
-                "updatedAt =:updatedAt, " +
-                "updatedBy =:updatedBy " +
-                "where id =:id ";
+    public int updateAddress(AddressRequest addressRequest, AuthUser loggedUser){
+        String hqQuery ="""
+                UPDATE Address SET
+                    city.id =:city,
+                    state.id =:state,
+                    latitude =:latitude,
+                    altitude =:altitude,
+                    updatedAt =:updatedAt,
+                    updatedBy =:updatedBy
+                WHERE id =:id 
+            """;
         Query query = entityManager.createQuery(hqQuery);
-        query.setParameter("city",addressDto.getCity());
-        query.setParameter("state",addressDto.getState());
-        query.setParameter("latitude",addressDto.getLatitude());
-        query.setParameter("altitude",addressDto.getAltitude());
+        query.setParameter("city",addressRequest.getCity());
+        query.setParameter("state",addressRequest.getState());
+        query.setParameter("latitude",addressRequest.getLatitude());
+        query.setParameter("altitude",addressRequest.getAltitude());
         query.setParameter("updatedBy", loggedUser.getId());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
-        query.setParameter("id",addressDto.getAddressId());
+        query.setParameter("id",addressRequest.getAddressId());
         return  query.executeUpdate();
     }
 

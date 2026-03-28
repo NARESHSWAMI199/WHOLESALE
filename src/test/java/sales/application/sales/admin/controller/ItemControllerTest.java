@@ -213,7 +213,7 @@ public class ItemControllerTest extends TestUtil {
                         .headers(headers)
                 )
                 .andExpectAll(
-                        status().is(404)
+                        status().is(400)
                 )
                 .andDo(print());
     }
@@ -258,7 +258,7 @@ public class ItemControllerTest extends TestUtil {
                 .content(json)
                 .headers(headers)
         ).andExpectAll(
-                status().is(406)
+                status().is(400)
         );
     }
 
@@ -283,8 +283,8 @@ public class ItemControllerTest extends TestUtil {
 
         List categoryList = extractCategoryListFromResponse(result);
         if(!categoryList.isEmpty()) {
-            Map<String, Object> categoryDto = (Map<String, Object>) categoryList.get(0);
-            Integer categoryId = (Integer) categoryDto.get("id");
+            Map<String, Object> categoryRequest = (Map<String, Object>) categoryList.get(0);
+            Integer categoryId = (Integer) categoryRequest.get("id");
 
             // Getting subcategories also
             headers.set(GlobalConstant.AUTHORIZATION, token);
@@ -509,7 +509,7 @@ public class ItemControllerTest extends TestUtil {
         mockMvc.perform(get("/admin/item/detail/{slug}", "nonexistent")
                 .headers(headers)
         ).andExpectAll(
-                status().is(404),
+                status().is(400),
                 jsonPath("$.message", is("Item Not Found"))
         );
     }

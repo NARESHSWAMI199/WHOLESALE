@@ -1,15 +1,16 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.GroupDto;
+import com.sales.admin.dto.PermissionDto;
+import com.sales.admin.mapper.GroupMapper;
+import com.sales.admin.mapper.PermissionMapper;
 import com.sales.admin.repositories.GroupRepository;
 import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.dto.DeleteDto;
-import com.sales.dto.GroupDto;
-import com.sales.dto.SearchFilters;
-import com.sales.dto.UserPermissionsDto;
+import com.sales.request.*;
 import com.sales.entities.Group;
 import com.sales.entities.Permission;
 import com.sales.exceptions.NotFoundException;
@@ -17,7 +18,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.utils.Utils;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,13 @@ public class GroupService {
     private final PermissionRepository permissionRepository;
     private final PermissionHbRepository permissionHbRepository;
     private final UserCacheService userCacheService;
-    
+    private final GroupMapper groupMapper;
+    private final PermissionMapper permissionMapper;
+
     private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
-    public Page<Group> getAllGroups(SearchFilters filters, AuthUser loggedUser) {
+    @Transactional(readOnly = true)
+    public Page<GroupDto> getAllGroups(GroupFilterRequest filters, AuthUser loggedUser) {
         logger.debug("Entering getAllGroups with filters: {}, loggedUser: {}", filters, loggedUser);
         Specification<Group> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))
@@ -57,43 +61,45 @@ public class GroupService {
                         .and(hasSlug(filters.getSlug()))
                         .and(notSuperAdmin(loggedUser))
         );
-        Pageable pageable = getPageable(logger,filters);
+        Pageable pageable = getPageable(logger, filters);
         Page<Group> result = groupRepository.findAll(specification, pageable);
         logger.debug("Exiting getAllGroups with result: {}", result);
-        return result;
+        return result.map(groupMapper::toDto);
     }
 
-    public void validateRequiredFieldsForGroup(GroupDto groupDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering validateRequiredFieldsForGroup with groupDto: {}", groupDto);
+    public void validateRequiredFieldsForGroup(GroupRequest groupRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering validateRequiredFieldsForGroup with groupRequest: {}", groupRequest);
         List<String> requiredFields = new ArrayList<>(List.of("name"));
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(groupDto, requiredFields);
+        Utils.checkRequiredFields(groupRequest, requiredFields);
         logger.debug("Exiting validateRequiredFieldsForGroup");
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, NotFoundException.class, RuntimeException.class, Exception.class})
-    public Map<String, Object> createOrUpdateGroup(GroupDto groupDto, AuthUser loggedUser, String path) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        logger.debug("Entering createOrUpdateGroup with groupDto: {}, loggedUser: {}, path: {}", groupDto, loggedUser, path);
+    @Transactional(rollbackFor = {IllegalArgumentException.class, NotFoundException.class, RuntimeException.class, Exception.class})
+    public Map<String, Object> createOrUpdateGroup(GroupRequest groupRequest, AuthUser loggedUser, String path) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        logger.debug("Entering createOrUpdateGroup with groupRequest: {}, loggedUser: {}, path: {}", groupRequest, loggedUser, path);
         Map<String, Object> responseObject = new HashMap<>();
 
         // Validating the required fields if there is any required field is null then this is throw Exception
-        validateRequiredFieldsForGroup(groupDto);
+        validateRequiredFieldsForGroup(groupRequest);
 
         //Only super admin can create or update a group.
-        if(!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType())) throw new PermissionDeniedDataAccessException("You don't have permission to create or update a group. Please contact a super admin",new Exception());
+        if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
+            throw new PermissionDeniedDataAccessException("You don't have permission to create or update a group. Please contact a super admin", new Exception());
 
-        if (!Utils.isEmpty(groupDto.getSlug()) || path.contains("update")) {
+        if (!Utils.isEmpty(groupRequest.getSlug()) || path.contains("update")) {
             logger.debug("We are going to update the group.");
             // if there is any required field null then this will throw IllegalArgumentException
-            Utils.checkRequiredFields(groupDto, List.of("slug"));
+            Utils.checkRequiredFields(groupRequest, List.of("slug"));
 
-            Group group = groupRepository.findGroupBySlug(groupDto.getSlug());
+            Group group = groupRepository.findGroupBySlug(groupRequest.getSlug());
             if (group == null) throw new NotFoundException("No group found to update.");
-            if(group.getId() == GlobalConstant.groupId && loggedUser.getId() != GlobalConstant.suId) throw  new NotFoundException("There is nothing to update.");
+            if (group.getId() == GlobalConstant.groupId && loggedUser.getId() != GlobalConstant.suId)
+                throw new NotFoundException("There is nothing to update.");
 
             // Going to update existing group.
-            int isUpdated = permissionHbRepository.updateGroup(groupDto, group.getId(),loggedUser.getId() == GlobalConstant.suId);
-            if (isUpdated > 0 && group.getId() == GlobalConstant.groupId ) {
+            int isUpdated = permissionHbRepository.updateGroup(groupRequest, group.getId(), loggedUser.getId() == GlobalConstant.suId);
+            if (isUpdated > 0 && group.getId() == GlobalConstant.groupId) {
                 responseObject.put(ConstantResponseKeys.MESSAGE, "The group has been updated successfully. But dear " + loggedUser.getUsername() + " ji We are not able to remove permissions. from " + group.getName() + " New permissions updated.");
                 responseObject.put(ConstantResponseKeys.STATUS, 200);
             } else if (isUpdated > 0) {
@@ -104,16 +110,16 @@ public class GroupService {
                 responseObject.put(ConstantResponseKeys.STATUS, 404);
             }
             // Evict user from redis
-            userCacheService.deleteCacheUser(loggedUser.getSlug());
+            deleteCacheUser(loggedUser.getSlug());
         } else { // Going to insert a new group
             logger.debug("We are going to create the group.");
             Group group = new Group(loggedUser);
-            group.setName(groupDto.getName());
+            group.setName(groupRequest.getName());
             Group insertedGroup = groupRepository.save(group);
             // Updating given permissions.
-            permissionHbRepository.updatePermissions(insertedGroup.getId(), groupDto.getPermissions());
-            responseObject.put(ConstantResponseKeys.RES, insertedGroup);
-            responseObject.put(ConstantResponseKeys.MESSAGE, groupDto.getName() + " successfully created.");
+            permissionHbRepository.updatePermissions(insertedGroup.getId(), groupRequest.getPermissions());
+            responseObject.put(ConstantResponseKeys.RES, groupMapper.toDto(group));
+            responseObject.put(ConstantResponseKeys.MESSAGE, groupRequest.getName() + " successfully created.");
             responseObject.put(ConstantResponseKeys.STATUS, 201);
         }
         logger.debug("Exiting createOrUpdateGroup with responseObject: {}", responseObject);
@@ -143,10 +149,10 @@ public class GroupService {
 
     public Map<String, List<Object>> getAllPermissions() {
         logger.debug("Entering getAllPermissions");
-        List<Permission> permissionList = permissionRepository.findAll();
+        List<PermissionDto> permissionList = permissionRepository.findAll().stream().map(permissionMapper::toDto).toList();
         Map<String, List<Object>> formattedPermissions = new HashMap<>();
-        for (Permission permission : permissionList) {
-            String key = permission.getPermissionFor();
+        for (PermissionDto permission : permissionList) {
+            String key = permission.permissionFor();
             if (formattedPermissions.containsKey(key)) {
                 List<Object> addedPermissions = formattedPermissions.get(key);
                 addedPermissions.add(permission);
@@ -161,29 +167,37 @@ public class GroupService {
         return formattedPermissions;
     }
 
-    @Transactional(rollbackOn = {IllegalArgumentException.class, PermissionDeniedDataAccessException.class, RuntimeException.class, Exception.class})
-    public int deleteGroupBySlug(DeleteDto deleteDto, AuthUser loggedUser) throws Exception {
-        logger.debug("Entering deleteGroupBySlug with deleteDto: {}, loggedUser: {}", deleteDto, loggedUser);
+    @Transactional(rollbackFor = {IllegalArgumentException.class, PermissionDeniedDataAccessException.class, RuntimeException.class, Exception.class})
+    public int deleteGroupBySlug(DeleteRequest deleteRequest, AuthUser loggedUser) throws Exception {
+        logger.debug("Entering deleteGroupBySlug with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         // if there is any required field null then this will throw IllegalArgumentException
-        Utils.checkRequiredFields(deleteDto, List.of("slug"));
+        Utils.checkRequiredFields(deleteRequest, List.of("slug"));
 
         //Only super admin can create or update a group.
         if (!loggedUser.getUserType().equals("SA"))
             throw new PermissionDeniedDataAccessException("You don't have permission to delete a group. Please contact a super admin", null);
 
-        String slug = deleteDto.getSlug();
+        String slug = deleteRequest.getSlug();
         Group group = groupRepository.findGroupBySlug(slug);
         if (group == null) throw new NotFoundException("No group found to delete");
-        int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(),(loggedUser.getId() == GlobalConstant.suId));
+        int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(), (loggedUser.getId() == GlobalConstant.suId));
         logger.debug("Exiting deleteGroupBySlug with result: {}", result);
         return result;
     }
 
-    public int assignGroupsToUser(UserPermissionsDto userPermissionsDto, AuthUser loggedUser) throws Exception {
-        logger.debug("Entering assignGroupsToUser with userPermissionsDto: {}, loggedUser: {}", userPermissionsDto, loggedUser);
-        int userId = userPermissionsDto.getUserId();
-        int result = permissionHbRepository.assignGroupsToUser(userId, userPermissionsDto.getGroupList(), loggedUser);
+    public int assignGroupsToUser(UserPermissionsRequest userPermissionsRequest, AuthUser loggedUser) throws Exception {
+        logger.debug("Entering assignGroupsToUser with userPermissionsDto: {}, loggedUser: {}", userPermissionsRequest, loggedUser);
+        int userId = userPermissionsRequest.getUserId();
+        int result = permissionHbRepository.assignGroupsToUser(userId, userPermissionsRequest.getGroupList(), loggedUser);
         logger.debug("Exiting assignGroupsToUser with result: {}", result);
         return result;
+    }
+
+    private void deleteCacheUser(String slug) {
+        try {
+            userCacheService.evictCacheUser(slug);
+        } catch (Exception e) {
+            logger.warn("Facing issue when going to delete user from redis : {}", slug, e);
+        }
     }
 }

@@ -4,7 +4,7 @@ package com.sales.admin.controllers;
 import com.sales.admin.services.PaginationService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.UserPaginationDto;
+import com.sales.request.UserPaginationRequest;
 import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,11 +41,11 @@ public class PaginationController  {
     @PostMapping("update")
     @PreAuthorize("hasAnyAuthority('pagination.update','pagination.edit')")
     @Operation(summary = "Update pagination settings", description = "Updates the pagination row number settings for the user")
-    public ResponseEntity<Map<String,Object>> updatePaginationRowNumber(Authentication authentication,HttpServletRequest request, @RequestBody UserPaginationDto userPaginationDto) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String,Object>> updatePaginationRowNumber(Authentication authentication,HttpServletRequest request, @RequestBody UserPaginationRequest
+            userPaginationRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        userPaginationDto.setUserId(loggedUser.getId());
-        int updated = paginationService.updateUserPaginationRowsNumber(userPaginationDto);
+        int updated = paginationService.updateUserPaginationRowsNumber(userPaginationRequest,loggedUser);
         if(updated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE,"Pagination updated successfully");
             responseObj.put(ConstantResponseKeys.STATUS,200);

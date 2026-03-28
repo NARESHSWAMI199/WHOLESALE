@@ -8,7 +8,7 @@ import com.phonepe.sdk.pg.payments.v1.models.request.PgRefundRequest;
 import com.phonepe.sdk.pg.payments.v1.models.response.PgPaymentInstrument;
 import com.phonepe.sdk.pg.payments.v1.models.response.PgTransactionStatusResponse;
 import com.phonepe.sdk.pg.payments.v1.models.response.UPIPaymentInstrumentResponse;
-import com.sales.dto.PhonePeDto;
+import com.sales.request.PhonePeDto;
 import com.sales.entities.PhonePeTrans;
 import com.sales.payment.repository.PhonePeHbRepository;
 import com.sales.payment.repository.PhonePeRepository;

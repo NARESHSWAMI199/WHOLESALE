@@ -3,8 +3,9 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.StoreWalletTransactionRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
-import com.sales.dto.SearchFilters;
-import com.sales.dto.WalletTransactionDto;
+import com.sales.request.SearchFilters;
+import com.sales.request.WalletFilterRequest;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
 import com.sales.exceptions.NotFoundException;
@@ -37,7 +38,7 @@ public class StoreWalletTransactionService {
 
 
 
-    public Page<WalletTransaction> getAllWalletTransactionByUserId(SearchFilters searchFilters,String userSlug){
+    public Page<WalletTransaction> getAllWalletTransactionByUserId(WalletFilterRequest searchFilters, String userSlug){
         Integer userId = userRepository.getUserIdBySlug(userSlug);
         if (userId == null) throw new NotFoundException("User not found.");
         Specification<WalletTransaction> specification = Specification.allOf(
@@ -52,7 +53,7 @@ public class StoreWalletTransactionService {
 
 
 
-    public WalletTransaction addWalletTransaction(WalletTransactionDto walletTransactionDto,Integer userId) {
+    public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto, Integer userId) {
         logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())

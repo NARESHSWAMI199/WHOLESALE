@@ -3,7 +3,7 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.dto.GraphDto;
+import com.sales.request.GraphRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.wholesaler.services.WholesaleItemService;
 import com.sales.wholesaler.services.WholesaleStoreService;
@@ -54,12 +54,12 @@ public class WholesaleDashboardController  {
     @PostMapping("graph/months/")
     @PreAuthorize("hasAuthority('wallet.dashboard.graph')")
     @Operation(summary = "Get graph data by months", description = "Retrieves graph data for item counts by months based on filters for the wholesale store")
-    public ResponseEntity<Map<String, Object>> getAllGraphData(Authentication authentication, HttpServletRequest request, @RequestBody GraphDto graphDto) {
+    public ResponseEntity<Map<String, Object>> getAllGraphData(Authentication authentication, HttpServletRequest request, @RequestBody GraphRequest graphRequest) {
         logger.debug("Starting getAllGraphData method");
         Map<String,Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        responseObj.put(ConstantResponseKeys.RES ,wholesaleItemService.getItemCountByMonths(graphDto,storeId));
+        responseObj.put(ConstantResponseKeys.RES ,wholesaleItemService.getItemCountByMonths(graphRequest,storeId));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed getAllGraphData method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

@@ -10,6 +10,8 @@ public class GlobalConstant {
     public static String secretKey = "asdfghj123456789";
     public static int suId =1;
     public  static  int groupId = 1;
+    public static int OTHER_CATEGORY = 0;
+    public static int OTHER_SUBCATEGORY = 0;
     public static final String WHOLESALER_IMAGE_PATH = "/wholesale/auth/profile/";
     public static final String PATH_SEPARATOR = "/";
     public static final String STAFF_IMAGE_PATH = "/admin/auth/profile/";
@@ -35,7 +37,7 @@ public class GlobalConstant {
 
     public static final String ITEMS_NOT_UPDATED_PATH_FOR_ADMIN = "/admin/item/notUpdated/";
     public static final String ITEMS_NOT_UPDATED_PATH_FOR_WHOLESALE = "/wholesale/item/notUpdated/";
-    public static final String AUTH_TOKEN_PREFIX = "Beaver ";
+    public static final String AUTH_TOKEN_PREFIX = "Bearer ";
     public static final String AUTHORIZATION = "Authorization";
 
     public static final List<String> HEADERS_FOR_ITEMS = List.of("NAME","TOKEN","PRICE", "DISCOUNT","LABEL","CAPACITY","RATING","IN-STOCK","STATUS","CREATED-AT","UPDATED-AT");

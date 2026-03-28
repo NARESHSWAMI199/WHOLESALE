@@ -120,7 +120,7 @@ public class WriteExcelUtil {
                 String key = normalizeHeader(originalHeader);
 
                 Cell cell = row.createCell(colIdx);
-                String value = formatValue(key, data.get(key).get(rowIdx));
+                String value = formatValue(key, data.get(key) != null ? data.get(key).get(rowIdx) : "");
 
                 cell.setCellValue(value);
                 cell.setCellStyle(style);

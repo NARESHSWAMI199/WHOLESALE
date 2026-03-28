@@ -9,8 +9,8 @@ import com.cashfree.model.CustomerDetails;
 import com.cashfree.model.OrderEntity;
 import com.cashfree.model.OrderMeta;
 import com.sales.claims.AuthUser;
-import com.sales.dto.CashfreeDto;
-import com.sales.dto.CashfreeFilters;
+import com.sales.request.CashfreeRequest;
+import com.sales.request.CashfreeFilters;
 import com.sales.entities.CashfreeTrans;
 import com.sales.entities.ServicePlan;
 import com.sales.global.GlobalConstant;
@@ -74,15 +74,15 @@ public class CashfreeService {
     }
 
 
-    public void insertPaymentDetail(CashfreeDto cashfreeDto) {
+    public void insertPaymentDetail(CashfreeRequest cashfreeRequest) {
         CashfreeTrans cashfreeTrans = CashfreeTrans.builder()
-                .orderId(cashfreeDto.getOrderId())
-                .amount(String.valueOf(cashfreeDto.getAmount()))
-                .status(cashfreeDto.getStatus())
-                .currency(cashfreeDto.getCurrency())
-                .slug(cashfreeDto.getSlug())
-                .amount(String.valueOf(cashfreeDto.getAmount()))
-                .userId(cashfreeDto.getUserId())
+                .orderId(cashfreeRequest.getOrderId())
+                .amount(String.valueOf(cashfreeRequest.getAmount()))
+                .status(cashfreeRequest.getStatus())
+                .currency(cashfreeRequest.getCurrency())
+                .slug(cashfreeRequest.getSlug())
+                .amount(String.valueOf(cashfreeRequest.getAmount()))
+                .userId(cashfreeRequest.getUserId())
                 .createdAt(Utils.getCurrentMillis())
                 .build();
         cashfreeRepository.save(cashfreeTrans);
@@ -102,7 +102,7 @@ public class CashfreeService {
         String paymentGroup = payment.getString("payment_group");
         String paymentMethod = payment.getJSONObject("payment_method").toString();
 
-        CashfreeDto cashfreeDto = CashfreeDto.builder()
+        CashfreeRequest cashfreeRequest = CashfreeRequest.builder()
                 .orderId(orderId)
                 .slug(slug)
                 .cfPaymentId(cfPaymentId)
@@ -117,7 +117,7 @@ public class CashfreeService {
                 .actualResponse(paymentResponseStr)
                 .build();
 
-        int updatedRows = cashfreeHbRepository.updateCashfreePaymentDetail(cashfreeDto, userId);
+        int updatedRows = cashfreeHbRepository.updateCashfreePaymentDetail(cashfreeRequest, userId);
         logger.debug("Updated rows in updateCashfreeCallback. return by updatePaymentCallback -> {}", updatedRows);
         // The Active plan is payment status is successful
         if (paymentStatus.equals("SUCCESS")) wholesaleServicePlanService.assignOrAddFuturePlans(userId, servicePlanId);
@@ -126,8 +126,8 @@ public class CashfreeService {
     }
 
 
-    public OrderEntity getOrderEntityForCashfreePaymentForPlans(HttpServletRequest httpServletRequest, CashfreeDto cashfreeDto, AuthUser loggedUser, ServicePlan servicePlan, String givenRedirectUri, String env) throws ApiException {
-        logger.debug("Started getOrderEntityForCashfreePaymentForPlans with params : cashfreeDto : {} and loggedUser : {} and servicePlan : {} and redirectUri : {} and env : {}", cashfreeDto, loggedUser, servicePlan, givenRedirectUri, env);
+    public OrderEntity getOrderEntityForCashfreePaymentForPlans(HttpServletRequest httpServletRequest, CashfreeRequest cashfreeRequest, AuthUser loggedUser, ServicePlan servicePlan, String givenRedirectUri, String env) throws ApiException {
+        logger.debug("Started getOrderEntityForCashfreePaymentForPlans with params : cashfreeRequest : {} and loggedUser : {} and servicePlan : {} and redirectUri : {} and env : {}", cashfreeRequest, loggedUser, servicePlan, givenRedirectUri, env);
         long amount = (servicePlan.getPrice() - servicePlan.getDiscount());
         String slug = UUID.randomUUID().toString();
         logger.debug("amount {}", amount);
@@ -163,13 +163,13 @@ public class CashfreeService {
         logger.debug("Payment session ID generated successfully: {}", response.getData().getPaymentSessionId());
         logger.debug("The order id for payment : {}",response.getData().getOrderId());
 
-        cashfreeDto.setSlug(slug);
-        cashfreeDto.setAmount((double) amount);
-        cashfreeDto.setCurrency("INR");
-        cashfreeDto.setOrderId(response.getData().getOrderId());
-        cashfreeDto.setStatus("VISITED");
-        cashfreeDto.setUserId(loggedUser.getId());
-        insertPaymentDetail(cashfreeDto);
+        cashfreeRequest.setSlug(slug);
+        cashfreeRequest.setAmount((double) amount);
+        cashfreeRequest.setCurrency("INR");
+        cashfreeRequest.setOrderId(response.getData().getOrderId());
+        cashfreeRequest.setStatus("VISITED");
+        cashfreeRequest.setUserId(loggedUser.getId());
+        insertPaymentDetail(cashfreeRequest);
         logger.debug("Ended getOrderEntityForCashfreePaymentForPlans with -> {}",response.getData());
         return response.getData();
     }
@@ -177,8 +177,8 @@ public class CashfreeService {
 
 
 
-    public OrderEntity getOrderEntityForCashfreePaymentForWallet(HttpServletRequest httpServletRequest, CashfreeDto cashfreeDto, AuthUser loggedUser, Double amount, String givenRedirectUri, String env) throws ApiException {
-        logger.debug("Started getOrderEntityForCashfreePaymentForWallet with params : cashfreeDto : {} and loggedUser : {} and redirectUri : {} and env : {}", cashfreeDto.toString(), loggedUser.toString(), givenRedirectUri, env);
+    public OrderEntity getOrderEntityForCashfreePaymentForWallet(HttpServletRequest httpServletRequest, CashfreeRequest cashfreeRequest, AuthUser loggedUser, Double amount, String givenRedirectUri, String env) throws ApiException {
+        logger.debug("Started getOrderEntityForCashfreePaymentForWallet with params : cashfreeRequest : {} and loggedUser : {} and redirectUri : {} and env : {}", cashfreeRequest.toString(), loggedUser.toString(), givenRedirectUri, env);
 
         String slug = UUID.randomUUID().toString();
         logger.debug("amount {}", amount);
@@ -214,13 +214,13 @@ public class CashfreeService {
         logger.debug("Payment session ID generated successfully: {}", response.getData().getPaymentSessionId());
         logger.debug("The order id for payment : {}",response.getData().getOrderId());
 
-        cashfreeDto.setSlug(slug);
-        cashfreeDto.setAmount((double) amount);
-        cashfreeDto.setCurrency("INR");
-        cashfreeDto.setOrderId(response.getData().getOrderId());
-        cashfreeDto.setStatus("VISITED");
-        cashfreeDto.setUserId(loggedUser.getId());
-        insertPaymentDetail(cashfreeDto);
+        cashfreeRequest.setSlug(slug);
+        cashfreeRequest.setAmount((double) amount);
+        cashfreeRequest.setCurrency("INR");
+        cashfreeRequest.setOrderId(response.getData().getOrderId());
+        cashfreeRequest.setStatus("VISITED");
+        cashfreeRequest.setUserId(loggedUser.getId());
+        insertPaymentDetail(cashfreeRequest);
         logger.debug("Ended getOrderEntityForCashfreePaymentForWallet with -> {}",response.getData());
         return response.getData();
     }

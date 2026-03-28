@@ -104,3 +104,5 @@ excel:
     template : ${public_folder.get}/items_excels/update_items/update_item_template.xlsx
   notUpdated:
     absolute:  ${public_folder.absolute}/items_excels/not_updated_items/
+aes:
+  key : opiuytghjklmnbvcdfg1243567787654

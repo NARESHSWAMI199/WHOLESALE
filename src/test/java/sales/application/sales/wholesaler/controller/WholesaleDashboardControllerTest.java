@@ -46,7 +46,7 @@ public class WholesaleDashboardControllerTest extends TestUtil {
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         ).andDo(print());
     }
 
@@ -73,7 +73,7 @@ public class WholesaleDashboardControllerTest extends TestUtil {
     public void testCountWithoutLogin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/dashboard/counts")
         ).andExpectAll(
-                status().is(403)
+                status().is(401)
         ).andDo(print());
     }
 

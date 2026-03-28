@@ -25,6 +25,7 @@ INSERT IGNORE INTO store_permissions (permission, display_name, default_permissi
 
 -- ITEMS
 ('wholesale.item.template.download', 'Download Item Template', 'Y', 'Item'),
+('wholesale.item.not.updated.download', 'Download Not Updated Items', 'Y', 'Item'),
 ('wholesale.item.export', 'Export Items', 'Y', 'Item'),
 ('wholesale.item.import', 'Import Items', 'Y', 'Item'),
 ('wholesale.item.stock.update', 'Update Item Stock', 'Y', 'Item'),

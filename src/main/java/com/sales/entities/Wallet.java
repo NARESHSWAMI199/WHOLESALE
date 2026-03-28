@@ -18,15 +18,15 @@ public class Wallet implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
     @Column(name = "user_id")
-    Integer userId;
+    private Integer userId;
 
     @Column(name = "amount")
-    Float amount;
+    private Float amount;
 
     @Column(name = "updated_at")
-    Long updatedAt;
+    private Long updatedAt;
 
 }
