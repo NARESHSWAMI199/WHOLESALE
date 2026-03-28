@@ -493,7 +493,7 @@ public class WholesaleItemService {
         itemDetailMap.put("CAPACITY", capacityList.get(index));
         itemDetailMap.put("PRICE", priceList.get(index));
         itemDetailMap.put("DISCOUNT", discountList.get(index));
-        itemDetailMap.put("ITEM_STOCK", inStockList.get(index));
+        itemDetailMap.put("IN-STOCK", inStockList.get(index));
         return itemDetailMap;
     }
 
