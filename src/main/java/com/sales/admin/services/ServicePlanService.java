@@ -12,6 +12,7 @@ import com.sales.claims.AuthUser;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.specifications.PlansSpecifications;
@@ -148,13 +149,13 @@ public class ServicePlanService {
                 int isUpdated = servicePlanHbRepository.updateServicePlansStatus(status, statusRequest.getSlug(), loggedUser);
                 if (isUpdated > 0) {
                     if (status.equals("A")) {
-                        result.put(ConstantResponseKeys.MESSAGE, "Successfully Activated.");
+                        result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_ACTIVATED);
                     } else {
-                        result.put(ConstantResponseKeys.MESSAGE, "Successfully Deactivated.");
+                        result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_DEACTIVATED);
                     }
                     result.put(ConstantResponseKeys.STATUS, 200);
                 } else {
-                    result.put(ConstantResponseKeys.MESSAGE, "No plan found to update.");
+                    result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_PLAN_FOUND_TO_UPDATE);
                     result.put(ConstantResponseKeys.STATUS, 404);
                 }
                 logger.debug("Exiting updateServicePlanStatus with result: {}", result);
@@ -173,10 +174,10 @@ public class ServicePlanService {
         if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator.",new Exception());
         int isUpdated = servicePlanHbRepository.deleteServicePlan(slug, loggedUser);
         if(isUpdated > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"Service plan successfully deleted.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SERVICE_PLAN_SUCCESSFULLY_DELETED);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"No service plan found to delete.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_SERVICE_PLAN_FOUND_TO_DELETE);
             result.put(ConstantResponseKeys.STATUS,404);
         }
         logger.debug("Exiting deletedServicePlan with result: {}", result);

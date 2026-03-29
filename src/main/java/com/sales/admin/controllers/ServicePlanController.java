@@ -9,6 +9,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.entities.ServicePlan;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.request.*;
 import com.sales.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,7 +86,7 @@ public class ServicePlanController  {
         Map<String,Object> result = new HashMap<>();
         ServicePlan servicePlan = servicePlanService.insertServicePlan(loggedUser,servicePlanRequest);
         result.put(ConstantResponseKeys.RES,servicePlan);
-        result.put(ConstantResponseKeys.MESSAGE,"Service plan added successfully.");
+        result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SERVICE_PLAN_ADDED_SUCCESSFULLY);
         result.put(ConstantResponseKeys.STATUS , 201);
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }

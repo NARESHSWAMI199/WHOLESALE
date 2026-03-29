@@ -12,10 +12,10 @@ import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.request.*;
 import com.sales.entities.Group;
-import com.sales.entities.Permission;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.utils.Utils;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,13 +100,14 @@ public class GroupService {
             // Going to update existing group.
             int isUpdated = permissionHbRepository.updateGroup(groupRequest, group.getId(), loggedUser.getId() == GlobalConstant.suId);
             if (isUpdated > 0 && group.getId() == GlobalConstant.groupId) {
-                responseObject.put(ConstantResponseKeys.MESSAGE, "The group has been updated successfully. But dear " + loggedUser.getUsername() + " ji We are not able to remove permissions. from " + group.getName() + " New permissions updated.");
+                responseObject.put(ConstantResponseKeys.MESSAGE,
+                        ResponseMessages.THE_GROUP_HAS_BEEN_UPDATED_SUCCESSFULLY_BUT_DEAR + " " + loggedUser.getUsername() + " ji We are not able to remove permissions. from " + group.getName() + " " + ResponseMessages.NEW_PERMISSIONS_UPDATED);
                 responseObject.put(ConstantResponseKeys.STATUS, 200);
             } else if (isUpdated > 0) {
-                responseObject.put(ConstantResponseKeys.MESSAGE, "The group has been updated successfully.");
+                responseObject.put(ConstantResponseKeys.MESSAGE, ResponseMessages.THE_GROUP_HAS_BEEN_UPDATED_SUCCESSFULLY);
                 responseObject.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                responseObject.put(ConstantResponseKeys.MESSAGE, "No record found to update.");
+                responseObject.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND_TO_UPDATE);
                 responseObject.put(ConstantResponseKeys.STATUS, 404);
             }
             // Evict user from redis
@@ -119,7 +120,7 @@ public class GroupService {
             // Updating given permissions.
             permissionHbRepository.updatePermissions(insertedGroup.getId(), groupRequest.getPermissions());
             responseObject.put(ConstantResponseKeys.RES, groupMapper.toDto(group));
-            responseObject.put(ConstantResponseKeys.MESSAGE, groupRequest.getName() + " successfully created.");
+            responseObject.put(ConstantResponseKeys.MESSAGE, groupRequest.getName() + " " + ResponseMessages.SUCCESSFULLY_CREATED);
             responseObject.put(ConstantResponseKeys.STATUS, 201);
         }
         logger.debug("Exiting createOrUpdateGroup with responseObject: {}", responseObject);

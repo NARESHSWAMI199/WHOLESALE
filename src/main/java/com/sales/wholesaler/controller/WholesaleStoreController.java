@@ -5,6 +5,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.request.SearchFilters;
 import com.sales.request.StoreCreationRequest;
@@ -160,10 +161,10 @@ public class WholesaleStoreController {
         AuthUser loggedUser = (SalesUser) Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
         Store isInserted = wholesaleStoreService.createStore(storeCreationRequest, loggedUser);
         if (isInserted.getId() > 0) {
-            result.put(ConstantResponseKeys.MESSAGE, "Store created successfully. Welcome in Swami Sales");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_CREATED_SUCCESSFULLY_WELCOME_IN_SWAMI_SALES);
             result.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         logger.debug("Completed addNewStore method");

@@ -8,6 +8,7 @@ import com.sales.entities.SupportEmail;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.request.*;
 import com.sales.utils.SecureAesUtil;
@@ -199,10 +200,10 @@ public class WholesaleUserService {
         if (isUpdated > 0) {
             //Evict wholesaler from redis
             deleteCacheUser(loggedUser.getSlug());
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No user found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_USER_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         logger.debug("Completed updateUserProfile method");

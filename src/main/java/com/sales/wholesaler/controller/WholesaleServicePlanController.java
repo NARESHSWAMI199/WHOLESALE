@@ -5,6 +5,7 @@ import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.request.UserPlanRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleServicePlanDto;
@@ -92,10 +93,10 @@ public class WholesaleServicePlanController  {
         Map<String,Object> result = new HashMap<>();
         int isUpdated = wholesaleServicePlanService.updatedUserCurrentPlan(planSlug,loggedUser);
         if(isUpdated > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"Your current plan activated successfully");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CURRENT_PLAN_ACTIVATED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
-            result.put(ConstantResponseKeys.MESSAGE,"No record found to update.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND_TO_UPDATE);
             result.put(ConstantResponseKeys.STATUS,404);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));

@@ -11,6 +11,7 @@ import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
@@ -109,10 +110,10 @@ public class WholesaleStoreService {
         }
         int isUpdated = updateStore(storeCreationRequest, loggedUser); // Update operation
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No store found to update");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_STORE_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         logger.debug("Completed updateStoreBySlug method");

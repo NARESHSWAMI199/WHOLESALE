@@ -6,6 +6,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.global.STATUS;
 import com.sales.jwtUtils.JwtToken;
@@ -110,7 +111,7 @@ public class WholesaleUserController {
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findUserByOtpAndEmail(loginRequest.getEmail(), loginRequest.getPassword());
         if (user == null) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WRONG_OTP_PASSWORD);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
@@ -124,7 +125,7 @@ public class WholesaleUserController {
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             wholesaleUserService.resetOtp(user.getEmail());
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "You are blocked by admin");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOU_ARE_BLOCKED_BY_ADMIN);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         }
         logger.debug("Completed loginUserViaOtp method");
@@ -149,7 +150,7 @@ public class WholesaleUserController {
         Map<String, Object> responseObj = new HashMap<>();
         User user = wholesaleUserService.findUserByOtpAndSlug(userDetails);
         if (user == null) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WRONG_OTP_PASSWORD);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.getStatus().equalsIgnoreCase("A")) {
             WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserId(user.getId());
@@ -164,7 +165,7 @@ public class WholesaleUserController {
             // setting blank otp
             wholesaleUserService.resetOtp(user.getEmail());
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "You are blocked by admin");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOU_ARE_BLOCKED_BY_ADMIN);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         }
         logger.debug("Completed validateUserOtp method");
@@ -188,10 +189,10 @@ public class WholesaleUserController {
         boolean sendOtp = wholesaleUserService.sendOtp(userRequest);
         if (sendOtp) {
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Otp sent successfully");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.OTP_SENT_SUCCESSFULLY);
         } else {
             responseObj.put(ConstantResponseKeys.STATUS, 400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->" + userRequest.getEmail());
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WE_FACING_SOME_ISSUE_TO_SEND_OTP_TO_THIS_MAIL + userRequest.getEmail());
         }
         logger.debug("Completed sendOtp method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -251,7 +252,7 @@ public class WholesaleUserController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         WholesaleUserDto updatedUserDto = wholesaleUserService.resetPasswordByUserSlugDto(passwordDto, loggedUser);
         responseObj.put(ConstantResponseKeys.RES, updatedUserDto);
-        responseObj.put(ConstantResponseKeys.MESSAGE, "User password has been successfully updated.");
+        responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_PASSWORD_HAS_BEEN_SUCCESSFULLY_UPDATED);
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed resetUserPasswordBySlug method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -268,11 +269,11 @@ public class WholesaleUserController {
         String imageName = wholesaleUserService.updateProfileImage(profileImage, loggedUser);
         if (imageName != null) {
             responseObj.put("imageName", imageName);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Profile image successfully updated");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PROFILE_IMAGE_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.STATUS, 406);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Not a valid profile image");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOT_A_VALID_PROFILE_IMAGE);
         }
         logger.debug("Completed updateProfileImage method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -312,7 +313,7 @@ public class WholesaleUserController {
         Map<String, Object> result = new HashMap<>();
         WholesaleUserDto insertedUserDto = wholesaleUserService.addNewUserDto(userRequest);
         result.put("user", insertedUserDto);
-        result.put(ConstantResponseKeys.MESSAGE, "User created successfully");
+        result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_CREATED_SUCCESSFULLY);
         result.put(ConstantResponseKeys.STATUS, 201);
         logger.debug("Completed addNewUser method");
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
@@ -332,10 +333,10 @@ public class WholesaleUserController {
         wholesaleUserService.updateLastSeen(loggedUser);
         GlobalConstant.onlineUsers.put(loggedUser.getSlug(), user);
         if (isUpdated > 0) {
-            result.put(ConstantResponseKeys.MESSAGE, "User's last seen successfully updated.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_S_LAST_SEEN_SUCCESSFULLY_UPDATED);
             result.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during updating last seen of user");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_UPDATING_LAST_SEEN_OF_USER);
             result.put(ConstantResponseKeys.STATUS, 500);
         }
         logger.debug("Completed updateUserLastSeen method");

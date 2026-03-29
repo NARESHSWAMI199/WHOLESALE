@@ -4,6 +4,7 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.entities.Wallet;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleWalletDto;
@@ -50,10 +51,10 @@ public class WholesaleWalletController  {
         Map<String,Object> result = new HashMap<>();
         boolean payment = wholesaleWalletService.paymentViaWallet(servicePlanSlug, loggedUser);
         if(payment){
-            result.put(ConstantResponseKeys.MESSAGE,"Plan purchased successfully.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLAN_PURCHASED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS,200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"Inefficient amount in wallet.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.INEFFICIENT_AMOUNT_IN_WALLET);
             result.put("status",400);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));

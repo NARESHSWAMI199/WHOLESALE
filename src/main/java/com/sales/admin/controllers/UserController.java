@@ -8,6 +8,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.*;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.jwtUtils.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
@@ -96,18 +97,18 @@ public class UserController  {
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser user = userService.findUserByOtpAndEmail(loginRequest.getEmail(),loginRequest.getPassword());
         if (user == null) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Wrong otp password.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WRONG_OTP_PASSWORD);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.isEnabled()) {
             Map<String, Object> paginations = paginationService.findUserPaginationsByUserId(user);
             responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully logged in.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_LOGGED_IN);
             responseObj.put("user", user);
             responseObj.put(ConstantResponseKeys.PAGINATIONS,paginations);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             userService.resetOtp(user.getUsername());
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "You are blocked by admin.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOU_ARE_BLOCKED_BY_ADMIN_1);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -129,10 +130,10 @@ public class UserController  {
         boolean sendOtp = userService.sendOtp(userRequest);
         if(sendOtp)  {
             responseObj.put(ConstantResponseKeys.STATUS,200);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Otp sent successfully");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.OTP_SENT_SUCCESSFULLY);
         }else {
             responseObj.put(ConstantResponseKeys.STATUS,400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "We facing some issue to send otp to this mail ->"+userRequest.getEmail());
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WE_FACING_SOME_ISSUE_TO_SEND_OTP_TO_THIS_MAIL+userRequest.getEmail());
         }
         return  new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
@@ -186,7 +187,7 @@ public class UserController  {
             responseObj.put(ConstantResponseKeys.RES, user);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "User not found.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_NOT_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -201,10 +202,10 @@ public class UserController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = userService.deleteUserBySlug(deleteRequest,loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "User has been successfully deleted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No user found to delete");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_USER_FOUND_TO_DELETE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -219,10 +220,10 @@ public class UserController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = userService.resetPasswordByUserSlug(passwordDto,loggedUser);
         if (isUpdated > 0 || loggedUser.getId() == GlobalConstant.suId) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "User password has been successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_PASSWORD_HAS_BEEN_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "There is nothing to update.recheck you parameters");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.THERE_IS_NOTHING_TO_UPDATE_RECHECK_YOU_PARAMETERS);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -237,10 +238,10 @@ public class UserController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = userService.updateStatusBySlug(statusRequest,loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "User's status updated successfully.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_S_STATUS_UPDATED_SUCCESSFULLY);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No user found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_USER_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -262,10 +263,10 @@ public class UserController  {
             if(imageName!=null) {
                 responseObj.put(ConstantResponseKeys.STATUS , 200);
                 responseObj.put("imageName",imageName);
-                responseObj.put(ConstantResponseKeys.MESSAGE , "Profile image successfully updated");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PROFILE_IMAGE_SUCCESSFULLY_UPDATED);
             }else {
                 responseObj.put(ConstantResponseKeys.STATUS  , 406);
-                responseObj.put(ConstantResponseKeys.MESSAGE , "Not a valid profile image");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOT_A_VALID_PROFILE_IMAGE);
             }
         } catch (Exception e) {
             responseObj.put(ConstantResponseKeys.MESSAGE, e.getMessage());
@@ -299,7 +300,7 @@ public class UserController  {
             responseObj.put("content", groupsIds);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "There is no groups.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.THERE_IS_NO_GROUPS);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -319,7 +320,7 @@ public class UserController  {
             responseObj.put("allPermissions", wholesalerAllPermissions);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "There is no permission for this user.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.THERE_IS_NO_PERMISSION_FOR_THIS_USER);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj,  HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

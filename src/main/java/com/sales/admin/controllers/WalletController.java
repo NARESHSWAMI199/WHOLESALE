@@ -4,6 +4,7 @@ package com.sales.admin.controllers;
 import com.sales.admin.dto.WalletDto;
 import com.sales.admin.services.WalletService;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,10 +44,10 @@ public class WalletController  {
         Map<String,Object> result = new HashMap<>();
         boolean payment = walletService.paymentViaWallet(servicePlanSlug, userSlug);
         if(payment){
-            result.put(ConstantResponseKeys.MESSAGE,"Plan purchased successfully.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLAN_PURCHASED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS,200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"Inefficient amount in wallet.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.INEFFICIENT_AMOUNT_IN_WALLET);
             result.put(ConstantResponseKeys.STATUS,400);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));

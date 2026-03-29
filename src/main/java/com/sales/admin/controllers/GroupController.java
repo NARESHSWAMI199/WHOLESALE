@@ -5,15 +5,14 @@ import com.sales.admin.dto.GroupDto;
 import com.sales.admin.services.GroupService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
+import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.request.DeleteRequest;
 import com.sales.request.GroupFilterRequest;
 import com.sales.request.GroupRequest;
-import com.sales.request.SearchFilters;
-import com.sales.global.ConstantResponseKeys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Map;
 @RequestMapping("group")
 @RequiredArgsConstructor
 @Tag(name = "Group Management", description = "APIs for managing user groups and permissions")
-public class GroupController  {
+public class GroupController {
 
     private final GroupService groupService;
     private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
@@ -40,7 +41,7 @@ public class GroupController  {
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('group.all')")
     @Operation(summary = "Get all groups", description = "Retrieves a paginated list of all groups with optional search filters")
-    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication,HttpServletRequest request, @RequestBody GroupFilterRequest searchFilters) {
+    public ResponseEntity<Page<GroupDto>> getAllGroup(Authentication authentication, HttpServletRequest request, @RequestBody GroupFilterRequest searchFilters) {
         logger.debug("Fetching all groups with filters: {}", searchFilters);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Page<GroupDto> groupDtoPage = groupService.getAllGroups(searchFilters, loggedUser);
@@ -60,7 +61,7 @@ public class GroupController  {
     @PostMapping(value = {"create", "update"})
     @PreAuthorize("hasAnyAuthority('group.permission.add','group.permission.update','group.permission.edit')")
     @Operation(summary = "Create or update group", description = "Creates a new group or updates an existing group based on the provided data")
-    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication,HttpServletRequest request, @RequestBody GroupRequest groupRequest) throws Exception {
+    public ResponseEntity<Map<String, Object>> createOrUpdate(Authentication authentication, HttpServletRequest request, @RequestBody GroupRequest groupRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Creating or updating group: {}", groupRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI();
@@ -84,16 +85,16 @@ public class GroupController  {
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('group.delete')")
     @Operation(summary = "Delete group", description = "Deletes a group by its slug")
-    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws Exception {
+    public ResponseEntity<Map<String, Object>> deleteGroupBySlug(Authentication authentication, HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws Exception {
         logger.debug("Deleting group with slug: {}", deleteRequest);
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = groupService.deleteGroupBySlug(deleteRequest, loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "User has been successfully deleted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No group found to delete");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_GROUP_FOUND_TO_DELETE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

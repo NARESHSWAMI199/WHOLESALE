@@ -4,6 +4,7 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesalerFuturePlanDto;
@@ -56,10 +57,10 @@ public class WholesaleFuturePlansController  {
         Map<String,Object> result = new HashMap<>();
         int activated = wholesaleFuturePlansService.activateWholesalerFuturePlans(loggedUser, slug);
         if(activated > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"Future plan activated successfully.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FUTURE_PLAN_ACTIVATED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
-            result.put(ConstantResponseKeys.MESSAGE,"No plan found to activate.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_PLAN_FOUND_TO_ACTIVATE);
             result.put(ConstantResponseKeys.STATUS,400); // it's bad request.
         }
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));

@@ -14,6 +14,7 @@ import com.sales.request.PhonePeDto;
 import com.sales.entities.PhonePeTrans;
 import com.sales.entities.ServicePlan;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.payment.service.PhonePeService;
@@ -102,7 +103,7 @@ public class PhonePeGatewayController {
         }
         catch (Exception e){
             logger.error("Exception occurred during payment via PhonePe: {}", e.getMessage());
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during payment. please contact to administrator.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_PAYMENT_PLEASE_CONTACT_TO_ADMINISTRATOR);
             result.put(ConstantResponseKeys.STATUS,500);
             logger.error("Exception occur in  payViaPhonePe :: {}", e.getMessage());
         }
@@ -155,7 +156,7 @@ public class PhonePeGatewayController {
             result.put(ConstantResponseKeys.STATUS,200);
         }  catch (Exception e){
             logger.error("Exception occurred during PhonePe callback: {}", e.getMessage());
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during phonepe callback. please contact to administrator.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_PHONEPE_CALLBACK_PLEASE_CONTACT_TO_ADMINISTRATOR);
             result.put(ConstantResponseKeys.STATUS,500);
             logger.error("Exception occur in  phonePeCallbackResponse :: {}", e.getMessage());
         }
@@ -175,7 +176,7 @@ public class PhonePeGatewayController {
             result.put(ConstantResponseKeys.STATUS,200);
         } catch (PhonePeException e){
             logger.error("Exception occurred during refund: {}", e.getMessage());
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during phonepe callback. please contact to administrator.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_PHONEPE_CALLBACK_PLEASE_CONTACT_TO_ADMINISTRATOR);
             result.put(ConstantResponseKeys.STATUS,500);
             logger.error("Exception occur in  getRefund :: {}", e.getMessage());
         }
