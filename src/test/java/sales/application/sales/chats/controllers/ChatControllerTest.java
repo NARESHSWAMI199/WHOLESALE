@@ -126,7 +126,7 @@ public class ChatControllerTest extends TestUtil {
                         .content(json)
                 )
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("deleted successfully"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Deleted successfully."));
 
         verify(chatService, times(1)).deleteMessage(any(), any());
     }
