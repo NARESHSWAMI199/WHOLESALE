@@ -6,6 +6,7 @@ import com.sales.claims.SalesUser;
 import com.sales.request.DeleteRequest;
 import com.sales.request.ItemFilterRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.helpers.ExcelHelper;
 import com.sales.requests.ItemRequest;
@@ -83,7 +84,7 @@ public class WholesaleItemController  {
             responseObj.put(ConstantResponseKeys.RES, wholesaleItemDto);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item Not Found");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_NOT_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         logger.debug("Completed getItem method");
@@ -131,10 +132,10 @@ public class WholesaleItemController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = wholesaleItemService.deleteItem(deleteRequest,loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_HAS_BEEN_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else{
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to delete.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_DELETE);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         logger.debug("Completed deleteItemBySlug method");
@@ -159,10 +160,10 @@ public class WholesaleItemController  {
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
         int isUpdated = wholesaleItemService.updateStock(params,storeId);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item's stock has been successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_S_STOCK_HAS_BEEN_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         }else{
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         logger.debug("Completed updateItemStock method");
@@ -203,7 +204,7 @@ public class WholesaleItemController  {
                 Map<String,List<String>> result = readExcel.getExcelDataInJsonFormat(excelSheet);
                 List<ItemHbRepository.ItemUpdateError> updateItemsError = wholesaleItemService.updateItemsWithExcel(result, user.getId());
                 if(updateItemsError.isEmpty()) {
-                    responseObj.put(ConstantResponseKeys.MESSAGE, "Items successfully updated.");
+                    responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEMS_SUCCESSFULLY_UPDATED);
                     responseObj.put(ConstantResponseKeys.STATUS, 200);
                     logger.debug("Items successfully updated : {} ",updateItemsError);
                 }else{
@@ -216,7 +217,7 @@ public class WholesaleItemController  {
                 }
 
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Please upload a valid excel file (.xls or .xlsx)!");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLEASE_UPLOAD_A_VALID_EXCEL_FILE_XLS_OR_XLSX);
                 responseObj.put(ConstantResponseKeys.STATUS, 400);
             }
         } catch (Exception e) {
@@ -239,7 +240,7 @@ public class WholesaleItemController  {
             String filePath = wholesaleItemService.createItemsExcelSheet(searchFilters,loggedUser);
             Path path = Paths.get(filePath);
             Resource resource = new UrlResource(path.toUri());
-            responseObj.put(ConstantResponseKeys.MESSAGE, "File successfully downloaded.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_SUCCESSFULLY_DOWNLOADED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             logger.debug("Response during export items excel sheet : {} ",responseObj);
             HttpHeaders headers = new HttpHeaders();

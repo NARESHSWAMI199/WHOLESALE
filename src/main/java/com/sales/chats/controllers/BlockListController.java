@@ -6,6 +6,7 @@ import com.sales.claims.SalesUser;
 import com.sales.entities.BlockedUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.wholesaler.services.WholesaleUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,10 +42,10 @@ public class BlockListController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         BlockedUser blockedUser = blockListService.addAUserInBlockList(loggedUser, recipient);
         if(blockedUser.getId() > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"User has been successfully blocked");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_BLOCKED);
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during block user");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_BLOCK_USER);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
@@ -59,10 +60,10 @@ public class BlockListController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         boolean unblocked = blockListService.removeUserFromBlockList(loggedUser.getId(), recipient);
         if(unblocked){
-            result.put(ConstantResponseKeys.MESSAGE,"User has been successfully unblocked");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_UNBLOCKED);
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during unblock user");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_UNBLOCK_USER);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));

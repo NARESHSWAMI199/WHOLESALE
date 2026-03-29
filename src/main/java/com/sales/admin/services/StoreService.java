@@ -13,6 +13,7 @@ import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
@@ -189,10 +190,10 @@ public class StoreService {
 
             int isUpdated = updateStore(storeCreationRequest, loggedUser);
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully updated.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Nothing found to updated.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOTHING_FOUND_TO_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 404);
             }
         } else {  // We are going to create a store.
@@ -212,7 +213,7 @@ public class StoreService {
             Store createdStore = createStore(storeCreationRequest, loggedUser);
             StoreDto storeDto = storeMapper.toDto(createdStore);
             responseObj.put(ConstantResponseKeys.RES, storeDto);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Store successfully inserted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_SUCCESSFULLY_INSERTED);
             responseObj.put(ConstantResponseKeys.STATUS, 201);
         }
         logger.debug("Exiting createOrUpdateStore");

@@ -7,6 +7,7 @@ import com.sales.request.ContactDto;
 import com.sales.entities.Contact;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,11 +51,11 @@ public class ContactController  {
         if(contact != null){
             logger.debug("Contact added successfully for user: {}", loggedUser.getId());
             result.put("contact",contact.getContactUser());
-            result.put(ConstantResponseKeys.MESSAGE,"Your contact has been successfully added.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CONTACT_HAS_BEEN_SUCCESSFULLY_ADDED);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else {
             logger.error("Failed to add contact for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during insert your contact");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_INSERT_YOUR_CONTACT);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
@@ -68,11 +69,11 @@ public class ContactController  {
         int contact = contactService.removeContact(loggedUser, contactDto.getContactSlug(),contactDto.getDeleteChats());
         if(contact>0){
             logger.debug("Contact removed successfully for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Your contact has been successfully removed.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CONTACT_HAS_BEEN_SUCCESSFULLY_REMOVED);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else {
             logger.error("Failed to removed contact for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"No contact found to delete.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_CONTACT_FOUND_TO_DELETE);
             result.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));

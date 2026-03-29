@@ -9,6 +9,7 @@ import com.sales.request.ContactDto;
 import com.sales.entities.ChatUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,11 +64,11 @@ public class ChatUserController  {
         ChatUser chatUser = chatUserService.addNewChatUser(loggedUser, contactDto.getContactSlug(),"A");
         if(chatUser != null){
             logger.debug("Chat user added successfully for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Your chat user has been successfully inserted");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_INSERTED);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else {
             logger.error("Failed to add chat user for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during insert your chat user");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_INSERT_YOUR_CHAT_USER);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
@@ -83,11 +84,11 @@ public class ChatUserController  {
         int contact = chatUserService.removeChatUser(loggedUser, contactDto.getContactSlug(),contactDto.getDeleteChats());
         if(contact>0){
             logger.debug("Chat user removed successfully for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Your Chat user has been successfully removed.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_REMOVED);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else {
             logger.error("Failed to removed Chat user for user: {}", loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"No Chat user found to delete.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_CHAT_USER_FOUND_TO_DELETE);
             result.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
@@ -111,7 +112,7 @@ public class ChatUserController  {
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
             logger.error("Failed to {} chat for user: {}", status, loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during "+status+" chat.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING + " " + status + " chat.");
             result.put(ConstantResponseKeys.STATUS,400);
         }
 

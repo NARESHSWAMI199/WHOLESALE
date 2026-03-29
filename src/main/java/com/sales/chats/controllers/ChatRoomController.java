@@ -6,6 +6,7 @@ import com.sales.claims.SalesUser;
 import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,10 +54,10 @@ public class ChatRoomController {
         Map<String,Object> result = new HashMap<>();
         int isUpdated = chatRoomService.updateRoom(chatRoomDto, loggedUser);
         if(isUpdated > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"Chat room updated successfully");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CHAT_ROOM_UPDATED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS,200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"No room found for : "+chatRoomDto.getSlug());
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ROOM_FOUND_FOR_WITH_SPACE + chatRoomDto.getSlug());
             result.put("status",404);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));

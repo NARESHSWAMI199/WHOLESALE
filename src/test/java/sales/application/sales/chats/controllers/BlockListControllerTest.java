@@ -54,7 +54,7 @@ public class BlockListControllerTest extends TestUtil {
         mockMvc.perform(get("/block/" + blockedUser.getSlug()).headers(headers))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(200)))
-                .andExpect(jsonPath("$.message", is("User has been successfully blocked")))
+                .andExpect(jsonPath("$.message", is("User has been successfully blocked.")))
                 .andDo(print());
     }
 
@@ -82,7 +82,7 @@ public class BlockListControllerTest extends TestUtil {
         mockMvc.perform(get("/unblock/" + blockedUser.getSlug()).headers(headers))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(200)))
-                .andExpect(jsonPath("$.message", is("User has been successfully unblocked")))
+                .andExpect(jsonPath("$.message", is("User has been successfully unblocked.")))
                 .andDo(print());
     }
 

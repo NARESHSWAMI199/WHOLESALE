@@ -15,6 +15,7 @@ import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
@@ -233,10 +234,10 @@ public class ItemService {
             // updating item images
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
                 responseObj.put(ConstantResponseKeys.STATUS, 404);
             }
         } else { // Going to create item
@@ -246,7 +247,7 @@ public class ItemService {
             Item createdItem = createItem(itemRequest, loggedUser);
             ItemDto cratedItemDto = itemMapper.toDto(createdItem);
             responseObj.put(ConstantResponseKeys.RES, cratedItemDto);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully inserted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_INSERTED);
             responseObj.put(ConstantResponseKeys.STATUS, 201);
         }
         logger.debug("Exiting createOrUpdateItem");

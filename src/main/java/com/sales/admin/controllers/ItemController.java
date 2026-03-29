@@ -11,6 +11,7 @@ import com.sales.claims.SalesUser;
 import com.sales.entities.MeasurementUnit;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
@@ -83,7 +84,7 @@ public class ItemController {
             responseObj.put(ConstantResponseKeys.RES, itemDto);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item Not Found");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_NOT_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -141,24 +142,24 @@ public class ItemController {
                 }
                 List<ItemHbRepository.ItemUpdateError> updateItemsError = itemService.updateItemsWithExcel(result, user.getId(), wholesaleId);
                 if (updateItemsError.isEmpty()) {
-                    responseObj.put(ConstantResponseKeys.MESSAGE, "Items successfully updated.");
+                    responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEMS_SUCCESSFULLY_UPDATED);
                     responseObj.put(ConstantResponseKeys.STATUS, 200);
                     logger.debug("Items successfully updated : {} ", updateItemsError);
                 } else {
                     String fileName = writeExcel.writeNotUpdatedItemsExcel(updateItemsError, GlobalConstant.HEADERS_NOT_UPDATED_ITEMS_EXCEL, wholesaleSlug);
                     responseObj.put("fileUrl", Utils.getHostUrl(request) + GlobalConstant.ITEMS_NOT_UPDATED_PATH_FOR_ADMIN + wholesaleSlug +
                             GlobalConstant.PATH_SEPARATOR + fileName);
-                    responseObj.put(ConstantResponseKeys.MESSAGE, "Some items are not updated.");
+                    responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOME_ITEMS_ARE_NOT_UPDATED);
                     responseObj.put(ConstantResponseKeys.STATUS, 200);
                     logger.debug("Some items are not updated : {} ", updateItemsError);
                 }
 
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Please add a proper file.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLEASE_ADD_A_PROPER_FILE);
                 responseObj.put(ConstantResponseKeys.STATUS, 400);
             }
         } catch (Exception e) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Not a valid sheet or something went. Recheck your sheet otherwise contact to administrator.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOT_A_VALID_SHEET_OR_SOMETHING_WENT_RECHECK_YOUR_SHEET_OTHERWISE_CONTACT_TO_ADMINISTRATOR);
             responseObj.put(ConstantResponseKeys.STATUS, 500);
             logger.error("Facing Exception during updating or importing item from excel sheet  ; {}", e.getMessage());
         }
@@ -184,13 +185,13 @@ public class ItemController {
                 String filePath = itemService.createItemsExcelSheet(searchFilters, wholesaleSlug, loggedUser);
                 Path path = Paths.get(filePath);
                 Resource resource = new UrlResource(path.toUri());
-                responseObj.put(ConstantResponseKeys.MESSAGE, "File successfully downloaded.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_SUCCESSFULLY_DOWNLOADED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
                 MediaType mediaType = MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                 return ResponseEntity.ok().contentType(mediaType).body(resource);
             } else {
                 logger.debug("wholeSlug : {}", wholesaleSlug);
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Store not exist.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_NOT_EXIST);
                 responseObj.put(ConstantResponseKeys.STATUS, 500);
             }
         } catch (Exception e) {
@@ -211,7 +212,7 @@ public class ItemController {
         Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         itemService.deleteItem(deleteRequest, loggedUser);
-        responseObj.put(ConstantResponseKeys.MESSAGE, "Item has been successfully deleted.");
+        responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_HAS_BEEN_SUCCESSFULLY_DELETED);
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
@@ -233,10 +234,10 @@ public class ItemController {
         Map<String, Object> responseObj = new HashMap<>();
         int isUpdated = itemService.updateStock(params.get("stock"), params.get("slug"));
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item's stock has been successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_S_STOCK_HAS_BEEN_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 400);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -252,10 +253,10 @@ public class ItemController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = itemService.updateStatusBySlug(statusRequest, loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item's status has been successfully updated.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_S_STATUS_HAS_BEEN_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -299,10 +300,10 @@ public class ItemController {
         if (updatedItemCategory != null) {
             result.put(ConstantResponseKeys.RES, updatedItemCategory); // during update and inserted for both
             if (categoryRequest.getId() != null && categoryRequest.getId() != 0) {
-                result.put(ConstantResponseKeys.MESSAGE, "Category successfully updated.");
+                result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_UPDATED);
                 result.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                result.put(ConstantResponseKeys.MESSAGE, "Category successfully inserted.");
+                result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_INSERTED);
                 result.put(ConstantResponseKeys.STATUS, 201);
             }
         }
@@ -319,10 +320,10 @@ public class ItemController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = itemService.deleteItemCategory(deleteRequest, loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item's category delete successfully.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_S_CATEGORY_DELETE_SUCCESSFULLY);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No category to found.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_CATEGORY_TO_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -360,10 +361,10 @@ public class ItemController {
         if (updateItemSubCategory != null) {
             result.put(ConstantResponseKeys.RES, updateItemSubCategory); // during update and inserted for both
             if (subCategoryRequest.getId() != null) {
-                result.put(ConstantResponseKeys.MESSAGE, "Category successfully updated.");
+                result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_UPDATED);
                 result.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                result.put(ConstantResponseKeys.MESSAGE, "Category successfully inserted.");
+                result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_INSERTED);
                 result.put(ConstantResponseKeys.STATUS, 201);
             }
         }
@@ -380,10 +381,10 @@ public class ItemController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isUpdated = itemService.deleteItemSubCategory(deleteRequest, loggedUser);
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Item's subcategory deleted successfully");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ITEM_S_SUBCATEGORY_DELETED_SUCCESSFULLY);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No subcategory found to delete.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_SUBCATEGORY_FOUND_TO_DELETE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

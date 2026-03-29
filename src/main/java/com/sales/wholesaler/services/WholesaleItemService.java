@@ -17,6 +17,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.DateUtils;
@@ -249,10 +250,10 @@ public class WholesaleItemService {
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             int isUpdated = updateItem(itemRequest, loggedUser); // Update operation
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "successfully updated.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "No item found to update.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
                 responseObj.put(ConstantResponseKeys.STATUS, 404);
             }
         } else {  // Going to crate Item
@@ -261,7 +262,7 @@ public class WholesaleItemService {
             Item createdItem = createItem(itemRequest, loggedUser); // Create operation
             WholesaleItemDto wholesaleItemDto = wholesaleItemMapper.toDto(createdItem);
             responseObj.put(ConstantResponseKeys.RES, wholesaleItemDto);
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Successfully inserted.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_INSERTED);
             responseObj.put(ConstantResponseKeys.STATUS, 201);
         }
         logger.debug("Completed createOrUpdateItem method");

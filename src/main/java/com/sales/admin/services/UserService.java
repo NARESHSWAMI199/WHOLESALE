@@ -13,6 +13,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
@@ -331,10 +332,10 @@ public class UserService {
             if (isUpdated > 0) {
                 // Evict updated user from redis
                 deleteCacheUser(userRequest.getSlug());
-                responseObj.put(ConstantResponseKeys.MESSAGE, "User successfully updated.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Nothing to updated. may be something went wrong");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOTHING_TO_UPDATED_MAY_BE_SOMETHING_WENT_WRONG);
                 responseObj.put(ConstantResponseKeys.STATUS, 404);
                 // return responseObj;
             }
@@ -372,10 +373,10 @@ public class UserService {
                     UserDto userDto = userMapper.toDto(updatedUser);
                     responseObj.put(ConstantResponseKeys.RES, userDto);
                 }
-                responseObj.put(ConstantResponseKeys.MESSAGE, "User Successfully inserted.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_SUCCESSFULLY_INSERTED);
                 responseObj.put(ConstantResponseKeys.STATUS, 201);
             } else {
-                responseObj.put(ConstantResponseKeys.MESSAGE, "Nothing to save. may be something went wrong please contact to administrator.");
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NOTHING_TO_SAVE_MAY_BE_SOMETHING_WENT_WRONG_PLEASE_CONTACT_TO_ADMINISTRATOR);
                 responseObj.put(ConstantResponseKeys.STATUS, 500);
             }
         }
@@ -572,10 +573,10 @@ public class UserService {
         if (isUpdated > 0) {
             // Evict wholesaler from redis
             deleteCacheUser(userRequest.getSlug());
-            responseObject.put(ConstantResponseKeys.MESSAGE, "All permissions have been updated successfully.");
+            responseObject.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ALL_PERMISSIONS_HAVE_BEEN_UPDATED_SUCCESSFULLY);
             responseObject.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObject.put(ConstantResponseKeys.MESSAGE, "We don't found any user to update");
+            responseObject.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WE_DON_T_FOUND_ANY_USER_TO_UPDATE);
             responseObject.put(ConstantResponseKeys.STATUS, 404);
         }
         return responseObject;

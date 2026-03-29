@@ -4,6 +4,7 @@ package com.sales.wholesaler.services;
 import com.sales.claims.AuthUser;
 import com.sales.request.StorePromotionRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.wholesaler.repository.WholesaleHbPromotionRepository;
 import com.sales.wholesaler.repository.WholesaleStoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,10 @@ public class WholesalePromotionsService  {
         storePromotionRequest.setStoreId(storeId);
         int isInserted = wholesaleHbPromotionRepository.insertStorePromotions(storePromotionRequest,loggedUser); // Create operation
         if(isInserted > 0){
-            response.put(ConstantResponseKeys.MESSAGE,"Your item is going to promote.");
+            response.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_ITEM_IS_GOING_TO_PROMOTE);
             response.put(ConstantResponseKeys.STATUS,200);
         }else {
-            response.put(ConstantResponseKeys.MESSAGE,"Something went wrong during promote item. if your money was deducted contact to administrator");
+            response.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_PROMOTE_ITEM_IF_YOUR_MONEY_WAS_DEDUCTED_CONTACT_TO_ADMINISTRATOR);
             response.put(ConstantResponseKeys.STATUS,400);
         }
         logger.debug("Completed insertItemPromotion method");

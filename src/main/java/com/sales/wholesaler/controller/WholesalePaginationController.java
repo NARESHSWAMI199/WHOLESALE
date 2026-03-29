@@ -5,6 +5,7 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.request.UserPaginationRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,10 +47,10 @@ public class WholesalePaginationController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int updated = wholesalePaginationService.updateUserPaginationRowsNumber(userPaginationRequest, loggedUser);
         if (updated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "Pagination updated successfully");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PAGINATION_UPDATED_SUCCESSFULLY);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
-            responseObj.put(ConstantResponseKeys.MESSAGE, "No record found to update.");
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND_TO_UPDATE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

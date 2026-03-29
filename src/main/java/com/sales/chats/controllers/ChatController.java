@@ -8,6 +8,7 @@ import com.sales.entities.Chat;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
 import com.sales.wholesaler.services.WholesaleUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -88,10 +89,10 @@ public class ChatController  {
 
         List<String> allImagesName = chatService.saveAllImages(message, loggedUser);
         if(allImagesName.size() == message.getImages().size()){
-            result.put(ConstantResponseKeys.MESSAGE,"All images successfully sent.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.ALL_IMAGES_SUCCESSFULLY_SENT);
             result.put(ConstantResponseKeys.STATUS , 200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong during save images.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_SAVE_IMAGES);
             result.put(ConstantResponseKeys.STATUS , 400);
         }
 
@@ -137,7 +138,7 @@ public class ChatController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         message.setReceiver(loggedUser.getSlug());
         wholesaleUserService.updateSeenMessages(message);
-        result.put(ConstantResponseKeys.MESSAGE,"Message successfully updated.");
+        result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.MESSAGE_SUCCESSFULLY_UPDATED);
         result.put(ConstantResponseKeys.STATUS, 200);
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
@@ -167,10 +168,10 @@ public class ChatController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         int isDeleted = chatService.deleteMessage(loggedUser, messageDto);
         if(isDeleted > 0){
-            result.put(ConstantResponseKeys.MESSAGE,"deleted successfully");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.DELETED_SUCCESSFULLY);
             result.put(ConstantResponseKeys.STATUS, 200);
         }else{
-            result.put(ConstantResponseKeys.MESSAGE,"Something went wrong due to message deleted");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DUE_TO_MESSAGE_DELETED);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
         if(messageDto.getIsDeleted().equals("B")){

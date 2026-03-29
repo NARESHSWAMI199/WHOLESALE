@@ -12,6 +12,7 @@ import com.sales.entities.User;
 import com.sales.entities.WalletTransaction;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.payment.service.CashfreeService;
 import com.sales.utils.Utils;
@@ -69,7 +70,7 @@ public class CashFreePgController {
                 result.put(ConstantResponseKeys.STATUS, 201);
             } catch (ApiException e) {
                 logger.error("Exception occurred while getting payment session ID : {}", e.getMessage());
-                result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during getPaymentSessionId payment. please contact to administrator.");
+                result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_GETPAYMENTSESSIONID_PAYMENT_PLEASE_CONTACT_TO_ADMINISTRATOR);
                 result.put(ConstantResponseKeys.STATUS, 500);
                 logger.debug("Exception occur in  getPaymentSessionId :: {}", e.getMessage());
             }
@@ -128,7 +129,7 @@ public class CashFreePgController {
             result.put(ConstantResponseKeys.STATUS, 200);
         }catch (Exception e){
             logger.error("Exception during cashfree callback : {}",e.getMessage());
-            result.put(ConstantResponseKeys.MESSAGE, "Something went wrong during cashfree callback. please contact to administrator.");
+            result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_CASHFREE_CALLBACK_PLEASE_CONTACT_TO_ADMINISTRATOR);
             result.put(ConstantResponseKeys.STATUS,500);
         }
         return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));

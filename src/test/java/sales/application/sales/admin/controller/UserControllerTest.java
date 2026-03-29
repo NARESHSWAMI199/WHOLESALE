@@ -745,7 +745,7 @@ public void updateUserWrongStatus() throws Exception {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         ).andExpectAll(
-                jsonPath("$.message",containsString("We facing some issue to send otp to this mail")),
+                jsonPath("$.message",containsString("We are facing an issue sending OTP to this email")),
                 status().is(400)
         );
     }
@@ -772,7 +772,7 @@ public void updateUserWrongStatus() throws Exception {
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpectAll(
                 status().is(401),
-                jsonPath("$.message",is("Wrong otp password."))
+                jsonPath("$.message",is("Wrong OTP password."))
         )
                 .andDo(print())
         ;
