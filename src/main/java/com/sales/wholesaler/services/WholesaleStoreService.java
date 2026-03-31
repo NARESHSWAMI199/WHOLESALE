@@ -238,7 +238,6 @@ public class WholesaleStoreService {
         return insertedStore;
     }
 
-    @Transactional
     public Address insertAddress(AddressRequest addressRequest, AuthUser loggedUser) {
         logger.debug("Starting insertAddress method with addressRequest: {}, loggedUser: {}", addressRequest, loggedUser);
         Address address = Address.builder()

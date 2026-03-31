@@ -326,7 +326,6 @@ public class WholesaleItemService {
     }
 
 
-    @Transactional
     public String saveItemImageName(MultipartFile itemImage, String slug) throws IOException {
         logger.debug("Starting saveItemImageName method with itemImage: {}, slug: {}", itemImage, slug);
         if (itemImage != null) {
