@@ -9,6 +9,7 @@ import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.StoreNotifications;
@@ -40,7 +41,7 @@ public class WalletService {
     @Transactional(readOnly = true)
     public WalletDto getWalletDetail(String userSlug){
         Integer userId = userRepository.getUserIdBySlug(userSlug);
-        if (userId == null) throw new NotFoundException("Wallet user details not found.");
+        if (userId == null) throw new NotFoundException(ResponseMessages.WALLET_USER_DETAILS_NOT_FOUND);
         Wallet wallet = walletRepository.findByUserId(userId);
         return walletMapper.toDto(wallet);
     }
@@ -61,9 +62,9 @@ public class WalletService {
     public boolean paymentViaWallet(String servicePlanSlug, String slug) {
         boolean payment = false;
         User user = userRepository.findUserBySlug(slug);
-        if(user == null) throw new NotFoundException("User not found.");
+        if(user == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND);
         ServicePlan servicePlan = servicePlanService.findBySlug(servicePlanSlug);
-        if(servicePlan == null) throw new NotFoundException("Service plan not found.");
+        if(servicePlan == null) throw new NotFoundException(ResponseMessages.SERVICE_PLAN_NOT_FOUND);
         Long planPrice = servicePlan.getPrice();
         Wallet wallet = walletRepository.findByUserId(user.getId());
         float walletAmount = wallet != null ? wallet.getAmount() : 0;

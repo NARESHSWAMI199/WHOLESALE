@@ -85,7 +85,7 @@ public class GroupService {
 
         //Only super admin can create or update a group.
         if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
-            throw new PermissionDeniedDataAccessException("You don't have permission to create or update a group. Please contact a super admin", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.PERMISSION_DENIED_CREATE_OR_UPDATE_GROUP, new Exception());
 
         if (!Utils.isEmpty(groupRequest.getSlug()) || path.contains("update")) {
             logger.debug("We are going to update the group.");
@@ -93,9 +93,9 @@ public class GroupService {
             Utils.checkRequiredFields(groupRequest, List.of("slug"));
 
             Group group = groupRepository.findGroupBySlug(groupRequest.getSlug());
-            if (group == null) throw new NotFoundException("No group found to update.");
+            if (group == null) throw new NotFoundException(ResponseMessages.NO_GROUP_FOUND_TO_UPDATE);
             if (group.getId() == GlobalConstant.groupId && loggedUser.getId() != GlobalConstant.suId)
-                throw new NotFoundException("There is nothing to update.");
+                throw new NotFoundException(ResponseMessages.THERE_IS_NOTHING_TO_UPDATE);
 
             // Going to update existing group.
             int isUpdated = permissionHbRepository.updateGroup(groupRequest, group.getId(), loggedUser.getId() == GlobalConstant.suId);
@@ -129,9 +129,9 @@ public class GroupService {
 
     public Map<String, Object> findGroupBySlug(String slug) {
         logger.debug("Entering findGroupBySlug with slug: {}", slug);
-        if (Utils.isEmpty(slug)) throw new IllegalArgumentException("slug can't be null");
+        if (Utils.isEmpty(slug)) throw new IllegalArgumentException(ResponseMessages.SLUG_CAN_T_BE_NULL);
         Group group = groupRepository.findGroupBySlug(slug);
-        if (group == null) throw new NotFoundException("No record found.");
+        if (group == null) throw new NotFoundException(ResponseMessages.NO_RECORD_FOUND);
 
         List<Map<String, Object>> groupWithPermission = groupRepository.findGroupAndPermissionsByGroupId(group.getId());
 
@@ -175,12 +175,12 @@ public class GroupService {
         Utils.checkRequiredFields(deleteRequest, List.of("slug"));
 
         //Only super admin can create or update a group.
-        if (!loggedUser.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("You don't have permission to delete a group. Please contact a super admin", null);
+        if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
+            throw new PermissionDeniedDataAccessException(ResponseMessages.PERMISSION_DENIED_DELETE_GROUP, null);
 
         String slug = deleteRequest.getSlug();
         Group group = groupRepository.findGroupBySlug(slug);
-        if (group == null) throw new NotFoundException("No group found to delete");
+        if (group == null) throw new NotFoundException(ResponseMessages.NO_GROUP_FOUND_TO_DELETE_1);
         int result = permissionHbRepository.deleteGroupBySlug(slug, group.getId(), (loggedUser.getId() == GlobalConstant.suId));
         logger.debug("Exiting deleteGroupBySlug with result: {}", result);
         return result;

@@ -107,13 +107,13 @@ public class ServicePlanService {
     @Transactional
     public ServicePlan insertServicePlan(AuthUser loggedUser, ServicePlanCreateRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering insertServicePlan with loggedUser: {}, servicePlanDto: {}", loggedUser, servicePlanRequest);
-        if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action. Contact to your administrator.",new Exception());
+        if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException(ResponseMessages.PERMISSION_DENIED_ACTION_CONTACT_ADMINISTRATOR,new Exception());
 
         // Validating required fields if there we found any required field is null, then it will throw an Exception
         Utils.checkRequiredFields(servicePlanRequest, List.of("planName","price","discount","months","description"));
 
-        if(servicePlanRequest.getPrice() < 0) throw new IllegalArgumentException("Price can't be less than 0.");
-        if(servicePlanRequest.getDiscount() < 0 || servicePlanRequest.getDiscount() > servicePlanRequest.getPrice()) throw new IllegalArgumentException("Discount can't be greater than price and can't be less than 0.");
+        if(servicePlanRequest.getPrice() < 0) throw new IllegalArgumentException(ResponseMessages.PRICE_CAN_T_BE_LESS_THAN_0);
+        if(servicePlanRequest.getDiscount() < 0 || servicePlanRequest.getDiscount() > servicePlanRequest.getPrice()) throw new IllegalArgumentException(ResponseMessages.DISCOUNT_CAN_T_BE_GREATER_THAN_PRICE_AND_CAN_T_BE_LESS_THAN_0);
 
         ServicePlan servicePlan = ServicePlan.builder()
                 .name(servicePlanRequest.getPlanName())
@@ -142,7 +142,7 @@ public class ServicePlanService {
         String status = statusRequest.getStatus();
         Map<String, Object> result = new HashMap<>();
         if (!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()))
-            throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator.",new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.PERMISSION_DENIED_ACTION_CONTACT_ADMINISTRATOR,new Exception());
 
         switch (status) {
             case "A", "D":
@@ -161,7 +161,7 @@ public class ServicePlanService {
                 logger.debug("Exiting updateServicePlanStatus with result: {}", result);
                 return result;
             default:
-                throw new IllegalArgumentException("status must be A or D.");
+                throw new IllegalArgumentException(ResponseMessages.STATUS_MUST_BE_A_OR_D_1);
         }
     }
 
@@ -171,7 +171,7 @@ public class ServicePlanService {
         Utils.checkRequiredFields(deleteRequest, List.of("slug"));
         String slug = deleteRequest.getSlug();
         Map<String,Object> result = new HashMap<>();
-        if(!loggedUser.getUserType().equals("SA")) throw new PermissionDeniedDataAccessException("You don't have permission to perform this action.Contact to your administrator.",new Exception());
+        if(!loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType())) throw new PermissionDeniedDataAccessException(ResponseMessages.PERMISSION_DENIED_ACTION_CONTACT_ADMINISTRATOR,new Exception());
         int isUpdated = servicePlanHbRepository.deleteServicePlan(slug, loggedUser);
         if(isUpdated > 0){
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SERVICE_PLAN_SUCCESSFULLY_DELETED);

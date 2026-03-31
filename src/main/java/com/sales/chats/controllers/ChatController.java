@@ -83,7 +83,7 @@ public class ChatController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String recipient = message.getReceiver();
         User receiver = wholesaleUserService.findUserBySlug(recipient);
-        if (receiver == null) throw new MyException("Please provide a valid recipient");
+        if (receiver == null) throw new MyException(ResponseMessages.PLEASE_PROVIDE_A_VALID_RECIPIENT);
         boolean verified = chatService.verifyBeforeSend(loggedUser, recipient);
         if(!verified) return null;
 

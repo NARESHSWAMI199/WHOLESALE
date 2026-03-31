@@ -3,6 +3,7 @@ package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.PaginationRepository;
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.UserPaginationRequest;
 import com.sales.entities.Pagination;
 import com.sales.entities.User;
@@ -67,7 +68,7 @@ public class WholesalePaginationService {
         List<Pagination> allPagination = wholesalePaginationRepository.findAll(specification);
         for (Pagination pagination : allPagination) {
             UserPagination userPagination = insertUserPagination(pagination, user , 25); // default rows are 25
-            if(userPagination == null) throw new InternalException("We are unable to save your default pagination settings.");
+            if(userPagination == null) throw new InternalException(ResponseMessages.WE_ARE_UNABLE_TO_SAVE_YOUR_DEFAULT_PAGINATION_SETTINGS);
 
         }
     }

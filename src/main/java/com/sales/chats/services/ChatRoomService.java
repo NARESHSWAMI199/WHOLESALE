@@ -4,6 +4,7 @@ package com.sales.chats.services;
 import com.sales.chats.repositories.ChatRoomHbRepository;
 import com.sales.chats.repositories.ChatRoomRepository;
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.entities.ChatRoomUser;
@@ -48,7 +49,7 @@ public class ChatRoomService  {
         List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
         for(String slug :chatRoomDto.getUsers()) {
             User user = wholesaleUserRepository.findUserBySlug(slug);
-            if(user == null) throw new NotFoundException("Chat users are not valid.");
+            if(user == null) throw new NotFoundException(ResponseMessages.CHAT_USERS_ARE_NOT_VALID);
             ChatRoomUser chatRoomUser = ChatRoomUser.builder()
                     .user(user)
                     .roomId(inserted.getId())

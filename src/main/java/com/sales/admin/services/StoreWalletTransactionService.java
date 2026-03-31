@@ -3,6 +3,7 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.StoreWalletTransactionRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
+import com.sales.global.ResponseMessages;
 import com.sales.request.SearchFilters;
 import com.sales.request.WalletFilterRequest;
 import com.sales.request.WalletTransactionRequest;
@@ -40,7 +41,7 @@ public class StoreWalletTransactionService {
 
     public Page<WalletTransaction> getAllWalletTransactionByUserId(WalletFilterRequest searchFilters, String userSlug){
         Integer userId = userRepository.getUserIdBySlug(userSlug);
-        if (userId == null) throw new NotFoundException("User not found.");
+        if (userId == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND);
         Specification<WalletTransaction> specification = Specification.allOf(
             hasSlug(searchFilters.getSlug())
             .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))

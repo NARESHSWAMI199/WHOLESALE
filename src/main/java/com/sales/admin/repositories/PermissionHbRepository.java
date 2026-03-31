@@ -2,6 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.GroupRequest;
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
@@ -61,7 +62,7 @@ public class PermissionHbRepository {
 
 
     public int deleteGroupBySlug(String slug, int groupId,boolean isSuperAdmin){
-        if (groupId == GlobalConstant.groupId) throw new PermissionDeniedDataAccessException("We can't delete this group.",new Exception());
+        if (groupId == GlobalConstant.groupId) throw new PermissionDeniedDataAccessException(ResponseMessages.WE_CANT_DELETE_THIS_GROUP,new Exception());
         deleteGroupPermissionByGroupId(groupId,isSuperAdmin);
         deleteGroupFromUser(groupId);
         String sql = "delete from Group where slug=:slug";
@@ -103,7 +104,7 @@ public class PermissionHbRepository {
     public int assignGroupsToUser(int userId, List<Integer> groups, AuthUser loggedUser) throws MyException {
         if(groups.contains(GlobalConstant.groupId) && loggedUser.getId() != GlobalConstant.suId) groups.remove((Integer) GlobalConstant.groupId);
         deleteUserGroups(userId);
-        if(groups.isEmpty()) throw new MyException("Please provide at least one group.");
+        if(groups.isEmpty()) throw new MyException(ResponseMessages.PLEASE_PROVIDE_AT_LEAST_ONE_GROUP);
         StringBuilder values = new StringBuilder();
         for(int i=0; i < groups.size(); i++){
             values.append("(").append(userId).append(",").append(groups.get(i)).append(")");
@@ -128,7 +129,7 @@ public class PermissionHbRepository {
     public int assignPermissionsToWholesaler(int userId, List<Integer> permissions) throws MyException {
         if(permissions.contains(GlobalConstant.suId)) permissions.remove((Integer) GlobalConstant.suId);
         deleteWholesalerPermission(userId);
-        if(permissions.isEmpty()) throw new MyException("Please provide at least one permission.");
+        if(permissions.isEmpty()) throw new MyException(ResponseMessages.PLEASE_PROVIDE_AT_LEAST_ONE_PERMISSION);
         StringBuilder values = new StringBuilder();
         for(int i=0; i < permissions.size(); i++){
             values.append("(").append(userId).append(",").append(permissions.get(i)).append(")");

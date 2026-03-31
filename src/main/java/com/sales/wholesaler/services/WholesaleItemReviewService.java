@@ -2,6 +2,7 @@ package com.sales.wholesaler.services;
 
 import com.sales.claims.AuthUser;
 import com.sales.entities.ItemReviews;
+import com.sales.global.ResponseMessages;
 import com.sales.request.ItemReviewsFilterRequest;
 import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.mapper.WholesaleItemReviewMapper;
@@ -32,7 +33,7 @@ public class WholesaleItemReviewService  {
         logger.debug("Starting getALlItemReview method with filters: {}, loggedUser: {}", filters, loggedUser);
         if(filters.getItemId() == 0) {
             logger.error("Invalid itemId provided");
-            throw new IllegalArgumentException("Please provide a valid itemId.");
+            throw new IllegalArgumentException(ResponseMessages.PLEASE_PROVIDE_A_VALID_ITEMID);
         }
         Specification<ItemReviews> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))

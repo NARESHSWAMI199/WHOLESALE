@@ -2,6 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.StoreNotifications;
@@ -61,7 +62,7 @@ public class WholesaleWalletService  {
         int userId = loggedUser.getId();
         Integer storeId = wholesaleStoreRepository.getStoreIdByUserId(userId);
         ServicePlan servicePlan = wholesaleServicePlanRepository.findBySlug(servicePlanSlug);
-        if(servicePlan == null) throw new NotFoundException("Service plan not found.");
+        if(servicePlan == null) throw new NotFoundException(ResponseMessages.SERVICE_PLAN_NOT_FOUND);
         Long planPrice = servicePlan.getPrice();
         Wallet wallet = wholesaleWalletRepository.findByUserId(userId);
         float walletAmount = wallet != null ? wallet.getAmount() : 0;

@@ -50,7 +50,7 @@ public class ServicePlanController  {
     public ResponseEntity< Page<PlanDto>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters){
         logger.debug("Fetching user plans for userSlug: {}", userSlug);
         Integer userId = userService.getUserIdBySlug(userSlug);
-        if(!Utils.isEmpty(userSlug) && userId == null) throw new IllegalArgumentException("User not found.");
+        if(!Utils.isEmpty(userSlug) && userId == null) throw new IllegalArgumentException(ResponseMessages.USER_NOT_FOUND);
         Page<PlanDto> allUserPlans = servicePlanService.getAllUserPlans(userId, searchFilters);
         return new ResponseEntity<>(allUserPlans,HttpStatus.OK);
     }

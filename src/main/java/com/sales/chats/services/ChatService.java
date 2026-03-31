@@ -3,6 +3,7 @@ package com.sales.chats.services;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import com.sales.entities.User;
@@ -55,10 +56,10 @@ public class ChatService  {
 
 
     public boolean verifyBeforeSend(AuthUser loggedUser,String recipient) {
-        if (recipient == null) throw new MyException("Please provide a valid recipient");
+        if (recipient == null) throw new MyException(ResponseMessages.PLEASE_PROVIDE_A_VALID_RECIPIENT);
 
         User receiver = wholesaleUserRepository.findUserBySlug(recipient);
-        if (receiver == null) throw new MyException("Please provide a valid recipient");
+        if (receiver == null) throw new MyException(ResponseMessages.PLEASE_PROVIDE_A_VALID_RECIPIENT);
         /* Added new user in to sender's chat list →
         sender = loggedUser | receiver = who receives this message | status = sender Accepted
         or not default it's A  */
@@ -212,7 +213,7 @@ public class ChatService  {
             for (MultipartFile multipartFile : messageDto.getImages()) {
                 String originalFilename = Objects.requireNonNull(multipartFile.getOriginalFilename()).replace(" ", "_");
                 boolean validImage = Utils.isValidImage(originalFilename);
-                if (!validImage) throw new MyException("Not valid images.");
+                if (!validImage) throw new MyException(ResponseMessages.NOT_VALID_IMAGES);
                 multipartFile.transferTo(new File(folderPath + originalFilename));
                 imagesNames.add(originalFilename);
             }

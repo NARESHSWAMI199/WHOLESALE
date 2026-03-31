@@ -2,6 +2,7 @@ package com.sales.specifications;
 
 import com.sales.entities.Item;
 import com.sales.entities.Item_;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class ItemsSpecifications {
             if ((wholesaleId == null || wholesaleId == 0) && (userType.equals(USER_TYPES.STAFF.getType()) || userType.equals(USER_TYPES.SUPER_ADMIN.getType()))) {
                 return null;
             } else if (wholesaleId == null || wholesaleId == 0) {
-                throw new IllegalArgumentException("The store's id can't be null or 0.");
+                throw new IllegalArgumentException(ResponseMessages.THE_STORE_S_ID_CAN_T_BE_NULL_OR_0);
             } else {
                 return criteriaBuilder.equal(root.get(Item_.wholesaleId), wholesaleId);
             }

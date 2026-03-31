@@ -90,7 +90,7 @@ public class WholesaleStoreService {
             StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
             storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
-            throw new MyException("Invalid arguments for category and subcategory");
+            throw new MyException(ResponseMessages.INVALID_ARGUMENTS_FOR_CATEGORY_AND_SUBCATEGORY);
         }
         Store store = getStoreByUserId(loggedUser.getId());
         String slug = store.getSlug();
@@ -99,7 +99,7 @@ public class WholesaleStoreService {
         // before update store and store's address get address id from store
         Integer addressId = wholesaleStoreRepository.getAddressIdBySlug(storeCreationRequest.getStoreSlug());
         if (addressId == null)
-            throw new IllegalArgumentException("No store found to update.");  // wrong wholesale slug.
+            throw new IllegalArgumentException(ResponseMessages.NO_STORE_FOUND_TO_UPDATE);  // wrong wholesale slug.
         storeCreationRequest.setAddressId(addressId);
 
         String imageName = getStoreImagePath(storeCreationRequest.getStorePic(), slug);
@@ -187,7 +187,7 @@ public class WholesaleStoreService {
                 logger.debug("Completed getStoreImagePath method");
                 return fileOriginalName;
             } else {
-                throw new MyException("Image is not fit in accept ratio. please resize your image before upload.");
+                throw new MyException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOUR_IMAGE_BEFORE_UPLOAD);
             }
         }
         return null;
@@ -209,7 +209,7 @@ public class WholesaleStoreService {
             StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
             storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
-            throw new MyException("Invalid arguments for category and subcategory");
+            throw new MyException(ResponseMessages.INVALID_ARGUMENTS_FOR_CATEGORY_AND_SUBCATEGORY);
         }
 
         /* inserting  address during create a wholesale */
@@ -233,7 +233,7 @@ public class WholesaleStoreService {
         if (imageName != null) {
             store.setAvtar(imageName); /** I know save function called before set this, but it will save automatically due to same transaction */
         } else {
-            throw new MyException("Store image can't be blank.");
+            throw new MyException(ResponseMessages.STORE_IMAGE_CAN_T_BE_BLANK);
         }
         logger.debug("Completed createStore method");
 
@@ -241,7 +241,7 @@ public class WholesaleStoreService {
         List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();
         int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(loggedUser.getId(), defaultPermissions);
         if (isAssigned < 1)
-            throw new MyException("Something went wrong during update wholesaler's permissions. please contact to administrator.");
+            throw new MyException(ResponseMessages.SOMETHING_WENT_WRONG_DURING_UPDATE_WHOLESALER_S_PERMISSIONS_PLEASE_CONTACT_TO_ADMINISTRATOR);
         return insertedStore;
     }
 

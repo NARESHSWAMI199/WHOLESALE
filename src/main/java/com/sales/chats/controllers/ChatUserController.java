@@ -108,7 +108,7 @@ public class ChatUserController  {
         }
         if(accepted){
             logger.debug("Chat {} successfully for user: {}", status, loggedUser.getId());
-            result.put(ConstantResponseKeys.MESSAGE,"Chat "+status+" .");
+            result.put(ConstantResponseKeys.MESSAGE, String.format(ResponseMessages.CHAT_STATUS_CHANGE, status));
             result.put(ConstantResponseKeys.STATUS,200);
         }else {
             logger.error("Failed to {} chat for user: {}", status, loggedUser.getId());

@@ -4,6 +4,7 @@ package com.sales.chats.controllers;
 import com.sales.chats.services.BlockListService;
 import com.sales.chats.services.ChatService;
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import com.sales.entities.User;
@@ -75,7 +76,7 @@ public class ChatSocketController {
             String sender = Objects.requireNonNull(simpMessageHeaderAccessor.getSessionAttributes()).get("username").toString();
             logger.debug("The sender is : {}",sender);
             User user = wholesaleUserService.findUserBySlug(slug);
-            if(user == null) throw new MyException("Not valid user to connect for chat.");
+            if(user == null) throw new MyException(ResponseMessages.NOT_VALID_USER_TO_CONNECT_FOR_CHAT);
             user.setOnline(true);
             wholesaleUserService.updateLastSeen(user);
             GlobalConstant.onlineUsers.put(slug, user);
@@ -91,7 +92,7 @@ public class ChatSocketController {
         logger.debug("Disconnected");
         try{
             User user = GlobalConstant.onlineUsers.get(slug);
-            if(user == null) throw new MyException("Not valid user to connect for chat.");
+            if(user == null) throw new MyException(ResponseMessages.NOT_VALID_USER_TO_CONNECT_FOR_CHAT);
             user.setOnline(false);
             wholesaleUserService.updateLastSeen(user);
             GlobalConstant.onlineUsers.put(slug, user);
@@ -106,7 +107,7 @@ public class ChatSocketController {
     public void isReceiverSeen(@DestinationVariable("recipient") String recipient,SimpMessageHeaderAccessor headerAccessor){
         User chatLoggedUser = (User) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("user");
         User receiver = wholesaleUserService.findUserBySlug(recipient);
-        if (recipient == null) throw new MyException("Please provide a valid recipient");
+        if (recipient == null) throw new MyException(ResponseMessages.PLEASE_PROVIDE_A_VALID_RECIPIENT);
         logger.debug("Seen Called.....");
         /* Check If you already blocked by receiver or not if blocked, then do nothing eat fivestar */
         boolean isYouBlockedByReceiver = blockListService.isSenderBlockedByReceiver(chatLoggedUser,receiver);

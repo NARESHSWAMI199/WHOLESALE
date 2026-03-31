@@ -2,6 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.SearchFilters;
 import com.sales.entities.WholesalerFuturePlan;
 import com.sales.exceptions.NotFoundException;
@@ -43,7 +44,7 @@ public class WholesaleFuturePlansService  {
         Map<String,Object> futurePlan = wholesaleFuturePlansRepository.getNewFuturePlanByUserIdAndSlug(futurePlanSlug,loggedUser.getId());
         Object servicePlanId = futurePlan.get("servicePlanId");
         Object wholesalerFuturePlanId = futurePlan.get("wholesalerFuturePlanId");
-        if (servicePlanId == null || wholesalerFuturePlanId == null) throw  new NotFoundException("Not a valid request. Future plan not found.");
+        if (servicePlanId == null || wholesalerFuturePlanId == null) throw new NotFoundException(ResponseMessages.NOT_A_VALID_REQUEST_FUTURE_PLAN_NOT_FOUND);
         wholesaleServicePlanService.assignUserPlan(loggedUser.getId(), (Integer) servicePlanId);
         return wholesaleFuturePlansRepository.updateWholesalerFuturePlans((Long) wholesalerFuturePlanId, Utils.getCurrentMillis());
     }

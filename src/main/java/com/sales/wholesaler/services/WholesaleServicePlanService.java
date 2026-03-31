@@ -2,6 +2,7 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
+import com.sales.global.ResponseMessages;
 import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerFuturePlan;
@@ -121,7 +122,7 @@ public class WholesaleServicePlanService {
         WholesalerPlans userPlan = wholesaleUserPlansRepository.save(userPlans); // Create operation
         int updated = wholesaleUserHbRepository.updateUserActivePlan(userId, userPlan.getId());// Update operation
         if (updated < 1) {
-            throw new NotFoundException("No user found. to assign this plan.");
+            throw new NotFoundException(ResponseMessages.NO_USER_FOUND_TO_ASSIGN_THIS_PLAN);
         }
         logger.debug("Completed assignUserPlan method");
     }
@@ -149,7 +150,7 @@ public class WholesaleServicePlanService {
         WholesalerPlans userPlan = wholesaleUserPlansRepository.save(userPlans); // Create operation
         int updated = wholesaleUserHbRepository.updateUserActivePlan(userId, userPlan.getId());// Update operation
         if (updated < 1) {
-            throw new NotFoundException("No user found. to assign this plan.");
+            throw new NotFoundException(ResponseMessages.NO_USER_FOUND_TO_ASSIGN_THIS_PLAN);
         }
         logger.debug("Completed assignUserPlan method.");
     }
@@ -190,7 +191,7 @@ public class WholesaleServicePlanService {
     public int updatedUserCurrentPlan(String plansSlug, AuthUser loggedUser) {
         logger.debug("Starting updatedUserCurrentPlan method.");
         Integer wholesaleUserPlanId = wholesaleUserPlansRepository.getWholesaleUserPlanId(loggedUser.getId(), plansSlug);
-        if (wholesaleUserPlanId == null) throw new IllegalArgumentException("Not a valid active plan.");
+        if (wholesaleUserPlanId == null) throw new IllegalArgumentException(ResponseMessages.NOT_A_VALID_ACTIVE_PLAN);
         int isUpdated = wholesaleUserHbRepository.updateUserActivePlan(loggedUser.getId(), wholesaleUserPlanId);
         logger.debug("Completed updatedUserCurrentPlan method with isUpdated  : {}.", isUpdated);
         return isUpdated;

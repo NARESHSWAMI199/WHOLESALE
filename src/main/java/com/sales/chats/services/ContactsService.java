@@ -9,6 +9,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,7 +59,7 @@ public class ContactsService  {
         User contactUser = wholesaleUserRepository.findUserBySlug(contactSlug);
         if (contactUser == null) {
             logger.error("Not a valid contact");
-            throw new MyException("Not a valid contact");
+            throw new MyException(ResponseMessages.NOT_A_VALID_CONTACT);
         }
         Contact contacts = Contact.builder()
             .userId(loggedUser.getId())
@@ -73,7 +74,7 @@ public class ContactsService  {
     public int removeContact(AuthUser loggedUser,String contactUserSlug,Boolean deleteChats) {
         logger.debug("Going to remove contact from contact list with loggedUser  {} : and contactUserSlug {} ",loggedUser,contactUserSlug);
         User contactUser = wholesaleUserRepository.findUserBySlug(contactUserSlug);
-        if(contactUser == null) throw new NotFoundException("No contact user found to delete.");
+        if(contactUser == null) throw new NotFoundException(ResponseMessages.NO_CONTACT_USER_FOUND_TO_DELETE);
         Integer deleted = contactRepository.deleteContactUserFromContact(loggedUser.getId(), contactUser);
         if (deleted > 0 && deleteChats) {
             chatHbRepository.deleteChats(loggedUser.getSlug(),contactUserSlug);

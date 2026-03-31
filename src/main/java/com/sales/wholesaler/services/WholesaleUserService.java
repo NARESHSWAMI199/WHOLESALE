@@ -230,7 +230,7 @@ public class WholesaleUserService {
         logger.debug("Starting resetPasswordByUserSlug method with passwordDto: {}, loggedUser: {}", passwordDto, loggedUser);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
         Utils.checkRequiredFields(passwordDto, List.of("password"));
-        if (passwordDto.getPassword().isEmpty()) throw new IllegalArgumentException("password can't by empty or blank");
+        if (passwordDto.getPassword().isEmpty()) throw new IllegalArgumentException(ResponseMessages.PASSWORD_CAN_T_BY_EMPTY_OR_BLANK);
         User user = userCacheService.getCacheUser(loggedUser.getSlug());
         user.setPassword(passwordDto.getPassword());
         User updatedUser = wholesaleUserRepository.save(user); // Update operation
@@ -242,7 +242,7 @@ public class WholesaleUserService {
         logger.debug("Starting updateProfileImage method with profileImage: {}, loggedUser: {}", profileImage, loggedUser);
         String slug = loggedUser.getSlug();
         String imageName = UUID.randomUUID().toString().substring(0, 5) + "_" + Objects.requireNonNull(profileImage.getOriginalFilename()).replaceAll(" ", "_");
-        if (!Utils.isValidImage(imageName)) throw new IllegalArgumentException("Not a valid Image.");
+        if (!Utils.isValidImage(imageName)) throw new IllegalArgumentException(ResponseMessages.NOT_A_VALID_IMAGE);
         String dirPath = profilePath + slug + GlobalConstant.PATH_SEPARATOR;
         File dir = new File(dirPath);
         if (!dir.exists()) dir.mkdirs();
@@ -286,7 +286,7 @@ public class WholesaleUserService {
         }
         // Sending mail to user for email validation.
         if (!sendOtp(userRequest)) {
-            throw new MyException("User was created successfully. but we facing issue some issue during sending otp. Make sure your email address was correct.");
+            throw new MyException(ResponseMessages.USER_WAS_CREATED_SUCCESSFULLY_BUT_WE_FACING_ISSUE_SOME_ISSUE_DURING_SENDING_OTP_MAKE_SURE_YOUR_EMAIL_ADDRESS_WAS_CORRECT);
         }
         logger.debug("Completed addNewUser method");
 

@@ -10,6 +10,7 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,7 +73,7 @@ public class ChatUserService  {
         User receiver = wholesaleUserRepository.findUserBySlug(receiverSlug);
         if (receiver == null) {
             logger.error("Receiver not found");
-            throw new MyException("Receiver not found.");
+            throw new MyException(ResponseMessages.RECEIVER_NOT_FOUND);
         }
         ChatUser userFound = chatUserRepository.findByUserIdAndChatUser(sender.getId(), receiver);
         if (userFound != null) {
@@ -103,7 +104,7 @@ public class ChatUserService  {
     public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser,User receiver) {
         logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUserId : {} ",loggedUser.getId(),receiver.getId());
         ChatUser chatUser = chatUserRepository.findByUserIdAndChatUser(loggedUser.getId(), receiver);
-        if(chatUser == null) throw new NotFoundException("User not found in your chat users list.");
+        if(chatUser == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND_IN_YOUR_CHAT_USERS_LIST);
         logger.debug("Completed isChatRequestAccepted method");
         return chatUser.getSenderAcceptStatus();
     }
@@ -112,9 +113,9 @@ public class ChatUserService  {
     public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser,String receiverSlug) {
         logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUser : {} ",loggedUser.getId(),receiverSlug);
         User receiver = wholesaleUserRepository.findUserBySlug(receiverSlug);
-        if(receiver == null) throw new NotFoundException("Receiver not found.");
+        if(receiver == null) throw new NotFoundException(ResponseMessages.RECEIVER_NOT_FOUND);
         ChatUser chatUser = chatUserRepository.findByUserIdAndChatUser(loggedUser.getId(),receiver);
-        if(chatUser == null) throw new NotFoundException("Receiver not found.");
+        if(chatUser == null) throw new NotFoundException(ResponseMessages.RECEIVER_NOT_FOUND);
         logger.debug("Completed isChatRequestAcceptedByLoggedUser method");
         return chatUser.getSenderAcceptStatus();
     }
@@ -124,7 +125,7 @@ public class ChatUserService  {
     public int removeChatUser(AuthUser loggedUser,String chatUserSlug,Boolean deleteChats) {
         logger.debug("Going to remove contact from contact list with loggedUser  {} : and chatUserSlug {} ",loggedUser,chatUserSlug);
         User contactUser = wholesaleUserRepository.findUserBySlug(chatUserSlug);
-        if(contactUser == null) throw new NotFoundException("No contact user found to delete.");
+        if(contactUser == null) throw new NotFoundException(ResponseMessages.NO_CONTACT_USER_FOUND_TO_DELETE);
         Integer deleted = chatUserRepository.deleteChatUserFromChatList(loggedUser.getId(), contactUser);
         if (deleted > 0 && deleteChats) {
             chatHbRepository.deleteChats(loggedUser.getSlug(),chatUserSlug);

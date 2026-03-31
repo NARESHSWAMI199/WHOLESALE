@@ -2,6 +2,7 @@ package com.sales.utils;
 
 
 import com.sales.exceptions.MyException;
+import com.sales.global.ResponseMessages;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -17,31 +18,31 @@ import java.io.IOException;
 
 
 public class UploadImageValidator {
-    private static final Logger safeLog = LoggerFactory.getLogger(UploadImageValidator.class);
+    private static final Logger log = LoggerFactory.getLogger(UploadImageValidator.class);
 
     public static boolean isValidImage(MultipartFile imageFile, int minWidth, int minHeight, int maxWidth, int maxHeight, double[] allowedAspectRatios, String[] allowedFormats) {
             try {
 
                 BufferedImage image =ImageIO.read(imageFile.getInputStream());
                 if(image == null){
-                    throw new MyException("Your image file is corrupted or modified with another extension. We accept only png,jpg,jpeg image due to some security reasons.");
+                    throw new MyException(ResponseMessages.YOUR_IMAGE_FILE_IS_CORRUPTED_OR_MODIFIED_WITH_ANOTHER_EXTENSION_WE_ACCEPT_ONLY_PNG_JPG_JPEG_IMAGE_DUE_TO_SOME_SECURITY_REASONS);
                 }
                 int width = image.getWidth();
                 int height = image.getHeight();
 
-                safeLog.info("image width : {} : and height : {}", width, height);
+                log.info("image width : {} : and height : {}", width, height);
                 // Check dimensions
                 if (width < minWidth || width > maxWidth || height < minHeight || height > maxHeight) {
                     if(width < minWidth || height < minHeight) {
-                        throw new MyException("Your image file is too small.");
+                        throw new MyException(ResponseMessages.YOUR_IMAGE_FILE_IS_TOO_SMALL);
                     }else {
-                        throw new MyException("Your "+imageFile.getOriginalFilename()+" image file is too large.");
+                        throw new MyException(String.format(ResponseMessages.YOUR_IMAGE_FILE_IS_TOO_LARGE, imageFile.getOriginalFilename()));
                     }
                 }
 
                 // Check aspect ratio
                 double aspectRatio = (double) width / height;
-                safeLog.info("image aspectRatio : {}", aspectRatio);
+                log.info("image aspectRatio : {}", aspectRatio);
                 boolean validAspectRatio = false;
                 for (double allowedRatio : allowedAspectRatios) {
                     if (Math.abs(aspectRatio - allowedRatio) < 0.01) {
@@ -68,7 +69,7 @@ public class UploadImageValidator {
 
                 return true;
             } catch (IOException e) {
-                safeLog.error("The exception is : {}",e.getMessage());
+                log.error("The exception is : {}",e.getMessage());
                 return false;
             }
         }
@@ -98,7 +99,7 @@ public class UploadImageValidator {
             isWhite = true;
         }
         if(whitePixelPercentage > 90){
-            throw new MyException("Item not visible clearly.");
+            throw new MyException(ResponseMessages.ITEM_NOT_VISIBLE_CLEARLY);
         }
         return isWhite;
     }

@@ -3,6 +3,7 @@ package com.sales.wholesaler.controller;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -61,7 +62,7 @@ public class RemoveBg {
         Path userFolder = baseDir.resolve(user.getSlug()).normalize();
         Path targetPath = userFolder.resolve(Objects.requireNonNull(FilenameUtils.getName(file.getOriginalFilename()))).normalize();
         if (!targetPath.startsWith(baseDir)) {
-            throw new SecurityException("Invalid file path attempt detected!");
+            throw new SecurityException(ResponseMessages.INVALID_FILE_PATH_ATTEMPT_DETECTED);
         }
         File filePath = targetPath.toFile();
         if (!filePath.exists()){
@@ -78,7 +79,7 @@ public class RemoveBg {
             file.transferTo(filePath);
         }
         else {
-            throw new MyException("Image is not fit in accept ratio. please resize you image before upload.");
+            throw new MyException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOU_IMAGE_BEFORE_UPLOAD);
         }
     */
 

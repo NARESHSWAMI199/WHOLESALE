@@ -54,14 +54,14 @@ public class CashFreePgController {
     public ResponseEntity<Map<String,Object>> getPaymentSessionId (HttpServletRequest request,@RequestParam(value = "redirectUri", required = false) String redirectUri,
                                                                    @RequestBody CashfreeRequest cashfreeRequest,@PathVariable String paymentFor) {
         User loggedUser = wholesaleUserService.findUserBySlug(cashfreeRequest.getUserSlug());
-        if(loggedUser == null) throw new NotFoundException("No logged user found.");
+        if(loggedUser == null) throw new NotFoundException(ResponseMessages.NO_LOGGED_USER_FOUND);
         Map<String,Object> result = new HashMap<>();
         OrderEntity orderEntity = null;
             try {
                 if(!paymentFor.equalsIgnoreCase("wallet")) {
                     logger.debug("Received request to get payment session ID for service slug : {} and username : {} and user slug : {}", cashfreeRequest.getServicePlanSlug(), loggedUser.getUsername(), loggedUser.getSlug());
                     ServicePlan servicePlan = servicePlanService.findBySlug(cashfreeRequest.getServicePlanSlug());
-                    if (servicePlan == null) throw new NotFoundException("No service plan found.");
+                    if (servicePlan == null) throw new NotFoundException(ResponseMessages.NO_SERVICE_PLAN_FOUND);
                     orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForPlans(request, cashfreeRequest, loggedUser, servicePlan, redirectUri, env);
                 }else {
                     orderEntity = cashfreeService.getOrderEntityForCashfreePaymentForWallet(request, cashfreeRequest, loggedUser,cashfreeRequest.getAmount(), redirectUri, env);
