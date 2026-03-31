@@ -2,10 +2,10 @@ package com.sales.wholesaler.controller;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.request.SearchFilters;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
+import com.sales.request.SearchFilters;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesalerFuturePlanDto;
 import com.sales.wholesaler.services.WholesaleFuturePlansService;
@@ -30,10 +30,10 @@ import java.util.Map;
 @RequestMapping("future/plans")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Future Plans", description = "APIs for managing wholesale future plans")
-public class WholesaleFuturePlansController  {
+public class WholesaleFuturePlansController {
 
 
-    private final  JwtToken jwtToken;
+    private final JwtToken jwtToken;
     private final WholesaleUserService wholesaleUserService;
     private final WholesaleFuturePlansService wholesaleFuturePlansService;
 
@@ -42,8 +42,8 @@ public class WholesaleFuturePlansController  {
 //    @PreAuthorize("hasAuthority('wholesale.furture.plans.all')")
     @Operation(summary = "Get all future plans", description = "Retrieves a paginated list of all future plans for the wholesaler")
     public ResponseEntity<Page<WholesalerFuturePlanDto>> getAllWholesalerFuturePlans(HttpServletRequest request, @RequestBody SearchFilters searchFilters) {
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken, wholesaleUserService);
-        Page<WholesalerFuturePlanDto> wholesalerFuturePlans = wholesaleFuturePlansService.getWholesalerFuturePlans(loggedUser,searchFilters);
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        Page<WholesalerFuturePlanDto> wholesalerFuturePlans = wholesaleFuturePlansService.getWholesalerFuturePlans(loggedUser, searchFilters);
         return new ResponseEntity<>(wholesalerFuturePlans, HttpStatusCode.valueOf(200));
     }
 
@@ -51,21 +51,20 @@ public class WholesaleFuturePlansController  {
     @PostMapping("/activate")
 //    @PreAuthorize("hasAuthority('wholesale.furture.plans.activate')")
     @Operation(summary = "Activate future plan", description = "Activates a future plan for the wholesaler")
-    public ResponseEntity<Map<String,Object>> activateFuturePlan(HttpServletRequest request, @RequestBody Map<String,String> data){
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken, wholesaleUserService);
+    public ResponseEntity<Map<String, Object>> activateFuturePlan(HttpServletRequest request, @RequestBody Map<String, String> data) {
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
         String slug = data.get("slug");
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         int activated = wholesaleFuturePlansService.activateWholesalerFuturePlans(loggedUser, slug);
-        if(activated > 0){
+        if (activated > 0) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FUTURE_PLAN_ACTIVATED_SUCCESSFULLY);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else {
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_PLAN_FOUND_TO_ACTIVATE);
-            result.put(ConstantResponseKeys.STATUS,400); // it's bad request.
+            result.put(ConstantResponseKeys.STATUS, 400); // it's bad request.
         }
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
-
 
 
 }

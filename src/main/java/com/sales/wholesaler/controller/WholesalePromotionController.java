@@ -26,20 +26,20 @@ import java.util.Map;
 @RequestMapping("wholesale/promotions")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Promotion Management", description = "APIs for managing item promotions for wholesalers")
-public class WholesalePromotionController  {
+public class WholesalePromotionController {
 
-    private final WholesalePromotionsService wholesalePromotionsService;
     private static final Logger logger = LoggerFactory.getLogger(WholesalePromotionController.class);
+    private final WholesalePromotionsService wholesalePromotionsService;
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('wholesale.promoted.item.add')")
     @Operation(summary = "Insert promoted item", description = "Adds a new promoted item for the wholesaler store")
-    public ResponseEntity<Map<String,Object>> insertPromotedItem(Authentication authentication, HttpServletRequest request, @ModelAttribute StorePromotionRequest storePromotionRequest){
+    public ResponseEntity<Map<String, Object>> insertPromotedItem(Authentication authentication, HttpServletRequest request, @ModelAttribute StorePromotionRequest storePromotionRequest) {
         logger.debug("Starting insertPromotedItem method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> response = wholesalePromotionsService.insertItemPromotion(storePromotionRequest,loggedUser);
+        Map<String, Object> response = wholesalePromotionsService.insertItemPromotion(storePromotionRequest, loggedUser);
         logger.debug("Completed insertPromotedItem method");
-        return new ResponseEntity<>(response,HttpStatus.valueOf((Integer) response.get("status")));
+        return new ResponseEntity<>(response, HttpStatus.valueOf((Integer) response.get("status")));
     }
 
 

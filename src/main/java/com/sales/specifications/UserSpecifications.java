@@ -21,6 +21,7 @@ public class UserSpecifications {
             return criteriaBuilder.equal(root.get(User_.USER_TYPE), userType);
         };
     }
+
     public static Specification<User> hasNotUserType(String userType) {
         return (root, query, criteriaBuilder) -> {
             if (userType == null) return null;
@@ -50,7 +51,7 @@ public class UserSpecifications {
 
     public static Specification<User> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(User_.CREATED_AT), fromDate);
         };
     }
@@ -64,10 +65,10 @@ public class UserSpecifications {
 
 
     public static Specification<User> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
             if (status == null || !statusList.contains(status)) return null;
-            return criteriaBuilder.equal(root.get(User_.STATUS),status);
+            return criteriaBuilder.equal(root.get(User_.STATUS), status);
         };
     }
 
@@ -86,9 +87,8 @@ public class UserSpecifications {
     }
 
     public static Specification<User> notSuperAdmin() {
-        return (root, query, criteriaBuilder) ->  criteriaBuilder.notEqual(root.get(User_.id), GlobalConstant.suId);
+        return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get(User_.id), GlobalConstant.suId);
     }
-
 
 
 }

@@ -44,10 +44,10 @@ import java.util.Map;
 @Tag(name = "Wholesale Store Management", description = "APIs for managing stores for wholesalers")
 public class WholesaleStoreController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreController.class);
     private final WholesaleStoreService wholesaleStoreService;
     private final JwtToken jwtToken;
     private final WholesaleUserService wholesaleUserService;
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreController.class);
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema =
     @Schema(example = """

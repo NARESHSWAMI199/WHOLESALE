@@ -16,11 +16,9 @@ import sales.application.sales.util.TestUtil;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = SalesApplication.class)
@@ -63,8 +61,8 @@ public class ContactControllerTest extends TestUtil {
                 """.replace("{slug}", contactUser.getSlug());
 
         mockMvc.perform(post("/contacts/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -81,9 +79,9 @@ public class ContactControllerTest extends TestUtil {
                 """.replace("{slug}", contactUser.getSlug());
 
         mockMvc.perform(post("/contacts/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -100,9 +98,9 @@ public class ContactControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/contacts/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andDo(print());
     }
 
@@ -115,8 +113,8 @@ public class ContactControllerTest extends TestUtil {
                 """.replace("{slug}", contactUser.getSlug());
 
         mockMvc.perform(post("/contacts/remove")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -134,9 +132,9 @@ public class ContactControllerTest extends TestUtil {
                 """.replace("{slug}", contactUser.getSlug());
 
         mockMvc.perform(post("/contacts/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(addJson)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(addJson)
+                        .headers(headers))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -148,11 +146,11 @@ public class ContactControllerTest extends TestUtil {
                 """.replace("{slug}", contactUser.getSlug());
 
         MvcResult result = mockMvc.perform(post("/contacts/remove")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(removeJson)
-            .headers(headers))
-            .andDo(print())
-            .andReturn();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(removeJson)
+                        .headers(headers))
+                .andDo(print())
+                .andReturn();
         assertOkOrNotFound(result);
     }
 
@@ -168,9 +166,9 @@ public class ContactControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/contacts/remove")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andDo(print());
     }
 }

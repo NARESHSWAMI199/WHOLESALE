@@ -9,5 +9,6 @@ import org.mapstruct.Mapper;
 public interface WholesaleCategoryMapper {
 
     WholesaleCategoryDto toDto(ItemCategory itemCategory);
+
     WholesaleCategoryDto toDto(StoreCategory storeCategory);
 }

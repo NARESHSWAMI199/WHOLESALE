@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WholesaleServicePlanRepository extends JpaRepository<ServicePlan,Integer> , JpaSpecificationExecutor<ServicePlan> {
+public interface WholesaleServicePlanRepository extends JpaRepository<ServicePlan, Integer>, JpaSpecificationExecutor<ServicePlan> {
 
     ServicePlan findBySlug(@Param("slug") String slug);
 

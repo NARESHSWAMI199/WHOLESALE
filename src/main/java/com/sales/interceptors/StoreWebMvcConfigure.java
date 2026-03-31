@@ -13,8 +13,8 @@
 //import java.util.List;
 //
 //
-////@Configuration
-////@EnableWebMvc
+/// /@Configuration
+/// /@EnableWebMvc
 //@Component
 //@RequiredArgsConstructor
 //public class StoreWebMvcConfigure implements WebMvcConfigurer {

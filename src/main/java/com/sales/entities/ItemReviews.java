@@ -36,7 +36,7 @@ public class ItemReviews implements Serializable {
     User user;
 
     @Column(name = "likes")
-    Long likes= 0L;
+    Long likes = 0L;
 
     @Column(name = "parent_id")
     Integer parentId;
@@ -47,7 +47,7 @@ public class ItemReviews implements Serializable {
     @Column(name = "created_at")
     String createdAt;
 
-    @Column(name="is_deleted")
+    @Column(name = "is_deleted")
     String isDeleted;
 
     @Column(name = "updated_at")

@@ -56,7 +56,7 @@ public class WholesaleItemControllerTest extends TestUtil {
     @Test
     public void testGetAllItems() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                     {}
                 """;
@@ -72,14 +72,11 @@ public class WholesaleItemControllerTest extends TestUtil {
     }
 
 
-
-
-
     @Test
     public void testAddItem() throws Exception {
         ItemSubCategory itemSubCategory = createItemSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         MockMultipartFile file = getImageMultipartFileToUpload("newItemImages");
         List<MockMultipartFile> imageFiles = List.of(file);
         MockMultipartHttpServletRequestBuilder requestBuilder = multipart("/wholesale/item/add");
@@ -108,7 +105,7 @@ public class WholesaleItemControllerTest extends TestUtil {
     @Test
     public void testUpdateItem() throws Exception {
         Item item = createItem(storeId);
-        logger.info("Item : {} {}",item,item.getWholesaleId());
+        logger.info("Item : {} {}", item, item.getWholesaleId());
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION, token);
         MockMultipartFile file = getImageMultipartFileToUpload("newItemImages");
@@ -139,7 +136,7 @@ public class WholesaleItemControllerTest extends TestUtil {
     public void testUpdateStock() throws Exception {
         Item item = createItem(storeId);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                 {
@@ -147,7 +144,7 @@ public class WholesaleItemControllerTest extends TestUtil {
                 "stock" : "Y"
                 }
                 """
-                .replace("{slug}",item.getSlug());
+                .replace("{slug}", item.getSlug());
         mockMvc.perform(post("/wholesale/item/stock")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,7 +161,7 @@ public class WholesaleItemControllerTest extends TestUtil {
     public void testDeleteItem() throws Exception {
         Item item = createItem(storeId);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 "slug" : "{slug}"
@@ -183,13 +180,11 @@ public class WholesaleItemControllerTest extends TestUtil {
     }
 
 
-
-
     @Test
     public void testGetCategory() throws Exception {
         createItemCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/item/category")
                         .headers(headers)
@@ -200,13 +195,13 @@ public class WholesaleItemControllerTest extends TestUtil {
                 .andReturn();
 
         List categoryList = extractCategoryListFromResponse(result);
-        if(!categoryList.isEmpty()) {
+        if (!categoryList.isEmpty()) {
             Map<String, Object> categoryRequest = (Map<String, Object>) categoryList.get(0);
             Integer categoryId = (Integer) categoryRequest.get("id");
 
             // Getting subcategories also
             headers.set(GlobalConstant.AUTHORIZATION, token);
-            mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/item/subcategory/"+categoryId)
+            mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/item/subcategory/" + categoryId)
                     .headers(headers)
             ).andExpectAll(
                     status().is(200)

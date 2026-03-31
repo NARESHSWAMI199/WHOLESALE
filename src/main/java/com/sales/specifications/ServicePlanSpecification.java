@@ -17,7 +17,7 @@ public class ServicePlanSpecification {
 
     public static Specification<ServicePlan> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(ServicePlan_.CREATED_AT), fromDate);
         };
     }
@@ -31,13 +31,12 @@ public class ServicePlanSpecification {
 
 
     public static Specification<ServicePlan> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
             if (status == null || !statusList.contains(status)) return null;
-            return criteriaBuilder.equal(root.get(ServicePlan_.STATUS),status);
+            return criteriaBuilder.equal(root.get(ServicePlan_.STATUS), status);
         };
     }
-
 
 
     public static Specification<ServicePlan> equalOrLessThanPrice(Float price) {
@@ -46,7 +45,6 @@ public class ServicePlanSpecification {
             return criteriaBuilder.lessThanOrEqualTo(root.get(ServicePlan_.PRICE), price);
         };
     }
-
 
 
     public static Specification<ServicePlan> hasSlug(String slug) {

@@ -2,15 +2,15 @@ package com.sales.wholesaler.services;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.global.ResponseMessages;
-import com.sales.request.UserPlanRequest;
 import com.sales.entities.ServicePlan;
 import com.sales.entities.WholesalerFuturePlan;
 import com.sales.entities.WholesalerPlans;
 import com.sales.exceptions.NotFoundException;
+import com.sales.global.ResponseMessages;
+import com.sales.request.UserPlanRequest;
 import com.sales.utils.Utils;
-import com.sales.wholesaler.dto.WholesalerPlanDto;
 import com.sales.wholesaler.dto.WholesaleServicePlanDto;
+import com.sales.wholesaler.dto.WholesalerPlanDto;
 import com.sales.wholesaler.mapper.WholesaleServicePlanMapper;
 import com.sales.wholesaler.mapper.WholesalerPlanMapper;
 import com.sales.wholesaler.repository.WholesaleFuturePlansRepository;
@@ -36,6 +36,7 @@ import static com.sales.specifications.PlansSpecifications.*;
 @RequiredArgsConstructor
 public class WholesaleServicePlanService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanService.class);
     private final EntityManager entityManager;
     private final WholesaleServicePlanRepository wholesaleServicePlanRepository;
     private final WholesaleUserPlansRepository wholesaleUserPlansRepository;
@@ -43,8 +44,6 @@ public class WholesaleServicePlanService {
     private final WholesaleFuturePlansRepository wholesaleFuturePlansRepository;
     private final WholesaleServicePlanMapper wholesaleServicePlanMapper;
     private final WholesalerPlanMapper wholesalerPlanMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanService.class);
 
     @Transactional
     public List<WholesaleServicePlanDto> getAllServicePlan() {

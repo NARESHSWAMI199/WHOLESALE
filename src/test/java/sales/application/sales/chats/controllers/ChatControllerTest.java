@@ -1,9 +1,9 @@
 package sales.application.sales.chats.controllers;
 
 import com.sales.SalesApplication;
-import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import com.sales.entities.User;
+import com.sales.request.MessageDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +41,7 @@ public class ChatControllerTest extends TestUtil {
 
     @Test
     public void getAllChats_returnsMap() throws Exception {
-        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         principalUser.setAuthorities(java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_WHOLESALER")));
         var auth = new org.springframework.security.authentication.TestingAuthenticationToken(new com.sales.claims.SalesUser(principalUser), null, "ROLE_WHOLESALER");
 
@@ -50,10 +50,10 @@ public class ChatControllerTest extends TestUtil {
         String json = "{\"receiver\":\"abc\", \"createdAt\": 0}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/chats/all")
-                .with(authentication(auth))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-        )
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 
@@ -62,7 +62,7 @@ public class ChatControllerTest extends TestUtil {
 
     @Test
     public void getParentChatMessageById_returnsChat() throws Exception {
-        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         principalUser.setAuthorities(java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_WHOLESALER")));
         var auth = new org.springframework.security.authentication.TestingAuthenticationToken(new com.sales.claims.SalesUser(principalUser), null, "ROLE_WHOLESALER");
 
@@ -70,8 +70,8 @@ public class ChatControllerTest extends TestUtil {
         when(chatService.getParentMessageById(eq(999L), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class), org.mockito.ArgumentMatchers.any(jakarta.servlet.http.HttpServletRequest.class))).thenReturn(chat);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/chats/message/999")
-                .with(authentication(auth))
-        )
+                        .with(authentication(auth))
+                )
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("hello"));
 
@@ -80,11 +80,11 @@ public class ChatControllerTest extends TestUtil {
 
     @Test
     public void uploadImages_success_flow() throws Exception {
-        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         principalUser.setAuthorities(java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_WHOLESALER")));
         var auth = new org.springframework.security.authentication.TestingAuthenticationToken(new com.sales.claims.SalesUser(principalUser), null, "ROLE_WHOLESALER");
 
-        User receiver = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User receiver = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         when(wholesaleUserService.findUserBySlug(org.mockito.ArgumentMatchers.anyString())).thenReturn(receiver);
         when(chatService.verifyBeforeSend(org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class), org.mockito.ArgumentMatchers.anyString())).thenReturn(true);
         when(chatService.saveAllImages(org.mockito.ArgumentMatchers.any(com.sales.request.MessageDto.class), org.mockito.ArgumentMatchers.any(com.sales.claims.AuthUser.class))).thenReturn(List.of("img.png"));
@@ -112,7 +112,7 @@ public class ChatControllerTest extends TestUtil {
 
     @Test
     public void deleteMessage_callsDelete_and_returnsStatus() throws Exception {
-        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User principalUser = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         principalUser.setAuthorities(java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_WHOLESALER")));
         var auth = new org.springframework.security.authentication.TestingAuthenticationToken(new com.sales.claims.SalesUser(principalUser), null, "ROLE_WHOLESALER");
 

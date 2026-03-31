@@ -28,7 +28,17 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @Table(name = "`users`")
 @SQLRestriction("is_deleted != 'Y' ")
 @Builder
-public class User implements AuthUser,Serializable{
+public class User implements AuthUser, Serializable {
+    @Transient
+    public boolean isOnline = false;
+    @Transient
+    public Integer chatNotification = 0;
+    @Transient
+    public boolean isBlocked = false;
+    @Transient
+    public String accepted;
+    @Transient
+    List<GrantedAuthority> authorities;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -46,7 +56,7 @@ public class User implements AuthUser,Serializable{
     private String password;
     @Column(name = "email")
     private String email;
-    @Column(name = "contact",length = 12 , nullable = true)
+    @Column(name = "contact", length = 12, nullable = true)
     private String contact;
     @Column(name = "user_type")
     private String userType;
@@ -65,10 +75,8 @@ public class User implements AuthUser,Serializable{
     private Integer updatedBy;
     @Column(name = "active_plan")
     private Integer activePlan;
-
     @Column(name = "last_seen")
     private Long lastSeen;
-
     @ManyToMany
     @JoinTable(
             name = "user_groups",
@@ -76,27 +84,10 @@ public class User implements AuthUser,Serializable{
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     private Set<Group> groups = new HashSet<>();
-
-
     @Transient
     private String avatarUrl;
 
-    @Transient
-    public boolean isOnline =false;
-
-    @Transient
-    public Integer chatNotification = 0;
-
-    @Transient
-    public boolean isBlocked= false;
-
-    @Transient
-    public String accepted;
-
-    @Transient
-    List<GrantedAuthority> authorities;
-
-    public User (AuthUser loggedUser) {
+    public User(AuthUser loggedUser) {
         this.slug = UUID.randomUUID().toString();
         this.createdAt = getCurrentMillis();
         this.createdBy = loggedUser.getId();
@@ -107,7 +98,7 @@ public class User implements AuthUser,Serializable{
     }
 
 
-    public User () {
+    public User() {
         this.slug = UUID.randomUUID().toString();
         this.createdAt = getCurrentMillis();
         this.updatedAt = getCurrentMillis();

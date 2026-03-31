@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SQLRestriction("is_deleted != 'Y'" )
+@SQLRestriction("is_deleted != 'Y'")
 public class ServicePlan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,18 +31,18 @@ public class ServicePlan implements Serializable {
     String status;
     @Column(name = "icon")
     String icon;
-    @Column(name = "months",nullable = false)
+    @Column(name = "months", nullable = false)
     Integer months;
     @Column(name = "description")
     String description;
     @Column(name = "is_deleted")
     String isDeleted;
-    @Column(name = "created_at",nullable = false)
+    @Column(name = "created_at", nullable = false)
     Long createdAt;
-    @Column(name = "created_by",nullable = false)
+    @Column(name = "created_by", nullable = false)
     Integer createdBy;
-    @Column(name = "updated_at",nullable = false)
+    @Column(name = "updated_at", nullable = false)
     Long updatedAt;
-    @Column(name = "updated_by",nullable = false)
+    @Column(name = "updated_by", nullable = false)
     Integer updatedBy;
 }

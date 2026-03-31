@@ -22,10 +22,9 @@ import static com.sales.specifications.ItemReviewSpecifications.*;
 @RequiredArgsConstructor
 public class ItemReviewService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemReviewService.class);
     private final ItemReviewRepository itemReviewRepository;
     private final ItemReviewMapper itemReviewMapper;
-  
-  private static final Logger logger = LoggerFactory.getLogger(ItemReviewService.class);
 
     @Transactional(readOnly = true)
     public Page<ItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters) {
@@ -38,8 +37,8 @@ public class ItemReviewService {
                         .and(isItemId(filters.getItemId()))
                         .and(isParentComment(filters.getParentId()))
         );
-        Pageable pageable = getPageable(logger,filters);
-        Page<ItemReviews> itemReviewsPage = itemReviewRepository.findAll(specification,pageable);
+        Pageable pageable = getPageable(logger, filters);
+        Page<ItemReviews> itemReviewsPage = itemReviewRepository.findAll(specification, pageable);
         return itemReviewsPage.map(itemReviewMapper::toDto);
     }
 

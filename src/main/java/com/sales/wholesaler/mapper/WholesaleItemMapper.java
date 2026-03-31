@@ -5,7 +5,7 @@ import com.sales.entities.Item;
 import com.sales.wholesaler.dto.WholesaleItemDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring" , uses = {
+@Mapper(componentModel = "spring", uses = {
         WholesaleCategoryMapper.class,
         WholesaleSubcategoryMapper.class,
         WholesaleUserMapper.class

@@ -1,7 +1,6 @@
 package com.sales.wholesaler.dto;
 
 
-import com.sales.entities.Pagination;
 import lombok.Builder;
 
 @Builder

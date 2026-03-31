@@ -32,12 +32,12 @@ class WriteExcelUtilTest {
         data.put("SLUG", Arrays.asList("s1", "s2"));
         data.put("LABEL", Arrays.asList("N", "O"));
         data.put("STATUS", Arrays.asList("A", "D"));
-        data.put("INSTOCK", Arrays.asList("Y","N"));
+        data.put("INSTOCK", Arrays.asList("Y", "N"));
         data.put("CREATEDAT", Arrays.asList(String.valueOf(1000.0), String.valueOf(2000.0)));
 
-        List<String> headers = Arrays.asList("SLUG","LABEL","STATUS","INSTOCK","CREATEDAT");
+        List<String> headers = Arrays.asList("SLUG", "LABEL", "STATUS", "INSTOCK", "CREATEDAT");
 
-        String path = writer.createExcelSheet(data,2, headers, "folder1");
+        String path = writer.createExcelSheet(data, 2, headers, "folder1");
         File fpath = new File(path);
         assertTrue(fpath.exists());
         // cleanup
@@ -57,12 +57,12 @@ class WriteExcelUtilTest {
         f.set(writer, tmp.getAbsolutePath() + File.separator);
 
         ItemHbRepository.ItemUpdateError err = new ItemHbRepository.ItemUpdateError();
-        Map<String,Object> detail = new HashMap<>();
-        detail.put("ID","1");
+        Map<String, Object> detail = new HashMap<>();
+        detail.put("ID", "1");
         err.setItemRowDetail(detail);
         err.setErrorMessage("bad");
 
-        List<String> headers = Arrays.asList("ID","REASON");
+        List<String> headers = Arrays.asList("ID", "REASON");
 
         String fileName = writer.writeNotUpdatedItemsExcel(Arrays.asList(err), headers, "folder2");
         File saved = new File(tmp, "folder2" + File.separator + fileName);

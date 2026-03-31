@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = {SalesApplication.class})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AddressControllerTest extends  TestUtil{
+public class AddressControllerTest extends TestUtil {
 
     private String token;
 
@@ -33,7 +33,7 @@ public class AddressControllerTest extends  TestUtil{
     @Test
     public void getStates() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -51,7 +51,7 @@ public class AddressControllerTest extends  TestUtil{
     @Test
     public void getCities() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }

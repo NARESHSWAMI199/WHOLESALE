@@ -16,13 +16,13 @@ public class Test {
         JSONObject jsonObject = new JSONObject(setCodeJsonStr);
 
         String setCodes = "";
-        if(jsonObject.has(subjectCodeValue)) {
+        if (jsonObject.has(subjectCodeValue)) {
             setCodes = jsonObject.getString(subjectCodeValue);
         }
         //String setCodes = projectParams.getString("set_codes");
-        String setCodesArr[] = setCodes.split(",",-1); // -1 used for if during slipt have comma(,) in last. then don't get blank value. like a,b,c, -> [a,b,c]
+        String setCodesArr[] = setCodes.split(",", -1); // -1 used for if during slipt have comma(,) in last. then don't get blank value. like a,b,c, -> [a,b,c]
 
-        for(int i=0; i < setCodesArr.length; i++){
+        for (int i = 0; i < setCodesArr.length; i++) {
             System.out.println(setCodesArr[i]);
         }
 

@@ -8,8 +8,8 @@ import com.sales.entities.SupportEmail;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.request.*;
 import com.sales.utils.SecureAesUtil;
 import com.sales.utils.Utils;
@@ -230,7 +230,8 @@ public class WholesaleUserService {
         logger.debug("Starting resetPasswordByUserSlug method with passwordDto: {}, loggedUser: {}", passwordDto, loggedUser);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
         Utils.checkRequiredFields(passwordDto, List.of("password"));
-        if (passwordDto.getPassword().isEmpty()) throw new IllegalArgumentException(ResponseMessages.PASSWORD_CAN_T_BY_EMPTY_OR_BLANK);
+        if (passwordDto.getPassword().isEmpty())
+            throw new IllegalArgumentException(ResponseMessages.PASSWORD_CAN_T_BY_EMPTY_OR_BLANK);
         User user = userCacheService.getCacheUser(loggedUser.getSlug());
         user.setPassword(passwordDto.getPassword());
         User updatedUser = wholesaleUserRepository.save(user); // Update operation

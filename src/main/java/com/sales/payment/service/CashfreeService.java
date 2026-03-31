@@ -9,14 +9,14 @@ import com.cashfree.model.CustomerDetails;
 import com.cashfree.model.OrderEntity;
 import com.cashfree.model.OrderMeta;
 import com.sales.claims.AuthUser;
-import com.sales.request.CashfreeRequest;
-import com.sales.request.CashfreeFilters;
 import com.sales.entities.CashfreeTrans;
 import com.sales.entities.ServicePlan;
 import com.sales.global.GlobalConstant;
 import com.sales.payment.controller.CashFreePgController;
 import com.sales.payment.repository.CashfreeHbRepository;
 import com.sales.payment.repository.CashfreeRepository;
+import com.sales.request.CashfreeFilters;
+import com.sales.request.CashfreeRequest;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.services.WholesaleServicePlanService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,28 +39,20 @@ import static com.sales.specifications.CashfreeSpecification.*;
 @RequiredArgsConstructor
 public class CashfreeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(CashFreePgController.class);
     private final CashfreeHbRepository cashfreeHbRepository;
     private final CashfreeRepository cashfreeRepository;
-    
-    private static final Logger logger = LoggerFactory.getLogger(CashFreePgController.class);
-
-
-    @Value("${cashfree.key}")
-    String key;
-
+    private final WholesaleServicePlanService wholesaleServicePlanService;
     @Value("${cashfree.mid}")
     public String mid;
-
+    @Value("${cashfree.key}")
+    String key;
     @Value("${cashfree.mobile}")
     String mobileNumber;
-
     @Value("${cashfree.redirect_uri}")
     String redirectUri;
-
     @Value("${cashfree.callback_uri}")
     String callbackUri;
-
-    private final WholesaleServicePlanService wholesaleServicePlanService;
 
     public Page<CashfreeTrans> getAllPaymentHistoryFromCashfree(CashfreeFilters cashfreeFilters) {
         Specification<CashfreeTrans> specification = Specification.allOf(
@@ -69,7 +61,7 @@ public class CashfreeService {
                         .and(greaterThanOrEqualFromDate(cashfreeFilters.getFromDate()))
                         .and(lessThanOrEqualToToDate(cashfreeFilters.getToDate()))
         );
-        Pageable pageable = getPageable(logger,cashfreeFilters);
+        Pageable pageable = getPageable(logger, cashfreeFilters);
         return cashfreeRepository.findAll(specification, pageable);
     }
 
@@ -146,14 +138,14 @@ public class CashfreeService {
         OrderMeta orderMeta = new OrderMeta();
 
         // we redirect on referred site.
-        if (givenRedirectUri == null || givenRedirectUri.trim().isEmpty()){
-            orderMeta.setReturnUrl(redirectUri+"/?congratulation="+servicePlan.getSlug());
-        }else {
-            orderMeta.setReturnUrl(givenRedirectUri+"?congratulation="+servicePlan.getSlug());
+        if (givenRedirectUri == null || givenRedirectUri.trim().isEmpty()) {
+            orderMeta.setReturnUrl(redirectUri + "/?congratulation=" + servicePlan.getSlug());
+        } else {
+            orderMeta.setReturnUrl(givenRedirectUri + "?congratulation=" + servicePlan.getSlug());
         }
         // Updating callback uri if not provided.
-        if(callbackUri == null) callbackUri = httpServletRequest.getRequestURI();
-        orderMeta.setNotifyUrl(callbackUri+slug+ GlobalConstant.PATH_SEPARATOR+loggedUser.getId()+GlobalConstant.PATH_SEPARATOR+servicePlan.getId());
+        if (callbackUri == null) callbackUri = httpServletRequest.getRequestURI();
+        orderMeta.setNotifyUrl(callbackUri + slug + GlobalConstant.PATH_SEPARATOR + loggedUser.getId() + GlobalConstant.PATH_SEPARATOR + servicePlan.getId());
         request.setOrderMeta(orderMeta);
         request.setOrderAmount((double) amount);
         request.setOrderCurrency("INR");
@@ -161,7 +153,7 @@ public class CashfreeService {
         Cashfree cashfree = new Cashfree();
         ApiResponse<OrderEntity> response = cashfree.PGCreateOrder("2023-08-01", request, null, null, null);
         logger.debug("Payment session ID generated successfully: {}", response.getData().getPaymentSessionId());
-        logger.debug("The order id for payment : {}",response.getData().getOrderId());
+        logger.debug("The order id for payment : {}", response.getData().getOrderId());
 
         cashfreeRequest.setSlug(slug);
         cashfreeRequest.setAmount((double) amount);
@@ -170,11 +162,9 @@ public class CashfreeService {
         cashfreeRequest.setStatus("VISITED");
         cashfreeRequest.setUserId(loggedUser.getId());
         insertPaymentDetail(cashfreeRequest);
-        logger.debug("Ended getOrderEntityForCashfreePaymentForPlans with -> {}",response.getData());
+        logger.debug("Ended getOrderEntityForCashfreePaymentForPlans with -> {}", response.getData());
         return response.getData();
     }
-
-
 
 
     public OrderEntity getOrderEntityForCashfreePaymentForWallet(HttpServletRequest httpServletRequest, CashfreeRequest cashfreeRequest, AuthUser loggedUser, Double amount, String givenRedirectUri, String env) throws ApiException {
@@ -197,14 +187,14 @@ public class CashfreeService {
         OrderMeta orderMeta = new OrderMeta();
 
         // we redirect on referred site.
-        if (givenRedirectUri == null || givenRedirectUri.trim().isEmpty()){
+        if (givenRedirectUri == null || givenRedirectUri.trim().isEmpty()) {
             orderMeta.setReturnUrl(redirectUri);
-        }else {
+        } else {
             orderMeta.setReturnUrl(givenRedirectUri);
         }
         // Updating callback uri if not provided.
-        if(callbackUri == null) callbackUri = httpServletRequest.getRequestURI();
-        orderMeta.setNotifyUrl(callbackUri+slug+GlobalConstant.PATH_SEPARATOR+loggedUser.getId());
+        if (callbackUri == null) callbackUri = httpServletRequest.getRequestURI();
+        orderMeta.setNotifyUrl(callbackUri + slug + GlobalConstant.PATH_SEPARATOR + loggedUser.getId());
         request.setOrderMeta(orderMeta);
         request.setOrderAmount(amount);
         request.setOrderCurrency("INR");
@@ -212,7 +202,7 @@ public class CashfreeService {
         Cashfree cashfree = new Cashfree();
         ApiResponse<OrderEntity> response = cashfree.PGCreateOrder("2023-08-01", request, null, null, null);
         logger.debug("Payment session ID generated successfully: {}", response.getData().getPaymentSessionId());
-        logger.debug("The order id for payment : {}",response.getData().getOrderId());
+        logger.debug("The order id for payment : {}", response.getData().getOrderId());
 
         cashfreeRequest.setSlug(slug);
         cashfreeRequest.setAmount((double) amount);
@@ -221,12 +211,9 @@ public class CashfreeService {
         cashfreeRequest.setStatus("VISITED");
         cashfreeRequest.setUserId(loggedUser.getId());
         insertPaymentDetail(cashfreeRequest);
-        logger.debug("Ended getOrderEntityForCashfreePaymentForWallet with -> {}",response.getData());
+        logger.debug("Ended getOrderEntityForCashfreePaymentForWallet with -> {}", response.getData());
         return response.getData();
     }
-
-
-
 
 
 }

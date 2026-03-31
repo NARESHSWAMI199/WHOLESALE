@@ -13,8 +13,8 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.utils.Utils;
@@ -47,6 +47,7 @@ import static com.sales.specifications.UserSpecifications.*;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserHbRepository userHbRepository;
     private final PermissionHbRepository permissionHbRepository;
@@ -54,8 +55,6 @@ public class UserService {
     private final SupportEmailsRepository supportEmailsRepository;
     private final StoreRepository storeRepository;
     private final UserCacheService userCacheService;
-
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final StoreService storeService;
     private final PaginationService paginationService;
     private final UserMapper userMapper;
@@ -76,7 +75,7 @@ public class UserService {
     }
 
     public User findUserByOtpAndEmail(String email, String password) {
-        logger.debug("Finding user by OTP and email: {}",email);
+        logger.debug("Finding user by OTP and email: {}", email);
         // Here password key has otp
         return userRepository.findUserByOtpAndEmail(email, password);
     }

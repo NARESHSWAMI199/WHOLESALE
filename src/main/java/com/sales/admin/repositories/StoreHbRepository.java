@@ -1,14 +1,14 @@
 package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
-import com.sales.request.StoreCreationRequest;
 import com.sales.entities.StoreNotifications;
+import com.sales.request.StoreCreationRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
@@ -17,7 +17,7 @@ public class StoreHbRepository {
 
     private final EntityManager entityManager;
 
-    public int deleteStore(String slug, AuthUser loggedUser){
+    public int deleteStore(String slug, AuthUser loggedUser) {
         String hql = """
                     Update Store set 
                         isDeleted='Y', 
@@ -26,32 +26,30 @@ public class StoreHbRepository {
                     where slug=:slug
                 """;
         Query query = entityManager.createQuery(hql);
-        query.setParameter("slug",slug);
-        query.setParameter("updatedBy",loggedUser.getId());
-        query.setParameter("updatedAt",Utils.getCurrentMillis());
+        query.setParameter("slug", slug);
+        query.setParameter("updatedBy", loggedUser.getId());
+        query.setParameter("updatedAt", Utils.getCurrentMillis());
         return query.executeUpdate();
     }
 
 
-    public int deleteStore(int userId){
+    public int deleteStore(int userId) {
         String sql = "Update Store s set s.isDeleted='Y' where s.user.id =:userId";
         Query query = entityManager.createQuery(sql);
-        query.setParameter("userId",userId);
+        query.setParameter("userId", userId);
         return query.executeUpdate();
     }
 
 
-
-
-    public int updateStatus(String slug, String status){
+    public int updateStatus(String slug, String status) {
         String hql = "Update Store set status=:status where slug=:slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("status",status);
-        query.setParameter("slug",slug);
+        query.setParameter("status", status);
+        query.setParameter("slug", slug);
         return query.executeUpdate();
     }
 
-    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser){
+    public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) {
         String strQuery = """
                 update Store set
                     storeName=:name,
@@ -81,7 +79,7 @@ public class StoreHbRepository {
     }
 
 
-    public int updateStoreAvatar(String slug,String filename ){
+    public int updateStoreAvatar(String slug, String filename) {
         String hql = "update Store set avtar =:avtar where slug=:slug";
         Query query = entityManager.createQuery(hql);
         query.setParameter("avtar", filename);
@@ -90,7 +88,7 @@ public class StoreHbRepository {
     }
 
 
-    public void insertStoreNotifications(StoreNotifications storeNotifications){
+    public void insertStoreNotifications(StoreNotifications storeNotifications) {
         String hql = "INSERT INTO store_notifications " +
                 "(store_id,title, message_body, created_at, created_by, is_deleted, seen) " +
                 "VALUES(:storeId,:title,:messageBody, :createAt, :createdBy, 'N', 'N')";
@@ -104,39 +102,39 @@ public class StoreHbRepository {
     }
 
 
-    public int deleteStoreCategory(String slug){
+    public int deleteStoreCategory(String slug) {
         String hql = "Update StoreCategory set isDeleted='Y' where slug=:slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("slug",slug);
+        query.setParameter("slug", slug);
         return query.executeUpdate();
     }
 
 
-    public int deleteStoreSubCategory(String slug){
+    public int deleteStoreSubCategory(String slug) {
         String hql = "Update StoreSubCategory set isDeleted='Y' where slug=:slug";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("slug",slug);
+        query.setParameter("slug", slug);
         return query.executeUpdate();
     }
 
-    public Integer getStoreCategoryIdBySLug(String slug){
+    public Integer getStoreCategoryIdBySLug(String slug) {
         String hql = "select id from StoreCategory where slug=:slug ";
         Query query = entityManager.createQuery(hql);
-        query.setParameter("slug",slug);
+        query.setParameter("slug", slug);
         return (Integer) query.getSingleResult();
     }
 
-    public int switchCategoryToOther(int categoryId){
+    public int switchCategoryToOther(int categoryId) {
         String sql = "Update stores set category_id=0 , subcategory_id=0 where category_id=:categoryId";
         Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("categoryId",categoryId);
+        query.setParameter("categoryId", categoryId);
         return query.executeUpdate();
     }
 
-    public int switchSubCategoryToOther(int subcategoryId){
+    public int switchSubCategoryToOther(int subcategoryId) {
         String sql = "Update stores set category_id=0 , subcategory_id=0 where subcategory_id=:subcategoryId";
         Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("subcategoryId",subcategoryId);
+        query.setParameter("subcategoryId", subcategoryId);
         return query.executeUpdate();
     }
 

@@ -17,12 +17,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BlockListService  {
+public class BlockListService {
 
-  private final WholesaleUserRepository wholesaleUserRepository;
-  private final BlockListRepository blockListRepository;
-  private final BlockListHbRepository blockListHbRepository;
-  private static final Logger logger = LoggerFactory.getLogger(BlockListService.class);
+    private static final Logger logger = LoggerFactory.getLogger(BlockListService.class);
+    private final WholesaleUserRepository wholesaleUserRepository;
+    private final BlockListRepository blockListRepository;
+    private final BlockListHbRepository blockListHbRepository;
 
     public BlockedUser addAUserInBlockList(AuthUser blockingBy, String blockedUserSlug) {
         logger.debug("Starting addAUserInBlockList method");
@@ -32,27 +32,26 @@ public class BlockListService  {
             throw new NotFoundException(ResponseMessages.BLOCKED_USER_NOT_EXISTS);
         }
         BlockedUser blockList = BlockedUser.builder()
-            .userId(blockingBy.getId())
-            .blockedUser(blockedUser)
-            .createdAt(Utils.getCurrentMillis())
-            .build();
+                .userId(blockingBy.getId())
+                .blockedUser(blockedUser)
+                .createdAt(Utils.getCurrentMillis())
+                .build();
         BlockedUser savedBlockList = blockListRepository.save(blockList); // Create operation
         logger.debug("Completed addAUserInBlockList method");
         return savedBlockList;
     }
 
-    public boolean removeUserFromBlockList(Integer userId, String recipient){
+    public boolean removeUserFromBlockList(Integer userId, String recipient) {
         User receiver = wholesaleUserRepository.findUserBySlug(recipient);
-        return blockListHbRepository.deleteUserFromBlockList(userId,receiver);
+        return blockListHbRepository.deleteUserFromBlockList(userId, receiver);
     }
 
 
-
     public boolean isReceiverBlockedBySender(AuthUser loggedUser, User receiver) {
-        logger.debug("Starting isReceiverBlockedBySender method the loggedUser : {} and the receiver : {} ",loggedUser,receiver);
-        BlockedUser blockedUser = blockListRepository.findByUserIdAndBlockedUser(loggedUser.getId(),receiver);
+        logger.debug("Starting isReceiverBlockedBySender method the loggedUser : {} and the receiver : {} ", loggedUser, receiver);
+        BlockedUser blockedUser = blockListRepository.findByUserIdAndBlockedUser(loggedUser.getId(), receiver);
         boolean exists = blockedUser != null;
-        logger.debug("Completed isReceiverBlockedBySender method returning : {}",exists);
+        logger.debug("Completed isReceiverBlockedBySender method returning : {}", exists);
         return exists;
     }
 

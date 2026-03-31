@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class StoreFilterRequest extends SearchFilters{
+public class StoreFilterRequest extends SearchFilters {
     String slug;
     String status;
 }

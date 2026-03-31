@@ -47,7 +47,6 @@ public class WholesalePlanControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testIsMyPlanActive() throws Exception {
         HttpHeaders headers = new HttpHeaders();
@@ -82,7 +81,6 @@ public class WholesalePlanControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testGetAllMyPlansWithoutLogin() throws Exception {
         String json = """
@@ -113,8 +111,6 @@ public class WholesalePlanControllerTest extends TestUtil {
                 jsonPath("$.numberOfElements", notNullValue())
         ).andDo(print());
     }
-
-
 
 
 }

@@ -2,8 +2,8 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
-import com.sales.request.GraphRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.request.GraphRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ import java.util.Map;
 @RequestMapping("admin/dashboard")
 @RequiredArgsConstructor
 @Tag(name = "Admin Dashboard", description = "APIs for admin dashboard data")
-public class AdminDashboardController  {
+public class AdminDashboardController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
     private final UserService userService;
     private final StoreService storeService;
-    private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
 
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('dashboard.count')")
@@ -40,7 +40,7 @@ public class AdminDashboardController  {
         responseObj.put("admins", userService.getAdminsCounts());
         // responseObj.put("items", itemService.getItemCounts());
         // responseObj.put("wholesales", storeService.getWholesaleCounts());
-        return new ResponseEntity<>(responseObj, HttpStatus.OK );
+        return new ResponseEntity<>(responseObj, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('dashboard.count')")
@@ -51,6 +51,6 @@ public class AdminDashboardController  {
         Map<String, Object> responseObj = new HashMap<>();
         responseObj.put(ConstantResponseKeys.RES, storeService.getStoreCountByMonths(graphRequest));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
-        return new ResponseEntity<>(responseObj,HttpStatus.OK);
+        return new ResponseEntity<>(responseObj, HttpStatus.OK);
     }
 }

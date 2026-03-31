@@ -15,8 +15,8 @@ import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.request.enums.ITEM_LABEL;
@@ -51,6 +51,7 @@ import static com.sales.specifications.ItemsSpecifications.*;
 public class ItemService {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
     private final ItemRepository itemRepository;
     private final WriteExcelUtil writeExcel;
     private final ItemCategoryRepository itemCategoryRepository;
@@ -62,9 +63,6 @@ public class ItemService {
     private final ItemMapper itemMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
-
     @Value("${item.absolute}")
     String itemImagePath;
 
@@ -294,7 +292,7 @@ public class ItemService {
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
         logger.info("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = findItemBySlug(itemRequest.getSlug());
-        if(item == null) throw new NotFoundException(ResponseMessages.ITEM_NOT_FOUND_1);
+        if (item == null) throw new NotFoundException(ResponseMessages.ITEM_NOT_FOUND_1);
         String title = "Item " + item.getName() + " updated.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " updated by admin previous data was " +
                 item.toString()

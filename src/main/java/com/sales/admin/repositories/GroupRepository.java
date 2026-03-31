@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public interface GroupRepository extends JpaRepository<Group,Integer> , JpaSpecificationExecutor<Group> {
+public interface GroupRepository extends JpaRepository<Group, Integer>, JpaSpecificationExecutor<Group> {
 
     Group findGroupBySlug(String slug);
 
@@ -26,7 +26,7 @@ public interface GroupRepository extends JpaRepository<Group,Integer> , JpaSpeci
             left join g.permissions p
             where g.id =:groupId
             """)
-    List<Map<String,Object>> findGroupAndPermissionsByGroupId(@Param("groupId") Integer groupId);
+    List<Map<String, Object>> findGroupAndPermissionsByGroupId(@Param("groupId") Integer groupId);
 
 
     @Query(value = """

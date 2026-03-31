@@ -24,8 +24,6 @@ public class ItemsReportSpecifications {
             return criteriaBuilder.equal(root.get(Item_.ITEM_CATEGORY), category);
         };
     }*/
-
-
     public static Specification<ItemReport> containsMessage(String itemName) {
         return (root, query, criteriaBuilder) -> {
             if (itemName == null) return null;
@@ -34,18 +32,17 @@ public class ItemsReportSpecifications {
     }
 
 
-
     public static Specification<ItemReport> hasItemId(Long itemId) {
         return (root, query, criteriaBuilder) -> {
             if (itemId == null || itemId == 0) return null;
-            return criteriaBuilder.equal(root.get(ItemReport_.ITEM_ID),itemId);
+            return criteriaBuilder.equal(root.get(ItemReport_.ITEM_ID), itemId);
         };
     }
 
 
     public static Specification<Item> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(Item_.CREATED_AT), fromDate);
         };
     }
@@ -59,10 +56,10 @@ public class ItemsReportSpecifications {
 
 
     public static Specification<Item> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
             if (status == null || !statusList.contains(status)) return null;
-            return criteriaBuilder.equal(root.get(Item_.STATUS),status);
+            return criteriaBuilder.equal(root.get(Item_.STATUS), status);
         };
     }
 
@@ -70,14 +67,14 @@ public class ItemsReportSpecifications {
     public static Specification<Item> isLabel(String label) {
         return (root, query, criteriaBuilder) -> {
             if (label == null) return null;
-            return criteriaBuilder.equal(root.get(Item_.LABEL),label);
+            return criteriaBuilder.equal(root.get(Item_.LABEL), label);
         };
     }
 
     public static Specification<Item> inStock(String inStock) {
         return (root, query, criteriaBuilder) -> {
             if (inStock == null) return null;
-            return criteriaBuilder.equal(root.get(Item_.IN_STOCK),inStock);
+            return criteriaBuilder.equal(root.get(Item_.IN_STOCK), inStock);
         };
     }
 
@@ -87,7 +84,6 @@ public class ItemsReportSpecifications {
             return criteriaBuilder.lessThanOrEqualTo(root.get(Item_.price), price);
         };
     }
-
 
 
     public static Specification<Item> hasSlug(String slug) {

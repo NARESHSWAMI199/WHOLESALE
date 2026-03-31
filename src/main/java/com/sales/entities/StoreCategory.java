@@ -25,7 +25,7 @@ public class StoreCategory implements Serializable {
     @Column(name = "slug")
     String slug = UUID.randomUUID().toString();
 
-    @Column(name="category")
+    @Column(name = "category")
     String category;
 
     @Column(name = "icon")
@@ -33,10 +33,6 @@ public class StoreCategory implements Serializable {
 
     @Column(name = "is_deleted")
     String isDeleted = "N";
-
-
-
-
 
 
 }

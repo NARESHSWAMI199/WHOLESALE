@@ -3,15 +3,15 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.AddressHbRepository;
 import com.sales.admin.repositories.AddressRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.AddressRequest;
 import com.sales.entities.Address;
 import com.sales.entities.City;
 import com.sales.entities.State;
-import org.springframework.transaction.annotation.Transactional;
+import com.sales.request.AddressRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,10 +22,9 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @RequiredArgsConstructor
 public class AddressService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AddressService.class);
     private final AddressRepository addressRepository;
     private final AddressHbRepository addressHbRepository;
-    
-    private static final Logger logger = LoggerFactory.getLogger(AddressService.class);
 
     @Transactional
     public Address insertAddress(AddressRequest addressRequest, AuthUser loggedUser) {

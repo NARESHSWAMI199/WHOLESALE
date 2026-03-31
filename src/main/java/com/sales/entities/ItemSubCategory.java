@@ -20,7 +20,7 @@ public class ItemSubCategory implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @Column(name = "slug" )
+    @Column(name = "slug")
     String slug;
 
     @Column(name = "category_id")
@@ -40,9 +40,6 @@ public class ItemSubCategory implements Serializable {
 
     @Column(name = "is_deleted")
     String isDeleted = "N";
-
-
-
 
 
 }

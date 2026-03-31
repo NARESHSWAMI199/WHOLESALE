@@ -3,8 +3,8 @@ package sales.application.sales.chats.repositories;
 import com.sales.SalesApplication;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
-import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
+import com.sales.request.MessageDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +50,7 @@ public class ChatHbRepositoryTest extends TestUtil {
         String receiver = "r" + java.util.UUID.randomUUID();
 
         Chat a = Chat.builder().sender(sender).receiver(receiver).message("a").createdAt(System.currentTimeMillis()).build();
-        Chat b = Chat.builder().sender(receiver).receiver(sender).message("b").createdAt(System.currentTimeMillis()+1).build();
+        Chat b = Chat.builder().sender(receiver).receiver(sender).message("b").createdAt(System.currentTimeMillis() + 1).build();
         chatRepository.save(a);
         chatRepository.save(b);
 

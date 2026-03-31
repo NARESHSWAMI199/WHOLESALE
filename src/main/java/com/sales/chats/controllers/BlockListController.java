@@ -27,24 +27,24 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Block List Management", description = "APIs for managing blocked users in chat")
-public class BlockListController  {
+public class BlockListController {
 
-  
-  private static final Logger logger = LoggerFactory.getLogger(BlockListController.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(BlockListController.class);
     private final BlockListService blockListService;
     private final WholesaleUserService wholesaleUserService;
 
     @GetMapping("/block/{recipient}")
     @Operation(summary = "Block user", description = "Blocks a user from chatting with the authenticated user")
-    public ResponseEntity<Map<String,Object>> addUserInBlockList(Authentication authentication,@PathVariable String recipient, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> addUserInBlockList(Authentication authentication, @PathVariable String recipient, HttpServletRequest request) {
         logger.debug("Blocking user: {}", recipient);
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         BlockedUser blockedUser = blockListService.addAUserInBlockList(loggedUser, recipient);
-        if(blockedUser.getId() > 0){
+        if (blockedUser.getId() > 0) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_BLOCKED);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else {
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_BLOCK_USER);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
@@ -52,17 +52,16 @@ public class BlockListController  {
     }
 
 
-
     @GetMapping("/unblock/{recipient}")
-    public ResponseEntity<Map<String,Object>> removeUserFromBlockList(Authentication authentication,@PathVariable String recipient, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> removeUserFromBlockList(Authentication authentication, @PathVariable String recipient, HttpServletRequest request) {
         logger.debug("Unblocking user: {}", recipient);
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         boolean unblocked = blockListService.removeUserFromBlockList(loggedUser.getId(), recipient);
-        if(unblocked){
+        if (unblocked) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.USER_HAS_BEEN_SUCCESSFULLY_UNBLOCKED);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else {
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SOMETHING_WENT_WRONG_DURING_UNBLOCK_USER);
             result.put(ConstantResponseKeys.STATUS, 400);
         }
@@ -75,7 +74,7 @@ public class BlockListController  {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         User receiver = wholesaleUserService.findUserBySlug(receiverSlug);
         boolean blocked = blockListService.isReceiverBlockedBySender(loggedUser, receiver);
-        return new ResponseEntity<>(blocked,HttpStatus.valueOf(200));
+        return new ResponseEntity<>(blocked, HttpStatus.valueOf(200));
     }
 
 }

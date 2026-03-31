@@ -31,7 +31,7 @@ public class StoreCreationRequest extends AddressRequest {
     private String description;
     private String storeAvatar;
     private MultipartFile storePic;
-    private List<Long> seenIds ;
+    private List<Long> seenIds;
     @NotNull
     private Integer categoryId;
     @NotNull

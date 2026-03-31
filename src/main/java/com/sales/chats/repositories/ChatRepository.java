@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ChatRepository extends JpaRepository<Chat,Long> {
+public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query(" from Chat where (sender=:sender and receiver=:receiver) or (sender=:receiver and receiver=:sender)")
-    List<Chat> getChatBySenderKeyOrReceiverKey(String sender,String receiver);
+    List<Chat> getChatBySenderKeyOrReceiverKey(String sender, String receiver);
 
 
     @Query(" select count(id) as count from Chat where (sender=:sender and receiver=:receiver) and seen=false and isSent='S' ")
-    Integer getUnSeenChatsCount(String sender,String receiver);
+    Integer getUnSeenChatsCount(String sender, String receiver);
 
 
     @Query("select count(id) as count from Chat where sender=:sender and receiver=:receiver")
-    Integer isUserExistsInChatList(String sender,String receiver);
+    Integer isUserExistsInChatList(String sender, String receiver);
 
 
     @Query("from Chat where sender=:sender and receiver=:receiver and createdAt=:createdAt")

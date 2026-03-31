@@ -29,30 +29,27 @@ public class StoreNotifications implements Serializable {
     @Column(name = "title")
     String title;
 
-    @Column(name = "message_body" , columnDefinition = "TEXT")
+    @Column(name = "message_body", columnDefinition = "TEXT")
     String messageBody;
 
     @Column(name = "created_at")
     Long createAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by",referencedColumnName = "user_id")
+    @JoinColumn(name = "created_by", referencedColumnName = "user_id")
     User createdBy;
 
-    @Column(name ="is_deleted" )
-    String isDeleted ="N";
+    @Column(name = "is_deleted")
+    String isDeleted = "N";
 
-    @Column(name ="seen" )
-    String seen="N";
-
-
+    @Column(name = "seen")
+    String seen = "N";
 
 
 //    public StoreNotifications(SalesUser){
 //        this.createdBy = loggedUser;
 //        this.createAt = Utils.getCurrentMillis();
 //    }
-
 
 
 }

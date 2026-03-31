@@ -4,9 +4,9 @@ package com.sales.admin.controllers;
 import com.sales.admin.services.PaginationService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.UserPaginationRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
+import com.sales.request.UserPaginationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,16 +25,16 @@ import java.util.Map;
 @RequestMapping("/admin/pagination/")
 @RequiredArgsConstructor
 @Tag(name = "Pagination Settings", description = "APIs for managing user pagination settings")
-public class PaginationController  {
+public class PaginationController {
 
     private final PaginationService paginationService;
 
     @GetMapping("all")
     @PreAuthorize("hasAuthority('pagination.all')")
     @Operation(summary = "Get all user paginations", description = "Retrieves all pagination settings for the logged-in user")
-    public ResponseEntity<Map<String,Object>> findAllUserPaginations(Authentication authentication, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> findAllUserPaginations(Authentication authentication, HttpServletRequest request) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> allUserPaginations = paginationService.findUserPaginationsByUserId(loggedUser);
+        Map<String, Object> allUserPaginations = paginationService.findUserPaginationsByUserId(loggedUser);
         return new ResponseEntity<>(allUserPaginations, HttpStatus.valueOf(200));
     }
 
@@ -42,22 +42,20 @@ public class PaginationController  {
     @PostMapping("update")
     @PreAuthorize("hasAnyAuthority('pagination.update','pagination.edit')")
     @Operation(summary = "Update pagination settings", description = "Updates the pagination row number settings for the user")
-    public ResponseEntity<Map<String,Object>> updatePaginationRowNumber(Authentication authentication,HttpServletRequest request, @RequestBody UserPaginationRequest
+    public ResponseEntity<Map<String, Object>> updatePaginationRowNumber(Authentication authentication, HttpServletRequest request, @RequestBody UserPaginationRequest
             userPaginationRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int updated = paginationService.updateUserPaginationRowsNumber(userPaginationRequest,loggedUser);
-        if(updated > 0) {
+        int updated = paginationService.updateUserPaginationRowsNumber(userPaginationRequest, loggedUser);
+        if (updated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PAGINATION_UPDATED_SUCCESSFULLY);
-            responseObj.put(ConstantResponseKeys.STATUS,200);
-        }else{
+            responseObj.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND_TO_UPDATE);
-            responseObj.put(ConstantResponseKeys.STATUS,404);
+            responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
-
 
 
 }

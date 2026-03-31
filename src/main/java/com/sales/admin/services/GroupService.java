@@ -10,15 +10,17 @@ import com.sales.admin.repositories.PermissionHbRepository;
 import com.sales.admin.repositories.PermissionRepository;
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.request.*;
 import com.sales.entities.Group;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
+import com.sales.request.DeleteRequest;
+import com.sales.request.GroupFilterRequest;
+import com.sales.request.GroupRequest;
+import com.sales.request.UserPermissionsRequest;
 import com.sales.utils.Utils;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -42,14 +45,13 @@ import static com.sales.specifications.GroupSpecifications.*;
 public class GroupService {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
     private final GroupRepository groupRepository;
     private final PermissionRepository permissionRepository;
     private final PermissionHbRepository permissionHbRepository;
     private final UserCacheService userCacheService;
     private final GroupMapper groupMapper;
     private final PermissionMapper permissionMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(GroupService.class);
 
     @Transactional(readOnly = true)
     public Page<GroupDto> getAllGroups(GroupFilterRequest filters, AuthUser loggedUser) {

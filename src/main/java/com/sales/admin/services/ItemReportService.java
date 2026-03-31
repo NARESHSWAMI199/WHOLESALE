@@ -26,8 +26,8 @@ public class ItemReportService {
     private final ItemReportMapper itemReportMapper;
 
     @Transactional
-    public Page<ItemReportDto> getAllReportDtoByItemId(ItemReportFilterRequest searchFilters){
-        Pageable pageable = getPageable(logger,searchFilters);
+    public Page<ItemReportDto> getAllReportDtoByItemId(ItemReportFilterRequest searchFilters) {
+        Pageable pageable = getPageable(logger, searchFilters);
         Specification<ItemReport> specification = Specification.allOf(hasItemId(searchFilters.getItemId()));
         Page<ItemReport> itemReports = itemReportRepository.findAll(specification, pageable);
         return itemReports.map(itemReportMapper::toDto);

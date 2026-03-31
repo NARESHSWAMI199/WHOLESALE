@@ -20,7 +20,7 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @SQLRestriction("is_deleted != 'Y'") /* Same as where clause */
 @Builder
 public class Store implements Serializable {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -42,7 +42,7 @@ public class Store implements Serializable {
     @Column(name = "status")
     String status;
     @Column(name = "is_deleted")
-    String isDeleted="N";
+    String isDeleted = "N";
     @Column(name = "created_at")
     Long createdAt;
     @Column(name = "created_by")
@@ -71,8 +71,7 @@ public class Store implements Serializable {
     StoreSubCategory storeSubCategory;
 
 
-
-    public Store (AuthUser loggedUser) {
+    public Store(AuthUser loggedUser) {
         this.createdAt = getCurrentMillis();
         this.createdBy = loggedUser.getId();
         this.updatedAt = getCurrentMillis();

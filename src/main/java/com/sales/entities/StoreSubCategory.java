@@ -38,7 +38,7 @@ public class StoreSubCategory implements Serializable {
 
 
     @Column(name = "is_deleted")
-    String isDeleted ="N";
+    String isDeleted = "N";
 
 
 }

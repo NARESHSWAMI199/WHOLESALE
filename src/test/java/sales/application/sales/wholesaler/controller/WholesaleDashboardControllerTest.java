@@ -32,7 +32,8 @@ public class WholesaleDashboardControllerTest extends TestUtil {
 
     @BeforeEach
     public void loginUserTest() throws Exception {
-        token = loginUser(GlobalConstantTest.WHOLESALER);;
+        token = loginUser(GlobalConstantTest.WHOLESALER);
+        ;
     }
 
 
@@ -54,7 +55,7 @@ public class WholesaleDashboardControllerTest extends TestUtil {
     @Test
     public void testGraphData() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -81,7 +82,7 @@ public class WholesaleDashboardControllerTest extends TestUtil {
     @Test
     public void testCounts() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/dashboard/counts")
                 .headers(headers)
         ).andExpectAll(

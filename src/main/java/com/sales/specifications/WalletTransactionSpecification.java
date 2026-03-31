@@ -9,32 +9,32 @@ import org.springframework.data.jpa.domain.Specification;
 public class WalletTransactionSpecification {
 
 
-    public static Specification<WalletTransaction> hasSlug(String slug){
+    public static Specification<WalletTransaction> hasSlug(String slug) {
         return ((root, query, criteriaBuilder) -> {
-            if(Utils.isEmpty(slug)) return null;
-           return criteriaBuilder.equal(root.get(WalletTransaction_.slug),slug);
+            if (Utils.isEmpty(slug)) return null;
+            return criteriaBuilder.equal(root.get(WalletTransaction_.slug), slug);
         });
     }
 
-    public static Specification<WalletTransaction> hasUserId(Integer userId){
+    public static Specification<WalletTransaction> hasUserId(Integer userId) {
         return ((root, query, criteriaBuilder) -> {
-            if(userId == null || userId.equals(0)) return null;
-            return criteriaBuilder.equal(root.get(WalletTransaction_.userId),userId);
+            if (userId == null || userId.equals(0)) return null;
+            return criteriaBuilder.equal(root.get(WalletTransaction_.userId), userId);
         });
     }
 
 
-    public static Specification<WalletTransaction> hasSlug(Float amount){
+    public static Specification<WalletTransaction> hasSlug(Float amount) {
         return ((root, query, criteriaBuilder) -> {
-            if(amount == null || amount == 0 ) return null;
-            return criteriaBuilder.equal(root.get(WalletTransaction_.amount),amount);
+            if (amount == null || amount == 0) return null;
+            return criteriaBuilder.equal(root.get(WalletTransaction_.amount), amount);
         });
     }
 
 
     public static Specification<WalletTransaction> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(WalletTransaction_.CREATED_AT), fromDate);
         };
     }

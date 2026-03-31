@@ -5,8 +5,8 @@ import lombok.Builder;
 
 @Builder
 public record CityDto(
-    int id,
-    String cityName,
-    Integer stateId
+        int id,
+        String cityName,
+        Integer stateId
 ) {
 }

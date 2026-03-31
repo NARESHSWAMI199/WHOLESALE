@@ -22,7 +22,7 @@ public class MessageDto {
     private String sessionId;
     private Long createdAt;
     private Long lastSeen;
-    private Boolean seen=false;
+    private Boolean seen = false;
     private List<MultipartFile> images;
     private List<String> imagesUrls;
     private String isSenderDeleted;

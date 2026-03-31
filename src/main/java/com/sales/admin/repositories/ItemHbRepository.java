@@ -3,18 +3,17 @@ package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
 import com.sales.entities.Item_;
-import com.sales.entities.Store_;
 import com.sales.entities.User;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -135,18 +134,6 @@ public class ItemHbRepository {
         return query.executeUpdate();
     }
 
-
-    /// For updateItemsViaExcelSheet
-
-    @Getter
-    @Setter
-    @ToString
-    public static class ItemUpdateError {
-        Map<String, Object> itemRowDetail;
-        String errorMessage;
-    }
-
-
     public int updateExcelSheetItems(ItemRequest itemRequest, Integer userId, Integer wholesaleId) {
         String hql = """
                    update Item set name=:name,
@@ -173,7 +160,6 @@ public class ItemHbRepository {
         return query.executeUpdate();
     }
 
-
     public int updateItemImage(String slug, String filenames) {
         String hql = "update Item set avtars =:avtars where slug=:slug";
         Query query = entityManager.createQuery(hql);
@@ -182,14 +168,12 @@ public class ItemHbRepository {
         return query.executeUpdate();
     }
 
-
     public int deleteItemCategory(String slug) {
         String hqlString = "update ItemCategory set isDeleted='Y' where slug=:slug";
         Query query = entityManager.createQuery(hqlString);
         query.setParameter("slug", slug);
         return query.executeUpdate();
     }
-
 
     public int deleteItemSubCategory(String slug) {
         String hqlString = "update ItemSubCategory set isDeleted='Y' where slug=:slug";
@@ -217,6 +201,16 @@ public class ItemHbRepository {
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("subcategoryId", subcategoryId);
         return query.executeUpdate();
+    }
+
+    /// For updateItemsViaExcelSheet
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ItemUpdateError {
+        Map<String, Object> itemRowDetail;
+        String errorMessage;
     }
 
 

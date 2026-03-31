@@ -31,11 +31,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
 @ActiveProfiles("test")
-public class WholesaleUserControllerTest  extends TestUtil {
+public class WholesaleUserControllerTest extends TestUtil {
 
-    
-    private final Logger logger  = LoggerFactory.getLogger(WholesaleStoreControllerTest.class);
 
+    private final Logger logger = LoggerFactory.getLogger(WholesaleStoreControllerTest.class);
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    WholesaleUserRepository wholesaleUserRepository;
     private String token;
 
     @BeforeEach
@@ -43,14 +46,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
         token = loginUser(GlobalConstantTest.WHOLESALER);
     }
 
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WholesaleUserRepository wholesaleUserRepository;
-
-
-//    @Test
+    //    @Test
     public void testWholesaleLogin(String email) throws Exception {
         String json = """
                 {
@@ -58,8 +54,8 @@ public class WholesaleUserControllerTest  extends TestUtil {
                     "password" : "{password}"
                 }
                 """
-                .replace("{email}",email)
-                .replace("{password}","123456");
+                .replace("{email}", email)
+                .replace("{password}", "123456");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -72,7 +68,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
     }
 
 
-//    @Test
+    //    @Test
     public void validateOtp(String slug) throws Exception {
         User user = wholesaleUserRepository.findUserBySlug(slug);
         String otp = user.getOtp();
@@ -83,9 +79,8 @@ public class WholesaleUserControllerTest  extends TestUtil {
                     "password" : "{otp}"
                 }
                 """
-                .replace("{slug}",slug)
-                .replace("{otp}",otp)
-                ;
+                .replace("{slug}", slug)
+                .replace("{otp}", otp);
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/validate-otp")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -99,7 +94,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
     @Test
     public void testCreateOrRegisterUserWithoutLogin() throws Exception {
         createSupportEmail();
-        String randomEmail = UUID.randomUUID().toString().substring(0,6) + "@mocktest.in";
+        String randomEmail = UUID.randomUUID().toString().substring(0, 6) + "@mocktest.in";
         String randomPhone = getRandomMobileNumber();
 
         String json = """
@@ -110,8 +105,8 @@ public class WholesaleUserControllerTest  extends TestUtil {
                         "contact" : "{contact}"
                     }
                 """
-                .replace("{email}",randomEmail)
-                .replace("{contact}",randomPhone);
+                .replace("{email}", randomEmail)
+                .replace("{contact}", randomPhone);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +118,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
 
     @Test
     public void testUpdateUserWithoutLogin() throws Exception {
-        String randomEmail = UUID.randomUUID().toString().substring(0,6) + "@mocktest.in";
+        String randomEmail = UUID.randomUUID().toString().substring(0, 6) + "@mocktest.in";
         String randomPhone = getRandomMobileNumber();
         String json = """
                     {
@@ -134,8 +129,8 @@ public class WholesaleUserControllerTest  extends TestUtil {
                         "contact" : "{contact}"
                     }
                 """
-                .replace("{email}",randomEmail)
-                .replace("{contact}",randomPhone);
+                .replace("{email}", randomEmail)
+                .replace("{contact}", randomPhone);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/update")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -178,11 +173,11 @@ public class WholesaleUserControllerTest  extends TestUtil {
 
     @Test
     public void testUpdatePasswordWithoutLogin() throws Exception {
-            mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/password")
-                    .contentType(MediaType.APPLICATION_JSON)
-            ).andExpectAll(
-                    status().is(401)
-            );
+        mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/password")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().is(401)
+        );
     }
 
     @Test
@@ -191,15 +186,14 @@ public class WholesaleUserControllerTest  extends TestUtil {
     }
 
 
-
     // With login ==========================
 
 
-//    @Test
+    //    @Test
     public void testUpdateUser(String slug) throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        String randomEmail = UUID.randomUUID().toString().substring(0,6) + "@mocktest.in";
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String randomEmail = UUID.randomUUID().toString().substring(0, 6) + "@mocktest.in";
         String randomPhone = getRandomMobileNumber();
         String json = """
                     {
@@ -210,9 +204,9 @@ public class WholesaleUserControllerTest  extends TestUtil {
                         "contact" : "{contact}"
                     }
                 """
-                .replace("{slug}",slug)
-                .replace("{email}",randomEmail)
-                .replace("{contact}",randomPhone);
+                .replace("{slug}", slug)
+                .replace("{email}", randomEmail)
+                .replace("{contact}", randomPhone);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/auth/update")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -227,7 +221,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
     @Test
     public void testDetailUser() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/auth/detail")
                 .headers(headers)
@@ -242,9 +236,9 @@ public class WholesaleUserControllerTest  extends TestUtil {
     @Test
     public void testDetailUserWithSlug() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/auth/detail/"+selfSlug)
+        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/auth/detail/" + selfSlug)
                 .headers(headers)
         ).andExpectAll(
                 status().isOk()
@@ -257,7 +251,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
     @Test
     public void testUpdateLastSeenUser() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/auth/last-seen")
                 .headers(headers)
@@ -272,7 +266,7 @@ public class WholesaleUserControllerTest  extends TestUtil {
     @Test
     public void testChatUsers() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                 {
@@ -288,11 +282,13 @@ public class WholesaleUserControllerTest  extends TestUtil {
     }
 
 
-    /** @Note : Make sure if you update password once you need to use update password */
+    /**
+     * @Note : Make sure if you update password once you need to use update password
+     */
     @Test
     public void testUpdatePassword() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                 {
@@ -312,7 +308,6 @@ public class WholesaleUserControllerTest  extends TestUtil {
     public void testUpdateProfile() {
         // TODO : skipped for now.
     }
-
 
 
     @Test

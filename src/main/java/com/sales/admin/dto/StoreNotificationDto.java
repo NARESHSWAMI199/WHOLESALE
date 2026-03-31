@@ -6,14 +6,14 @@ import lombok.Builder;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StoreNotificationDto(
-    long id,
-    Integer userId,
-    Integer wholesaleId,
-    String title,
-    String messageBody,
-    Long createAt,
-    UserDto createdBy,
-    String seen
+        long id,
+        Integer userId,
+        Integer wholesaleId,
+        String title,
+        String messageBody,
+        Long createAt,
+        UserDto createdBy,
+        String seen
 ) {
 
 }

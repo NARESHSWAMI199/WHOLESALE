@@ -7,7 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name="chat_room_users")
+@Table(name = "chat_room_users")
 
 @Getter
 @Setter

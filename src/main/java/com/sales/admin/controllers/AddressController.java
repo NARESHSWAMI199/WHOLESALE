@@ -21,11 +21,11 @@ import java.util.List;
 @RequestMapping("/admin/address")
 @RequiredArgsConstructor
 @Tag(name = "Address Management", description = "APIs for managing addresses")
-public class AddressController  {
+public class AddressController {
 
 
-    private final AddressService addressService;
     private static final Logger logger = LoggerFactory.getLogger(AddressController.class);
+    private final AddressService addressService;
 
     @GetMapping("/city/{stateId}")
     @Operation(summary = "Get cities by state", description = "Retrieves the list of cities for a given state ID")

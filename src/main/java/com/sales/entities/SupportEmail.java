@@ -25,7 +25,7 @@ public class SupportEmail implements Serializable {
     @Column(name = "password_key")
     String passwordKey;
 
-    @Column(name="support_type")
+    @Column(name = "support_type")
     String supportType;
 
 }

@@ -10,12 +10,12 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SearchFilters {
-    protected String searchKey ="";
-//    protected String name = "";
+    protected String searchKey = "";
+    //    protected String name = "";
 //    protected String status;
-    protected Long fromDate=0L;
-    protected Long toDate= Utils.getCurrentMillis();
-    protected String orderBy="id";
+    protected Long fromDate = 0L;
+    protected Long toDate = Utils.getCurrentMillis();
+    protected String orderBy = "id";
     protected String order = "desc";
     protected int pageNumber = 0;
     protected int size = 10;

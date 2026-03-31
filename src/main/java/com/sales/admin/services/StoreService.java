@@ -8,16 +8,15 @@ import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.mapper.SubcategoryMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
-import com.sales.request.*;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.request.*;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -46,6 +46,7 @@ import static com.sales.specifications.StoreSpecifications.*;
 @RequiredArgsConstructor
 public class StoreService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
     private final StoreRepository storeRepository;
     private final ItemRepository itemRepository;
     private final StoreHbRepository storeHbRepository;
@@ -55,7 +56,6 @@ public class StoreService {
     private final AddressHbRepository addressHbRepository;
     private final UserRepository userRepository;
     private final AddressService addressService;
-    private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
     private final StoreMapper storeMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
@@ -322,7 +322,8 @@ public class StoreService {
 
     public Store getStoreByUserSlug(String userSlug) {
         logger.debug("Entering getStoreByUserSlug with userSlug: {}", userSlug);
-        if (Utils.isEmpty(userSlug)) throw new IllegalArgumentException(ResponseMessages.USER_SLUG_CAN_T_BE_NULL_OR_BLANK);
+        if (Utils.isEmpty(userSlug))
+            throw new IllegalArgumentException(ResponseMessages.USER_SLUG_CAN_T_BE_NULL_OR_BLANK);
         User user = userRepository.findUserBySlug(userSlug);
         if (user == null) throw new NotFoundException(ResponseMessages.NO_USER_FOUND);
         Store store = storeRepository.findStoreByUserId(user.getId());

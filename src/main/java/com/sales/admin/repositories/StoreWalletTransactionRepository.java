@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StoreWalletTransactionRepository extends JpaRepository<WalletTransaction,Long> , JpaSpecificationExecutor<WalletTransaction> {
+public interface StoreWalletTransactionRepository extends JpaRepository<WalletTransaction, Long>, JpaSpecificationExecutor<WalletTransaction> {
 }

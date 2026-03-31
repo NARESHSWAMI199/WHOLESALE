@@ -6,21 +6,21 @@ import java.util.Collection;
 
 public interface AuthUser {
 
-     int getId();
+    int getId();
 
-     String getSlug();
+    String getSlug();
 
-     String getUserType();
+    String getUserType();
 
-     Integer getActivePlan();
+    Integer getActivePlan();
 
-     Collection<? extends GrantedAuthority> getAuthorities();
+    Collection<? extends GrantedAuthority> getAuthorities();
 
-     String getPassword();
+    String getPassword();
 
-     String getUsername();
+    String getUsername();
 
-     String getEmail();
+    String getEmail();
 
-     boolean isEnabled();
+    boolean isEnabled();
 }

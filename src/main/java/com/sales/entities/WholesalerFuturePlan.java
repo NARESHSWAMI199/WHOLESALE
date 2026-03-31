@@ -19,14 +19,14 @@ public class WholesalerFuturePlan implements Serializable {
     @Id
     long id;
 
-    @Column(name = "user_id",nullable = false)
+    @Column(name = "user_id", nullable = false)
     Integer userId;
 
-    @Column(name = "slug" , nullable = false)
+    @Column(name = "slug", nullable = false)
     String slug;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plan_id",nullable = false)
+    @JoinColumn(name = "plan_id", nullable = false)
     ServicePlan servicePlan;
 
     @Column(name = "created_at")
@@ -35,7 +35,7 @@ public class WholesalerFuturePlan implements Serializable {
     @Column(name = "updated_at")
     Long updatedAt;
 
-    @Column(name="status") // status like used or not.
+    @Column(name = "status") // status like used or not.
     String status;
 
 }

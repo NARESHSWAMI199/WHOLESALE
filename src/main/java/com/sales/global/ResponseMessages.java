@@ -1,8 +1,6 @@
 package com.sales.global;
 
 public class ResponseMessages {
-    private ResponseMessages() {}
-
     public static final String ALL_IMAGES_SUCCESSFULLY_SENT = "All images successfully sent.";
     public static final String ALL_PERMISSIONS_HAVE_BEEN_UPDATED_SUCCESSFULLY = "All permissions have been updated successfully.";
     public static final String CATEGORY_SUCCESSFULLY_INSERTED = "Category successfully inserted.";
@@ -144,7 +142,6 @@ public class ResponseMessages {
     public static final String THE_KEY_SLUG_CAN_T_BE_BLANK = "The key slug can't be blank.";
     public static final String ITEM_PRICE_CAN_T_BE_LESS_THAN_DISCOUNT = "Price can't be less than discount.";
     public static final String YOUR_IMAGE_FILE_IS_TOO_LARGE = "Your %s image file is too large.";
-
     public static final String YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_REMOVED = "Your chat user has been successfully removed.";
     public static final String YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_INSERTED = "Your chat user has been successfully inserted.";
     public static final String YOUR_CONTACT_HAS_BEEN_SUCCESSFULLY_ADDED = "Your contact has been successfully added.";
@@ -217,4 +214,6 @@ public class ResponseMessages {
     public static final String STATUS_MUST_BE_A_OR_D_1 = "status must be A or D.";
     public static final String ONLY_SUPER_ADMIN_CAN_DELETE_STORE_SUBCATEGORY = "Only super admin can delete a store subcategory.";
     public static final String ONLY_SUPER_ADMIN_CAN_DELETE_STORE_CATEGORY = "Only super admin can delete a store category.";
+    private ResponseMessages() {
+    }
 }

@@ -3,10 +3,10 @@ package com.sales.wholesaler.controller;
 
 import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
-import com.sales.request.UserPlanRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
+import com.sales.request.UserPlanRequest;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleServicePlanDto;
 import com.sales.wholesaler.dto.WholesalerPlanDto;
@@ -33,13 +33,13 @@ import java.util.Map;
 @RequestMapping("wholesale/plan")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Service Plan Management", description = "APIs for managing service plans for wholesalers")
-public class WholesaleServicePlanController  {
+public class WholesaleServicePlanController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanController.class);
     private final WholesaleServicePlanService wholesaleServicePlanService;
     private final JwtToken jwtToken;
     private final WholesaleUserService wholesaleUserService;
     private final UserCacheService userCacheService;
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleServicePlanController.class);
 
     @GetMapping("/all")
     @Operation(summary = "Get all service plans", description = "Retrieves a list of all available service plans")
@@ -74,13 +74,13 @@ public class WholesaleServicePlanController  {
     @GetMapping("is-active")
 //    @PreAuthorize("hasAuthority('wholesale.plan.active')")
     @Operation(summary = "Check if user plan is active", description = "Checks whether the authenticated wholesaler's current plan is active")
-    public ResponseEntity<Map<String,Object>> isUserPlanActive(HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> isUserPlanActive(HttpServletRequest request) {
         logger.debug("Starting isUserPlanActive method");
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        Map<String,Object> result = new HashMap<>();
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        Map<String, Object> result = new HashMap<>();
         boolean planIsActive = wholesaleServicePlanService.isPlanActive(loggedUser.getActivePlan());
-        result.put("planIsActive",planIsActive);
-        result.put("status" , 200);
+        result.put("planIsActive", planIsActive);
+        result.put("status", 200);
         logger.debug("Completed isUserPlanActive method");
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
@@ -88,18 +88,18 @@ public class WholesaleServicePlanController  {
     @GetMapping("activate/{planSlug}")
 //    @PreAuthorize("hasAuthority('wholesale.my.current.plan')")
     @Operation(summary = "Activate user plan", description = "Activates a specific service plan for the authenticated wholesaler")
-    public ResponseEntity<Map<String,Object>> updateMyCurrentPlan(HttpServletRequest request , @PathVariable String planSlug){
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        Map<String,Object> result = new HashMap<>();
-        int isUpdated = wholesaleServicePlanService.updatedUserCurrentPlan(planSlug,loggedUser);
-        if(isUpdated > 0){
+    public ResponseEntity<Map<String, Object>> updateMyCurrentPlan(HttpServletRequest request, @PathVariable String planSlug) {
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        Map<String, Object> result = new HashMap<>();
+        int isUpdated = wholesaleServicePlanService.updatedUserCurrentPlan(planSlug, loggedUser);
+        if (isUpdated > 0) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CURRENT_PLAN_ACTIVATED_SUCCESSFULLY);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else {
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND_TO_UPDATE);
-            result.put(ConstantResponseKeys.STATUS,404);
+            result.put(ConstantResponseKeys.STATUS, 404);
         }
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
 
 }

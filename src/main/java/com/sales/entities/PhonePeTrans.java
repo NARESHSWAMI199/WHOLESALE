@@ -17,13 +17,13 @@ public class PhonePeTrans implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     int id;
-    @Column(name = "merchant_transaction_id",nullable = false)
+    @Column(name = "merchant_transaction_id", nullable = false)
     String merchantTransactionId;
     @Column(name = "user_id")
     Integer userId;
     @Column(name = "x_verify")
     String xVerify;
-    @Column(name = "amount",nullable = false)
+    @Column(name = "amount", nullable = false)
     Long amount;
     @Column(name = "transaction_id")
     String transactionId;
@@ -31,7 +31,7 @@ public class PhonePeTrans implements Serializable {
     String bankId;
     @Column(name = "response_code")
     String responseCode;
-    @Column(name = "payment_type" )
+    @Column(name = "payment_type")
     String paymentType;
     @Column(name = "state")
     String state;

@@ -26,7 +26,7 @@ public class PlansSpecifications {
 
     public static Specification<WholesalerPlans> greaterThanOrEqualCreatedFromDate(Long createdFromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (createdFromDate == null) return  null;
+            if (createdFromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(WholesalerPlans_.CREATED_AT), createdFromDate);
         };
     }
@@ -39,11 +39,9 @@ public class PlansSpecifications {
     }
 
 
-
-
     public static Specification<WholesalerPlans> greaterThanOrEqualExpiredFromDate(Long expiredFromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (expiredFromDate == null) return  null;
+            if (expiredFromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(WholesalerPlans_.EXPIRY_DATE), expiredFromDate);
         };
     }
@@ -58,14 +56,14 @@ public class PlansSpecifications {
 
     /* Expired or not */
     public static Specification<WholesalerPlans> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
-            if (status == null || !statusList.contains(status)){
+            if (status == null || !statusList.contains(status)) {
                 return null;
             } else if (status.equals("A")) {
-                return criteriaBuilder.lessThanOrEqualTo(root.get(WholesalerPlans_.createdAt),root.get(WholesalerPlans_.expiryDate));
+                return criteriaBuilder.lessThanOrEqualTo(root.get(WholesalerPlans_.createdAt), root.get(WholesalerPlans_.expiryDate));
             }
-            return criteriaBuilder.greaterThan(root.get(WholesalerPlans_.createdAt),root.get(WholesalerPlans_.expiryDate));
+            return criteriaBuilder.greaterThan(root.get(WholesalerPlans_.createdAt), root.get(WholesalerPlans_.expiryDate));
         };
     }
 
@@ -76,7 +74,7 @@ public class PlansSpecifications {
         };
     }
 
-    public static Specification<WholesalerPlans> isUserId(Integer userId){
+    public static Specification<WholesalerPlans> isUserId(Integer userId) {
         return (root, query, criteriaBuilder) -> {
             if (userId == null) return null;
             return criteriaBuilder.equal(root.get(WholesalerPlans_.USER_ID), userId);

@@ -1,13 +1,10 @@
 package sales.application.sales.chats.controllers;
 
 import com.sales.SalesApplication;
-import com.sales.entities.BlockedUser;
 import com.sales.entities.User;
-import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;

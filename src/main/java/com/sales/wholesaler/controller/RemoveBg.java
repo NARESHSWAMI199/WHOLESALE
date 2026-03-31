@@ -42,8 +42,8 @@ import java.util.Objects;
 @Tag(name = "Background Removal", description = "APIs for uploading images and removing backgrounds")
 public class RemoveBg {
 
-  
-  private static final Logger logger = LoggerFactory.getLogger(RemoveBg.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(RemoveBg.class);
 
     @Value(value = "${removebg.absolute}")
     String outputPath;
@@ -54,7 +54,7 @@ public class RemoveBg {
     @PostMapping("/")
     @PreAuthorize("hasAuthority('remove.bg.image.upload')")
     @Operation(summary = "Upload image for background removal", description = "Uploads an image and processes it to remove the background")
-    public ResponseEntity<Map<String,String>> uploadImage(Authentication authentication,HttpServletRequest request, @RequestParam("image") MultipartFile file) throws IOException {
+    public ResponseEntity<Map<String, String>> uploadImage(Authentication authentication, HttpServletRequest request, @RequestParam("image") MultipartFile file) throws IOException {
         logger.debug("Starting uploadImage method");
         AuthUser user = (SalesUser) authentication.getPrincipal();
         String baseUrl = GlobalConstant.removeBgUrl; // Replace with your Flask API URL
@@ -65,9 +65,9 @@ public class RemoveBg {
             throw new SecurityException(ResponseMessages.INVALID_FILE_PATH_ATTEMPT_DETECTED);
         }
         File filePath = targetPath.toFile();
-        if (!filePath.exists()){
+        if (!filePath.exists()) {
             boolean dirCreated = filePath.getParentFile().mkdirs();
-            if(dirCreated) logger.debug("New dir created :{}",filePath.getName());
+            if (dirCreated) logger.debug("New dir created :{}", filePath.getName());
 
         }
 
@@ -90,8 +90,8 @@ public class RemoveBg {
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("input_path", filePath.getAbsolutePath());
-        body.add("output_path", outputPath+user.getSlug()+GlobalConstant.PATH_SEPARATOR);
-        body.add("output_filename","result_"+ file.getName());
+        body.add("output_path", outputPath + user.getSlug() + GlobalConstant.PATH_SEPARATOR);
+        body.add("output_filename", "result_" + file.getName());
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
 
@@ -101,10 +101,10 @@ public class RemoveBg {
 
         // Extract the output path from the response
         String outputPathRes = responseEntity.getBody();
-        Map<String,String> result = new HashMap<>();
-        result.put("downloadPath","/removebg/"+outputPathRes);
+        Map<String, String> result = new HashMap<>();
+        result.put("downloadPath", "/removebg/" + outputPathRes);
         Files.delete(targetPath);
-        logger.debug("File : {} successfully deleted",filePath.getAbsolutePath());
+        logger.debug("File : {} successfully deleted", filePath.getAbsolutePath());
         logger.debug("Completed uploadImage method");
         return new ResponseEntity<>(result, responseEntity.getStatusCode());
     }
@@ -113,9 +113,9 @@ public class RemoveBg {
     @GetMapping("/{filename}")
     @PreAuthorize("hasAuthority('remove.bg.image.download')")
     @Operation(summary = "Download processed image", description = "Retrieves the processed image after background removal")
-    public ResponseEntity<Resource> getFile(Authentication authentication,HttpServletRequest request, @PathVariable(required = true) String filename) throws MalformedURLException {
+    public ResponseEntity<Resource> getFile(Authentication authentication, HttpServletRequest request, @PathVariable(required = true) String filename) throws MalformedURLException {
         logger.debug("Starting getFile method");
-          AuthUser user = (SalesUser) authentication.getPrincipal();
+        AuthUser user = (SalesUser) authentication.getPrincipal();
         Path relative = Paths.get(relativePath);
         Path userSlug = relative.resolve(user.getSlug()).normalize();
         Path path = userSlug.resolve(filename).normalize();

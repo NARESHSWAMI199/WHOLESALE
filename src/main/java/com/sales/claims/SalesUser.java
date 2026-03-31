@@ -3,7 +3,6 @@ package com.sales.claims;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sales.entities.User;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
@@ -11,28 +10,28 @@ public class SalesUser implements AuthUser {
 
     private final User user;
 
-    public SalesUser(User user){
+    public SalesUser(User user) {
         this.user = user;
     }
 
     @Override
-    public int getId(){
+    public int getId() {
         return user.getId();
     }
 
     @Override
-    public String getSlug(){
+    public String getSlug() {
         return user.getSlug();
     }
 
     @Override
-    public String getUserType(){
+    public String getUserType() {
         return user.getUserType();
     }
 
     @JsonIgnore
     @Override
-    public Integer getActivePlan(){
+    public Integer getActivePlan() {
         return user.getActivePlan();
     }
 

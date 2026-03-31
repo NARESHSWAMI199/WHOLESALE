@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WriteExcelUtil {
 
-    
+
     private final Logger logger = LoggerFactory.getLogger(WriteExcelUtil.class);
 
     @Value("${excel.export.absolute}")
@@ -55,21 +55,20 @@ public class WriteExcelUtil {
 
     public String writeNotUpdatedItemsExcel(List<ItemHbRepository.ItemUpdateError> data, List<String> headers, String folderName) throws IOException {
 
-        try (XSSFWorkbook workbook =new XSSFWorkbook()) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Items");
             applyDefaultColumnWidths(sheet);
 
             Row headerRow = sheet.createRow(0);
             CellStyle headerStyle = createHeaderStyle(workbook);
-            populateHeaders(headerRow,headers,headerStyle);
+            populateHeaders(headerRow, headers, headerStyle);
 
             CellStyle dataStyle = createDataStyle(workbook);
-            populateDataRows(sheet,data,headers,dataStyle);
+            populateDataRows(sheet, data, headers, dataStyle);
 
-            return saveWorkbookForNotUpdated(workbook,folderName);
+            return saveWorkbookForNotUpdated(workbook, folderName);
         }
     }
-
 
 
     private void applyDefaultColumnWidths(Sheet sheet) {
@@ -163,8 +162,8 @@ public class WriteExcelUtil {
 
         // Special value mappings (can be easily extended later)
         return switch (key) {
-            case "LABEL"   -> mapLabel(value);
-            case "STATUS"  -> mapStatus(value);
+            case "LABEL" -> mapLabel(value);
+            case "STATUS" -> mapStatus(value);
             case "INSTOCK" -> mapInStock(value);
             case "CREATEDAT", "UPDATEDAT" -> formatDate(value);
             default -> value;
@@ -175,7 +174,7 @@ public class WriteExcelUtil {
         return switch (value) {
             case "N" -> "New";
             case "O" -> "Old";
-            default  -> value;
+            default -> value;
         };
     }
 
@@ -183,7 +182,7 @@ public class WriteExcelUtil {
         return switch (value) {
             case "A" -> "Active";
             case "D" -> "Deactive";
-            default  -> value;
+            default -> value;
         };
     }
 
@@ -191,7 +190,7 @@ public class WriteExcelUtil {
         return switch (value) {
             case "Y" -> "Yes";
             case "N" -> "No";
-            default  -> value;
+            default -> value;
         };
     }
 

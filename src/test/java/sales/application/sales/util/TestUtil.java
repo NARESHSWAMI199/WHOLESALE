@@ -8,6 +8,7 @@ import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import lombok.Getter;
 import lombok.Setter;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.junit.jupiter.api.Assertions;
 import sales.application.sales.testglobal.GlobalConstantTest;
 
 import java.io.IOException;
@@ -31,68 +31,45 @@ public class TestUtil {
 
     @Autowired
     protected MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper; // For JSON parsing/creation
-
     @Autowired
     protected UserRepository userRepository;
-
     @Autowired
     protected ServicePlanRepository servicePlanRepository;
-
     @Autowired
     protected WholesalerPlansRepository wholesalePlansRepository;
-
     @Autowired
     protected ItemRepository itemRepository;
-
     @Autowired
     protected ItemCategoryRepository itemCategoryRepository;
-
     @Autowired
     protected ItemSubCategoryRepository itemSubCategoryRepository;
-
     @Autowired
     protected StoreCategoryRepository storeCategoryRepository;
-
     @Autowired
     protected StoreSubCategoryRepository storeSubCategoryRepository;
-
     @Autowired
     protected StoreRepository storeRepository;
-
     @Autowired
     protected CityRepository cityRepository;
-
     @Autowired
     protected StateRepository stateRepository;
-
     @Autowired
     protected AddressRepository addressRepository;
-
     @Autowired
     protected SupportEmailsRepository supportEmailsRepository;
-
     @Autowired
     protected GroupRepository groupRepository;
-
     @Autowired
     protected PermissionRepository permissionRepository;
-
-
     @Autowired
     protected StorePermissionsRepository storePermissionRepository;
-
     @Autowired
     protected WholesalePermissionRepository wholesalePermissionRepository;
-
     protected Integer storeId;
-
     protected String storeSlug;
-
     protected String selfSlug;
-
+    @Autowired
+    private ObjectMapper objectMapper; // For JSON parsing/creation
 
     protected String createRandomEmail() {
         return UUID.randomUUID() + "@sales.com";
@@ -131,26 +108,6 @@ public class TestUtil {
         return categoryResponse;
     }
 
-    @Getter
-    @Setter
-    private static class TokenResponse {
-        private String token;
-    }
-
-
-    @Getter
-    @Setter
-    private static class TestResResponse {
-        private Map<String, Object> res;
-    }
-
-    @Getter
-    @Setter
-    private static class TestUser {
-        private Map<String, Object> user;
-    }
-
-
     protected State createState() {
         State state = State.builder()
                 .stateName("Rajasthan")
@@ -169,7 +126,6 @@ public class TestUtil {
         return cityRepository.save(city);
     }
 
-
     protected StoreCategory createStoreCategory() {
         String slug = UUID.randomUUID().toString();
         StoreCategory storeCategory = StoreCategory.builder()
@@ -180,7 +136,6 @@ public class TestUtil {
                 .build();
         return storeCategoryRepository.save(storeCategory);
     }
-
 
     protected StoreSubCategory createStoreSubCategory() {
         StoreCategory storeCategory = createStoreCategory();
@@ -195,7 +150,6 @@ public class TestUtil {
         return storeSubCategoryRepository.save(storeSubCategory);
     }
 
-
     public Address createAddress() {
         City city = createCity();
         String slug = UUID.randomUUID().toString();
@@ -207,7 +161,6 @@ public class TestUtil {
                 .build();
         return addressRepository.save(address);
     }
-
 
     public Store createStore() {
         Address address = createAddress();
@@ -226,7 +179,6 @@ public class TestUtil {
                 .build();
         return storeRepository.save(store);
     }
-
 
     public ServicePlan createServicePlan(Date currentTime) {
         ServicePlan servicePlan = ServicePlan.builder()
@@ -331,7 +283,6 @@ public class TestUtil {
         return response;
     }
 
-
     public Map<String, String> getWholesaleLoginBeaverSlugAndToken(String email, String password) throws Exception {
         String json = """
                     {
@@ -355,7 +306,6 @@ public class TestUtil {
         return response;
     }
 
-
     public String getRandomMobileNumber() {
         Random random = new Random();
         String randomMobileNumber = "9";
@@ -365,7 +315,6 @@ public class TestUtil {
         }
         return randomMobileNumber;
     }
-
 
     public MockMultipartFile getImageMultipartFileToUpload(String parameterName) throws IOException {
         ClassPathResource resource =
@@ -380,7 +329,6 @@ public class TestUtil {
 
     }
 
-
     protected ItemCategory createItemCategory() {
         String slug = UUID.randomUUID().toString();
         ItemCategory itemCategory = ItemCategory.builder()
@@ -391,7 +339,6 @@ public class TestUtil {
                 .build();
         return itemCategoryRepository.save(itemCategory);
     }
-
 
     protected ItemSubCategory createItemSubCategory() {
         ItemCategory itemCategory = createItemCategory();
@@ -405,7 +352,6 @@ public class TestUtil {
                 .build();
         return itemSubCategoryRepository.save(itemSubCategory);
     }
-
 
     public Item createItem(Integer storeId) {
         ItemCategory itemCategory = createItemCategory();
@@ -428,7 +374,6 @@ public class TestUtil {
         return itemRepository.save(item);
     }
 
-
     public void createSupportEmail() {
         boolean exists = false;
         for (SupportEmail supportEmail : supportEmailsRepository.findAll()) {
@@ -446,7 +391,6 @@ public class TestUtil {
         }
     }
 
-
     public Group createGroup() {
         Group group = Group.builder()
                 .name("Test group")
@@ -462,7 +406,6 @@ public class TestUtil {
                 .build();
         return permissionRepository.save(permissionObj);
     }
-
 
     public StorePermissions createStorePermission() {
         StorePermissions permission = StorePermissions.builder()
@@ -481,7 +424,6 @@ public class TestUtil {
                 .build();
         return wholesalePermissionRepository.save(wholesalerPermissions);
     }
-
 
     public Set<Permission> getRequiredStaffPermissions() {
         List<String> permissionsStr = List.of(
@@ -560,7 +502,6 @@ public class TestUtil {
         permissionRepository.saveAll(permissionsSet);
         return permissionsSet;
     }
-
 
     public void assignWholesalerPermissions(Set<StorePermissions> permissions, Integer userId) {
         Set<WholesalerPermissions> wholesalerPermissions = new HashSet<>();
@@ -677,6 +618,24 @@ public class TestUtil {
             String body = result.getResponse().getContentAsString();
             Assertions.fail("Unexpected response status: " + status + ", body: " + body);
         }
+    }
+
+    @Getter
+    @Setter
+    private static class TokenResponse {
+        private String token;
+    }
+
+    @Getter
+    @Setter
+    private static class TestResResponse {
+        private Map<String, Object> res;
+    }
+
+    @Getter
+    @Setter
+    private static class TestUser {
+        private Map<String, Object> user;
     }
 
 

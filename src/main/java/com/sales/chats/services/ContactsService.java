@@ -13,24 +13,24 @@ import com.sales.global.ResponseMessages;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class ContactsService  {
+public class ContactsService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContactsService.class);
     private final ContactRepository contactRepository;
     private final ChatRepository chatRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
     private final ChatHbRepository chatHbRepository;
-    private static final Logger logger = LoggerFactory.getLogger(ContactsService.class);
 
     public List<User> getAllContactsByUserId(AuthUser loggedUser, HttpServletRequest request) {
         logger.debug("Starting getAllContactsByUserId method");
@@ -49,7 +49,7 @@ public class ContactsService  {
     }
 
     public Contact addNewContact(AuthUser loggedUser, String contactSlug) {
-        logger.debug("Starting addNewContact method loggedUser slug : {} and contactSlug : {}",loggedUser.getSlug(),contactSlug);
+        logger.debug("Starting addNewContact method loggedUser slug : {} and contactSlug : {}", loggedUser.getSlug(), contactSlug);
         // TODO : check if user already in contact list not chat list
 //        Integer userFound = chatRepository.isUserExistsInChatList(loggedUser.getSlug(), contactSlug);
 //        if (userFound > 0) {
@@ -62,22 +62,22 @@ public class ContactsService  {
             throw new MyException(ResponseMessages.NOT_A_VALID_CONTACT);
         }
         Contact contacts = Contact.builder()
-            .userId(loggedUser.getId())
-            .contactUser(contactUser)
-            .build();
+                .userId(loggedUser.getId())
+                .contactUser(contactUser)
+                .build();
         Contact savedContact = contactRepository.save(contacts); // Create operation
         logger.debug("Completed addNewContact method");
         return savedContact;
     }
 
     @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
-    public int removeContact(AuthUser loggedUser,String contactUserSlug,Boolean deleteChats) {
-        logger.debug("Going to remove contact from contact list with loggedUser  {} : and contactUserSlug {} ",loggedUser,contactUserSlug);
+    public int removeContact(AuthUser loggedUser, String contactUserSlug, Boolean deleteChats) {
+        logger.debug("Going to remove contact from contact list with loggedUser  {} : and contactUserSlug {} ", loggedUser, contactUserSlug);
         User contactUser = wholesaleUserRepository.findUserBySlug(contactUserSlug);
-        if(contactUser == null) throw new NotFoundException(ResponseMessages.NO_CONTACT_USER_FOUND_TO_DELETE);
+        if (contactUser == null) throw new NotFoundException(ResponseMessages.NO_CONTACT_USER_FOUND_TO_DELETE);
         Integer deleted = contactRepository.deleteContactUserFromContact(loggedUser.getId(), contactUser);
         if (deleted > 0 && deleteChats) {
-            chatHbRepository.deleteChats(loggedUser.getSlug(),contactUserSlug);
+            chatHbRepository.deleteChats(loggedUser.getSlug(), contactUserSlug);
         }
         return deleted;
     }

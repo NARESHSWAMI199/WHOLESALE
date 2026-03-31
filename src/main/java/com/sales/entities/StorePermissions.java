@@ -25,10 +25,10 @@ public class StorePermissions implements Serializable {
     @Column(name = "permission_for")
     String permissionFor;
 
-    @Column(name="default_permission")
+    @Column(name = "default_permission")
     String defaultPermission;
 
-    @Column(name="display_name")
+    @Column(name = "display_name")
     String displayName;
 
 }

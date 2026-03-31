@@ -9,8 +9,6 @@ import java.util.List;
 public class StoreSpecifications {
 
 
-
-
     public static Specification<Store> isStoreId(Integer wholesaleId) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(Store_.ID), wholesaleId);
     }
@@ -32,7 +30,7 @@ public class StoreSpecifications {
 
     public static Specification<Store> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(Store_.CREATED_AT), fromDate);
         };
     }
@@ -46,10 +44,10 @@ public class StoreSpecifications {
 
 
     public static Specification<Store> isStatus(String status) {
-        List<String> statusList = List.of("A","D");
+        List<String> statusList = List.of("A", "D");
         return (root, query, criteriaBuilder) -> {
             if (status == null || !statusList.contains(status)) return null;
-            return criteriaBuilder.equal(root.get(Store_.STATUS),status);
+            return criteriaBuilder.equal(root.get(Store_.STATUS), status);
         };
     }
 
@@ -59,8 +57,6 @@ public class StoreSpecifications {
             return criteriaBuilder.equal(root.get(Store_.SLUG), slug.trim());
         };
     }
-
-
 
 
 }

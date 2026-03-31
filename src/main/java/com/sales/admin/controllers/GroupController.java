@@ -35,8 +35,8 @@ import java.util.Map;
 @Tag(name = "Group Management", description = "APIs for managing user groups and permissions")
 public class GroupController {
 
-    private final GroupService groupService;
     private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
+    private final GroupService groupService;
 
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('group.all')")

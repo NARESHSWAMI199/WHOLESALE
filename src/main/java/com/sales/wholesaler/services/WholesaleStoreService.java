@@ -1,18 +1,16 @@
 package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.AddressRepository;
-import com.sales.admin.repositories.PermissionHbRepository;
-import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.AddressRequest;
-import com.sales.request.SearchFilters;
-import com.sales.request.StoreCreationRequest;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.request.AddressRequest;
+import com.sales.request.SearchFilters;
+import com.sales.request.StoreCreationRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleCategoryDto;
@@ -24,7 +22,6 @@ import com.sales.wholesaler.mapper.WholesaleStoreMapper;
 import com.sales.wholesaler.mapper.WholesaleStoreNotificationMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -50,6 +48,7 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @RequiredArgsConstructor
 public class WholesaleStoreService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
     private final WholesaleCategoryRepository wholesaleCategoryRepository;
     private final WholesaleSubCategoryRepository wholesaleSubCategoryRepository;
     private final WholesaleAddressHbRepository wholesaleAddressHbRepository;
@@ -63,10 +62,6 @@ public class WholesaleStoreService {
     private final WholesaleSubcategoryMapper wholesaleSubCategoryMapper;
     private final WholesalePermissionHbRepository permissionHbRepository;
     private final WholsaleStorePermissionsRepository storePermissionsRepository;
-
-
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
-
     @Value("${store.absolute}")
     String storeImagePath;
 

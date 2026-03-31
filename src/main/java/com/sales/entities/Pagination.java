@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "paginations" )
+@Table(name = "paginations")
 @Getter
 @Setter
 public class Pagination implements Serializable {

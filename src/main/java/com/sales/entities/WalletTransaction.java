@@ -26,7 +26,7 @@ public class WalletTransaction implements Serializable {
     @Column(name = "user_id")
     Integer userId;
 
-    @Column(name="amount")
+    @Column(name = "amount")
     Float amount;
 
     @Column(name = "created_at")

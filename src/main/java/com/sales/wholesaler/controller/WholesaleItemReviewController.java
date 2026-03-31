@@ -21,15 +21,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("wholesale/item/review")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Item Review Management", description = "APIs for managing item reviews for wholesalers")
-public class WholesaleItemReviewController  {
+public class WholesaleItemReviewController {
 
-    private final WholesaleItemReviewService wholesaleItemReviewService;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewController.class);
-
+    private final WholesaleItemReviewService wholesaleItemReviewService;
 
     @PostMapping("all")
     @PreAuthorize("hasAuthority('wholesale.review.all')")

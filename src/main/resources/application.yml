@@ -1,12 +1,12 @@
 server:
-  port : 8080
+  port: 8080
 
 spring:
   profiles:
     active: dev # must change, according environment
 
-  application :
-    name : WHOLESALE-SERVICE
+  application:
+    name: WHOLESALE-SERVICE
 
   config:
     # import: optional:configserver:https://github.com/NARESHSWAMI199/swami-sales-profiles.git

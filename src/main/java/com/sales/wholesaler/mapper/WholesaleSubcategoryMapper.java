@@ -9,5 +9,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface WholesaleSubcategoryMapper {
     WholesaleSubcategoryDto toDto(ItemSubCategory itemSubCategory);
+
     WholesaleSubcategoryDto toDto(StoreSubCategory storeSubCategory);
 }

@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Cashfree Checkout Integration</title>
     <script th:src="@{/js/cashfree.js}"></script>
     <script th:src="@{/js/sweetalert2.all.min.js}"></script>
-    <link th:href="@{/css/sweetalert2.min.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sweetalert2.min.css}">
 
     <style>
         .center {
@@ -27,17 +27,16 @@
 <body>
 
 <div class="center">
-    <img class="payment-gif" th:src="@{/images/payment.gif}" alt="Payment in progress"/>
+    <img alt="Payment in progress" class="payment-gif" th:src="@{/images/payment.gif}"/>
     <h3 style="opacity:0.5; margin:0px">Redirecting you to the payment page to proceed with your payment. </h3>
 </div>
 
 
-
-    <input type="hidden" id="servicePlanSlug" th:value="${servicePlanSlug}">
-    <input type="hidden" id="amount" th:value="${amount}">
-    <input type="hidden" id="userSlug" th:value="${userSlug}">
-    <input type="hidden" id="env" th:value="${env}">
-    <input type="hidden" id="redirectUri" th:value="${redirectUri}">
+<input id="servicePlanSlug" th:value="${servicePlanSlug}" type="hidden">
+<input id="amount" th:value="${amount}" type="hidden">
+<input id="userSlug" th:value="${userSlug}" type="hidden">
+<input id="env" th:value="${env}" type="hidden">
+<input id="redirectUri" th:value="${redirectUri}" type="hidden">
 <script>
 
     let env = document.getElementById("env")?.value;

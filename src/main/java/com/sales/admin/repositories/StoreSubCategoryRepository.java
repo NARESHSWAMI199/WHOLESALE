@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StoreSubCategoryRepository extends JpaRepository<StoreSubCategory,Integer> {
+public interface StoreSubCategoryRepository extends JpaRepository<StoreSubCategory, Integer> {
     @Query(value = "from StoreSubCategory ssc where ssc.categoryId =:categoryId or ssc.categoryId=-1")
     List<StoreSubCategory> getSubCategories(@Param("categoryId") int categoryId, Sort sort);
 

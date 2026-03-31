@@ -38,9 +38,9 @@ public class GroupControllerTest extends TestUtil {
 
 
     @Test
-    public void testCreateGroupWithoutParams () throws Exception {
+    public void testCreateGroupWithoutParams() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -50,16 +50,16 @@ public class GroupControllerTest extends TestUtil {
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(headers)
         ).andExpectAll(
-            status().is(406)
+                status().is(406)
         ).andDo(print());
     }
 
 
     @Test
-    public void testCreateGroupWithStaffAccount () throws Exception {
+    public void testCreateGroupWithStaffAccount() throws Exception {
         token = loginUser(GlobalConstantTest.STAFF);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                 {
@@ -79,18 +79,17 @@ public class GroupControllerTest extends TestUtil {
 
 
     @Test
-    public void testCreateGroupWithSuperAdminAccount () throws Exception {
+    public void testCreateGroupWithSuperAdminAccount() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
-        String json= """
+        String json = """
                 {
                     "name" : "Mock test group {random}"
                 }
                 
                 """
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6))
-                ;
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6));
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/group/create")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -104,45 +103,42 @@ public class GroupControllerTest extends TestUtil {
 
 
     @Test
-    public void testUpdateGroupWithSuperAdminAccountWithoutSlug () throws Exception {
+    public void testUpdateGroupWithSuperAdminAccountWithoutSlug() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
-        String json= """
+        String json = """
                 {
                     "name" : "Mock test group {random}"
                 }
                 
                 """
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6))
-                ;
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6));
         mockMvc.perform(MockMvcRequestBuilders.post("/group/update")
-                    .content(json)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .headers(headers)
-            )
-            .andExpectAll(
-                    status().is(406)
-            ).andDo(print())
-            .andReturn();
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(headers)
+                )
+                .andExpectAll(
+                        status().is(406)
+                ).andDo(print())
+                .andReturn();
     }
 
 
-
     @Test
-    public void testUpdateGroupWithSuperAdminAccountWithWrongSlug () throws Exception {
+    public void testUpdateGroupWithSuperAdminAccountWithWrongSlug() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        String json= """
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String json = """
                 {
                     "slug" : "{slug}",
                     "name" : "Mock test updated group {random}"
                 }
                 
                 """
-                .replace("{slug}","sdfsd")
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6))
-                ;
+                .replace("{slug}", "sdfsd")
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6));
         mockMvc.perform(MockMvcRequestBuilders.post("/group/update")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,37 +150,35 @@ public class GroupControllerTest extends TestUtil {
     }
 
 
-
     @Test
-    public void testUpdateGroupWithSuperAdminAccountWithSlug () throws Exception {
+    public void testUpdateGroupWithSuperAdminAccountWithSlug() throws Exception {
         Group group = createGroup();
         HttpHeaders headers = new HttpHeaders();
-            headers.set(GlobalConstant.AUTHORIZATION , token);
-            String json= """
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String json = """
                 {
                     "slug" : "{slug}",
                     "name" : "Mock test updated group {random}"
                 }
                 
                 """
-                    .replace("{slug}",group.getSlug())
-                    .replace("{random}", UUID.randomUUID().toString().substring(0,6))
-                    ;
-            mockMvc.perform(MockMvcRequestBuilders.post("/group/update")
-                            .content(json)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .headers(headers)
-                    )
-                    .andExpectAll(
-                            status().is(200)
-                    ).andDo(print());
-        }
+                .replace("{slug}", group.getSlug())
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6));
+        mockMvc.perform(MockMvcRequestBuilders.post("/group/update")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(headers)
+                )
+                .andExpectAll(
+                        status().is(200)
+                ).andDo(print());
+    }
 
     @Test
-    public void testGetAllGroups () throws Exception {
+    public void testGetAllGroups() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        String json= """
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String json = """
                 {
                 }
                 """;
@@ -195,42 +189,41 @@ public class GroupControllerTest extends TestUtil {
                 )
                 .andExpectAll(
                         status().is(200),
-                        jsonPath("$.content",notNullValue())
+                        jsonPath("$.content", notNullValue())
                 ).andDo(print());
     }
 
 
     @Test
-    public void testFindGroupBySlug () throws Exception {
+    public void testFindGroupBySlug() throws Exception {
         Group group = createGroup();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        mockMvc.perform(MockMvcRequestBuilders.get("/group/detail/"+group.getSlug())
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        mockMvc.perform(MockMvcRequestBuilders.get("/group/detail/" + group.getSlug())
                         .contentType(MediaType.APPLICATION_JSON)
                         .headers(headers)
                 )
                 .andExpectAll(
                         status().is(200),
-                        jsonPath("$.res.group",notNullValue()),
-                        jsonPath("$.res.permissions",notNullValue())
+                        jsonPath("$.res.group", notNullValue()),
+                        jsonPath("$.res.permissions", notNullValue())
                 ).andDo(print());
     }
 
 
-
     @Test
-    public void testDeleteGroupByStaffAccount () throws Exception {
+    public void testDeleteGroupByStaffAccount() throws Exception {
         token = loginUser(GlobalConstantTest.STAFF);
         Group group = createGroup();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                     {
                         "slug" : "{slug}"
                     }
                 """
-                .replace("{slug}",group.getSlug());
+                .replace("{slug}", group.getSlug());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/group/delete")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -244,16 +237,16 @@ public class GroupControllerTest extends TestUtil {
 
 
     @Test
-    public void testDeleteGroupBySuperAdminAccount () throws Exception {
+    public void testDeleteGroupBySuperAdminAccount() throws Exception {
         Group group = createGroup();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                     {
                         "slug" : "{slug}"
                     }
                 """
-                .replace("{slug}",group.getSlug());
+                .replace("{slug}", group.getSlug());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/group/delete")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -15,8 +15,4 @@ public class UserRepositoryTest {
     public UserHbRepository userHbRepository;
 
 
-
-
-
-
 }

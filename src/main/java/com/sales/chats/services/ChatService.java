@@ -3,12 +3,12 @@ package com.sales.chats.services;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
 import com.sales.claims.AuthUser;
-import com.sales.global.ResponseMessages;
-import com.sales.request.MessageDto;
 import com.sales.entities.Chat;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.request.MessageDto;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,21 +24,19 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService  {
+public class ChatService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+    private final static String chatImagesPath = GlobalConstant.CHAT_STATIC_PATH;
     private final ChatRepository chatRepository;
     private final ChatHbRepository chatHbRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
-    private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
-
-    @Value("${chat.absolute}")
-    private String chatAbsolutePath;
     private final ChatUserService chatUserService;
     private final BlockListService blockListService;
-    private final static String chatImagesPath = GlobalConstant.CHAT_STATIC_PATH;
+    @Value("${chat.absolute}")
+    private String chatAbsolutePath;
 
-
-    public Chat sendMessage(MessageDto message, AuthUser loggedUser, String recipient){
+    public Chat sendMessage(MessageDto message, AuthUser loggedUser, String recipient) {
         message.setSender(loggedUser.getSlug());
         message.setReceiver(recipient);
         //message.setMessage(HtmlUtils.htmlEscape(message.getMessage()));
@@ -46,7 +44,7 @@ public class ChatService  {
 
         // verifying user sender or receiver blocked or not.
         boolean readyToSend = verifyBeforeSend(loggedUser, recipient);
-        if(!readyToSend) return null;
+        if (!readyToSend) return null;
 
         // Going to update a message
         updateMessageToSent(savedMessage.getId());
@@ -55,7 +53,7 @@ public class ChatService  {
     }
 
 
-    public boolean verifyBeforeSend(AuthUser loggedUser,String recipient) {
+    public boolean verifyBeforeSend(AuthUser loggedUser, String recipient) {
         if (recipient == null) throw new MyException(ResponseMessages.PLEASE_PROVIDE_A_VALID_RECIPIENT);
 
         User receiver = wholesaleUserRepository.findUserBySlug(recipient);
@@ -63,73 +61,73 @@ public class ChatService  {
         /* Added new user in to sender's chat list →
         sender = loggedUser | receiver = who receives this message | status = sender Accepted
         or not default it's A  */
-        chatUserService.addNewChatUser(loggedUser,receiver,"A");
+        chatUserService.addNewChatUser(loggedUser, receiver, "A");
 
         /* Added sender in to the recipient chat list →
         sender = loggedUser | receiver = who receives this message | status =s
         receiver accepted or not default it's P */
-        chatUserService.addNewChatUser(receiver, loggedUser,"P");
+        chatUserService.addNewChatUser(receiver, loggedUser, "P");
 
         /* Check you are blocked by receiver or not */
-        boolean isYouBlockedByReceiver = blockListService.isSenderBlockedByReceiver(loggedUser,receiver);
+        boolean isYouBlockedByReceiver = blockListService.isSenderBlockedByReceiver(loggedUser, receiver);
         if (isYouBlockedByReceiver) {
             logger.debug("Receiver blocked you ? : {} ", true);
             return false; //  If isBlocked == true, that's mean. Receiver already blocked you
         }
 
         /* Check you blocked the receiver or not */
-        boolean isYouBlockedReceiver = blockListService.isReceiverBlockedBySender(loggedUser,receiver);
-        if(isYouBlockedReceiver){
+        boolean isYouBlockedReceiver = blockListService.isReceiverBlockedBySender(loggedUser, receiver);
+        if (isYouBlockedReceiver) {
             logger.debug("You blocked receiver ? : {} ", true);
         }
         return !isYouBlockedReceiver; //  If isYouBlockedReceiver == true, that's mean.
     }
 
 
-
-    public Chat saveMessage(MessageDto message,String commaSeparatedImagesName) {
+    public Chat saveMessage(MessageDto message, String commaSeparatedImagesName) {
         logger.debug("Starting saveMessage method");
         Chat chat = Chat.builder()
-            .parentId(message.getParentId())
+                .parentId(message.getParentId())
 //            .userId(loggedUser.getId())
-            .sender(message.getSender())
-            .receiver(message.getReceiver())
-            .message(message.getMessage())
-            .images(commaSeparatedImagesName)
-            .isSenderDeleted("N")
-            .isReceiverDeleted("N")
-            .createdAt(message.getCreatedAt())
-            .isSent("F")
-            .seen(false)
-            .build();
+                .sender(message.getSender())
+                .receiver(message.getReceiver())
+                .message(message.getMessage())
+                .images(commaSeparatedImagesName)
+                .isSenderDeleted("N")
+                .isReceiverDeleted("N")
+                .createdAt(message.getCreatedAt())
+                .isSent("F")
+                .seen(false)
+                .build();
         Chat savedChat = chatRepository.save(chat); // Create operation
         logger.debug("Completed saveMessage method");
         return savedChat;
     }
 
-    public Map<String, List<Chat>> getAllChatBySenderAndReceiverKey(MessageDto message,HttpServletRequest request) {
+    public Map<String, List<Chat>> getAllChatBySenderAndReceiverKey(MessageDto message, HttpServletRequest request) {
         // sender is loggedUser
-        logger.debug("Starting getAllChatBySenderAndReceiverKey method with messageDto : {} ",message);
+        logger.debug("Starting getAllChatBySenderAndReceiverKey method with messageDto : {} ", message);
         Map<String, List<Chat>> formattedData = new TreeMap<>();
         List<Chat> chatList = chatRepository.getChatBySenderKeyOrReceiverKey(message.getSender(), message.getReceiver());
         for (Chat chat : chatList) {
             // checking message sent or not.
-            if(chat.getReceiver().equals(message.getSender()) && chat.getIsSent().equals("F")) continue;
+            if (chat.getReceiver().equals(message.getSender()) && chat.getIsSent().equals("F")) continue;
 
 
-            if(chat.getReceiver().equals(message.getSender())){
+            if (chat.getReceiver().equals(message.getSender())) {
                 // skipping deleted messages.
-                if(chat.getIsReceiverDeleted().equals("Y")) continue;
+                if (chat.getIsReceiverDeleted().equals("Y")) continue;
                 // hiding deleted messages.
-                if(chat.getIsReceiverDeleted().equals("H")) {
+                if (chat.getIsReceiverDeleted().equals("H")) {
                     chat.setMessage("Message was deleted.");
                     chat.setImages(null);
                 }
-            } if(chat.getSender().equals(message.getSender())){
+            }
+            if (chat.getSender().equals(message.getSender())) {
                 // skipping deleted messages.
-                if(chat.getIsSenderDeleted().equals("Y")) continue;
+                if (chat.getIsSenderDeleted().equals("Y")) continue;
                 // hiding deleted messages.
-                if(chat.getIsSenderDeleted().equals("H")) {
+                if (chat.getIsSenderDeleted().equals("H")) {
                     chat.setMessage("Message was deleted.");
                     chat.setImages(null);
                 }
@@ -156,19 +154,20 @@ public class ChatService  {
     }
 
 
-    public Chat getParentMessageById(Long parentId, AuthUser loggedUser, HttpServletRequest request){
-        logger.debug("Starting getParentMessageById method with parentId : {} ",parentId);
+    public Chat getParentMessageById(Long parentId, AuthUser loggedUser, HttpServletRequest request) {
+        logger.debug("Starting getParentMessageById method with parentId : {} ", parentId);
         Optional<Chat> chatOptional = chatRepository.findById(parentId);
-        if (chatOptional.isPresent()){
+        if (chatOptional.isPresent()) {
             Chat chat = chatOptional.get();
-            if(chat.getReceiver().equals(loggedUser.getSlug())){
+            if (chat.getReceiver().equals(loggedUser.getSlug())) {
                 // hiding deleted messages.
-                if(chat.getIsReceiverDeleted().equals("Y")  || chat.getIsReceiverDeleted().equals("H")){
+                if (chat.getIsReceiverDeleted().equals("Y") || chat.getIsReceiverDeleted().equals("H")) {
                     chat.setMessage("Message was deleted.");
                 }
-            } if(chat.getSender().equals(loggedUser.getSlug())){
+            }
+            if (chat.getSender().equals(loggedUser.getSlug())) {
                 // hiding deleted messages.
-                if(chat.getIsSenderDeleted().equals("Y") || chat.getIsSenderDeleted().equals("H")) {
+                if (chat.getIsSenderDeleted().equals("Y") || chat.getIsSenderDeleted().equals("H")) {
                     chat.setMessage("Message was deleted.");
                 }
             }
@@ -185,18 +184,16 @@ public class ChatService  {
             logger.debug("Completed getParentMessageById method");
             return chat;
         }
-        return  null;
+        return null;
     }
 
 
-
-    public Integer getParentMessageIdByCreatedAt(MessageDto messageDto, HttpServletRequest request){
-        logger.debug("Starting getParentMessageIdByCreatedAt method with messageDto : {}",messageDto);
-        Integer parentMessageId = chatRepository.getParentMessageIdByCreateAt(messageDto.getSender(),messageDto.getReceiver(),messageDto.getCreatedAt());
+    public Integer getParentMessageIdByCreatedAt(MessageDto messageDto, HttpServletRequest request) {
+        logger.debug("Starting getParentMessageIdByCreatedAt method with messageDto : {}", messageDto);
+        Integer parentMessageId = chatRepository.getParentMessageIdByCreateAt(messageDto.getSender(), messageDto.getReceiver(), messageDto.getCreatedAt());
         logger.debug("Completed getParentMessageIdByCreatedAt method");
         return parentMessageId;
     }
-
 
 
     public List<String> saveAllImages(MessageDto messageDto, AuthUser loggedUser) {
@@ -206,7 +203,7 @@ public class ChatService  {
         File directory = new File(folderPath);
         if (!directory.exists()) {
             boolean dirCreated = directory.mkdirs();
-            if(dirCreated) logger.debug("New dir created :{}",directory.getName());
+            if (dirCreated) logger.debug("New dir created :{}", directory.getName());
 
         }
         try {
@@ -234,43 +231,44 @@ public class ChatService  {
         message.setSender(loggedUser.getSlug());
         message.setReceiver(recipient);
         String imagesNamesString = String.join(",", allImagesName);
-        Chat savedMessage = saveMessage(message,imagesNamesString); // Create operation
+        Chat savedMessage = saveMessage(message, imagesNamesString); // Create operation
         message.setId(savedMessage.getId());
         logger.debug("Completed addImagesList method");
         return message;
     }
 
 
-    public boolean updateMessageToSent(Long id){
+    public boolean updateMessageToSent(Long id) {
         return chatHbRepository.updateMessageToSent(id);
     }
 
 
-    public int deleteMessage(AuthUser loggedUser,MessageDto messageDto){
+    public int deleteMessage(AuthUser loggedUser, MessageDto messageDto) {
         logger.debug("Starting deleteMessage method with loggedUser: {}, messageDto: {}", loggedUser, messageDto);
-        switch (messageDto.getIsDeleted()){
+        switch (messageDto.getIsDeleted()) {
             case "S": // delete sender's message
-                if(!messageDto.getSender().equals(loggedUser.getSlug())) return  0;
+                if (!messageDto.getSender().equals(loggedUser.getSlug())) return 0;
                 messageDto.setIsSenderDeleted("H");
                 messageDto.setIsReceiverDeleted(null);
                 break;
-            case "SY" : // Force delete sender's message
-                if(!messageDto.getSender().equals(loggedUser.getSlug())) return  0;
+            case "SY": // Force delete sender's message
+                if (!messageDto.getSender().equals(loggedUser.getSlug())) return 0;
                 messageDto.setIsSenderDeleted("Y");
                 messageDto.setIsReceiverDeleted(null);
                 break;
             case "R": // delete receiver's message
-                if(!messageDto.getReceiver().equals(loggedUser.getSlug())) return 0;
+                if (!messageDto.getReceiver().equals(loggedUser.getSlug())) return 0;
                 messageDto.setIsSenderDeleted(null);
                 messageDto.setIsReceiverDeleted("H");
                 break;
             case "RY": // Force delete receiver's message
-                if(!messageDto.getReceiver().equals(loggedUser.getSlug())) return 0;
+                if (!messageDto.getReceiver().equals(loggedUser.getSlug())) return 0;
                 messageDto.setIsSenderDeleted(null);
                 messageDto.setIsReceiverDeleted("Y");
                 break;
             case "B": // Delete it from both sides
-                if(!messageDto.getReceiver().equals(loggedUser.getSlug()) && !messageDto.getSender().equals(loggedUser.getSlug())) return 0;
+                if (!messageDto.getReceiver().equals(loggedUser.getSlug()) && !messageDto.getSender().equals(loggedUser.getSlug()))
+                    return 0;
                 messageDto.setIsSenderDeleted("H");
                 messageDto.setIsReceiverDeleted("H");
                 break;

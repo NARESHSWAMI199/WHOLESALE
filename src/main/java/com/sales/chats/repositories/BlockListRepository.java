@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BlockListRepository extends JpaRepository<BlockedUser,Integer> {
+public interface BlockListRepository extends JpaRepository<BlockedUser, Integer> {
     BlockedUser findByUserIdAndBlockedUser(Integer userId, AuthUser blockedUser);
 }

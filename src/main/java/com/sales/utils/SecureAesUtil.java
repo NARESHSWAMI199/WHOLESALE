@@ -14,12 +14,12 @@ import java.util.Base64;
 
 public class SecureAesUtil {
 
-    private SecureAesUtil(){}
     private static final Logger logger = LoggerFactory.getLogger(SecureAesUtil.class);
-
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_IV_LENGTH = 12;      // 96 bits is standard
     private static final int GCM_TAG_LENGTH = 128;    // 16 bytes
+    private SecureAesUtil() {
+    }
 
     public static String encrypt(String plaintext, String secretKey) {
         try {
@@ -48,7 +48,7 @@ public class SecureAesUtil {
 
         } catch (Exception e) {
             // In real code: throw checked exception or use Result type
-            logger.error("Exception during encrypt : {}",e.getMessage());
+            logger.error("Exception during encrypt : {}", e.getMessage());
             throw new MyException(ResponseMessages.ENCRYPTION_FAILED);
         }
     }
@@ -83,7 +83,7 @@ public class SecureAesUtil {
             return new String(decrypted, StandardCharsets.UTF_8);
 
         } catch (Exception e) {
-            logger.error("Exception during decrypt : {}",e.getMessage());
+            logger.error("Exception during decrypt : {}", e.getMessage());
             throw new MyException(ResponseMessages.DECRYPTION_FAILED);
         }
     }
