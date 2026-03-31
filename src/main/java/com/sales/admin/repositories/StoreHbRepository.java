@@ -2,6 +2,7 @@ package com.sales.admin.repositories;
 
 import com.sales.claims.AuthUser;
 import com.sales.entities.StoreNotifications;
+import com.sales.exceptions.MyException;
 import com.sales.request.StoreCreationRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
+@Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
 @RequiredArgsConstructor
 public class StoreHbRepository {
 

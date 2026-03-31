@@ -47,7 +47,6 @@ public class WalletService {
     }
 
 
-    @Transactional
     public void sendNotification(String title, String messageBody, int storeId, AuthUser loggedUser) {
         logger.debug("Entering sendNotification with title: {}, messageBody: {}, storeId: {}, loggedUser: {}", title, messageBody, storeId, loggedUser);
         StoreNotifications storeNotifications = new StoreNotifications();

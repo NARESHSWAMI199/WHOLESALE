@@ -115,7 +115,6 @@ public class WholesaleStoreService {
         return responseObj;
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
     public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting updateStore method with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
         AddressRequest address = new AddressRequest();
@@ -166,7 +165,6 @@ public class WholesaleStoreService {
         return storeId;
     }
 
-    @Transactional
     public String getStoreImagePath(MultipartFile storeImage, String slug) throws MyException, IOException {
         logger.debug("Starting getStoreImagePath method with storeImage: {}, slug: {}", storeImage, slug);
         if (storeImage != null) {

@@ -214,6 +214,9 @@ public class ResponseMessages {
     public static final String STATUS_MUST_BE_A_OR_D_1 = "status must be A or D.";
     public static final String ONLY_SUPER_ADMIN_CAN_DELETE_STORE_SUBCATEGORY = "Only super admin can delete a store subcategory.";
     public static final String ONLY_SUPER_ADMIN_CAN_DELETE_STORE_CATEGORY = "Only super admin can delete a store category.";
+    public static final String ITEM_CATEGORY_NOT_FOUND = "Item category not found.";
+    public static final String ITEM_SUBCATEGORY_NOT_FOUND = "Item subcategory not found.";
+
     private ResponseMessages() {
     }
 }

@@ -4,6 +4,7 @@ package com.sales.admin.repositories;
 import com.sales.claims.AuthUser;
 import com.sales.entities.Item_;
 import com.sales.entities.User;
+import com.sales.exceptions.MyException;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-@Transactional
+@Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
 @RequiredArgsConstructor
 public class ItemHbRepository {
 

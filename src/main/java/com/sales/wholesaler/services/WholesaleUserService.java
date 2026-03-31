@@ -210,7 +210,6 @@ public class WholesaleUserService {
         return responseObj;
     }
 
-    @Transactional
     public int updateUser(UserRequest userRequest, AuthUser loggedUser) {
         logger.debug("Starting updateUser method with userRequest: {}, loggedUser: {}", userRequest, loggedUser);
         int updateCount = wholesaleUserHbRepository.updateUser(userRequest, loggedUser); // Update operation
@@ -225,7 +224,6 @@ public class WholesaleUserService {
         return user;
     }
 
-    @Transactional
     public User resetPasswordByUserSlug(PasswordDto passwordDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting resetPasswordByUserSlug method with passwordDto: {}, loggedUser: {}", passwordDto, loggedUser);
         // Validating required fields. If their we found any required field is null, this will throw an Exception
@@ -340,8 +338,7 @@ public class WholesaleUserService {
         logger.debug("Completed convertUserToDto method");
         return result;
     }
-
-    @Transactional
+    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
     public WholesaleUserDto resetPasswordByUserSlugDto(PasswordDto passwordDto, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting resetPasswordByUserSlugDto method with passwordDto: {}, loggedUser: {}", passwordDto, loggedUser);
         User updatedUser = resetPasswordByUserSlug(passwordDto, loggedUser);
