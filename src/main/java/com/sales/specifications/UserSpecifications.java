@@ -17,7 +17,7 @@ public class UserSpecifications {
 
     public static Specification<User> hasUserType(String userType) {
         return (root, query, criteriaBuilder) -> {
-            if (userType == null) return null;
+            if (userType == null || userType.equals("A")) return null;
             return criteriaBuilder.equal(root.get(User_.USER_TYPE), userType);
         };
     }
@@ -88,6 +88,10 @@ public class UserSpecifications {
 
     public static Specification<User> notSuperAdmin() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get(User_.id), GlobalConstant.suId);
+    }
+
+    public static Specification<User> notSelf(Integer loggedUserId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get(User_.id), loggedUserId);
     }
 
 

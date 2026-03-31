@@ -129,7 +129,6 @@ public class PermissionHbRepository {
     }
 
     public int assignPermissionsToWholesaler(int userId, List<Integer> permissions) throws MyException {
-        if (permissions.contains(GlobalConstant.suId)) permissions.remove((Integer) GlobalConstant.suId);
         deleteWholesalerPermission(userId);
         if (permissions.isEmpty()) throw new MyException(ResponseMessages.PLEASE_PROVIDE_AT_LEAST_ONE_PERMISSION);
         StringBuilder values = new StringBuilder();

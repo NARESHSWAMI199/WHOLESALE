@@ -151,12 +151,19 @@ public class UserService {
     }
 
 
-    public Map<String, Integer> getUserCounts() {
+    public Map<String, Integer> getUserCounts(AuthUser loggedUser) {
         logger.debug("Getting user counts");
         Map<String, Integer> responseObj = new HashMap<>();
-        responseObj.put("all", userRepository.totalUserCount());
-        responseObj.put("active", userRepository.optionUserCount("A"));
-        responseObj.put("deactive", userRepository.optionUserCount("D"));
+        if (loggedUser.getId() == GlobalConstant.suId) {
+            responseObj.put("all", userRepository.totalUserCount());
+            responseObj.put("active", userRepository.optionUserCount("A"));
+            responseObj.put("deactive", userRepository.optionUserCount("D"));
+        } else {
+            responseObj.put("all", userRepository.totalUserSkipAdminsCount());
+            responseObj.put("active", userRepository.optionUserSkipAdminsCount("A"));
+            responseObj.put("deactive", userRepository.optionUserSkipAdminsCount("D"));
+        }
+
         return responseObj;
     }
 
@@ -200,13 +207,6 @@ public class UserService {
     @Transactional
     public Page<UserDto> getAllUser(UserSearchFilters filters, AuthUser loggedUser) {
         logger.debug("Getting all users with filters: {}", filters);
-        String notUserType = null;
-        if (filters.getUserType().equals("SA") && loggedUser.getId() != GlobalConstant.suId) {
-            filters.setUserType(null);
-        } else if (filters.getUserType().equals("A")) {
-            notUserType = "SA";
-            filters.setUserType(null);
-        }
         Specification<User> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()).or(containsEmail(filters.getSearchKey())))
                         .and(greaterThanOrEqualFromDate(filters.getFromDate()))
@@ -214,8 +214,9 @@ public class UserService {
                         .and(isStatus(filters.getStatus()))
                         .and(hasSlug(filters.getSlug()))
                         .and(notSuperAdmin())
+                        .and(notSelf(loggedUser.getId()))
                         .and(hasUserType(filters.getUserType()))
-                        .and(hasNotUserType(notUserType))
+                        .and(hasNotUserType(loggedUser.getId() == GlobalConstant.suId ? null : USER_TYPES.SUPER_ADMIN.getType()))
         );
 
         Pageable pageable = getPageable(logger, filters);

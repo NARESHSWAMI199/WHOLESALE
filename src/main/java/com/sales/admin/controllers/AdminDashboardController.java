@@ -2,6 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
+import com.sales.claims.AuthUser;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.request.GraphRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,10 +32,11 @@ public class AdminDashboardController {
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('dashboard.count')")
     @Operation(summary = "Get dashboard counts", description = "Retrieves counts for users, retailers, wholesalers, staffs, and admins")
-    public ResponseEntity<Map<String, Object>> getAllDashboardCount() {
+    public ResponseEntity<Map<String, Object>> getAllDashboardCount(Authentication authentication) {
         logger.debug("Fetching all dashboard counts");
         Map<String, Object> responseObj = new HashMap<>();
-        responseObj.put("users", userService.getUserCounts());
+        AuthUser loggedUser = (AuthUser) authentication.getPrincipal();
+        responseObj.put("users", userService.getUserCounts(loggedUser));
         responseObj.put("retailers", userService.getRetailersCounts());
         responseObj.put("wholesalers", userService.getWholesalersCounts());
         responseObj.put("staffs", userService.getStaffsCounts());

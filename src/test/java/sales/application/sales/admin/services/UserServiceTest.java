@@ -64,12 +64,14 @@ public class UserServiceTest extends TestUtil {
     @Test
     public void testGetUserCounts() {
         // Create some test users
-        createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.ADMIN);
+        String email = createRandomEmail();
+        String password = "pass";
+        createUser(UUID.randomUUID().toString(), email, password, GlobalConstantTest.ADMIN);
         createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.STAFF);
         createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.RETAILER);
         createUser(UUID.randomUUID().toString(), createRandomEmail(), "pass", GlobalConstantTest.WHOLESALER);
-
-        Map<String, Integer> counts = userService.getUserCounts();
+        User user = userService.findByEmailAndPassword(email, password);
+        Map<String, Integer> counts = userService.getUserCounts(user);
         Assertions.assertNotNull(counts);
         Assertions.assertTrue(counts.size() > 0);
     }
