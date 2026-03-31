@@ -4,6 +4,7 @@ package com.sales.wholesaler.repository;
 import com.sales.claims.AuthUser;
 import com.sales.commons.repositories.CommonHbRepository;
 import com.sales.entities.*;
+import com.sales.exceptions.MyException;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleItemListDto;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Transactional
+@Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
 @RequiredArgsConstructor
 public class WholesaleItemHbRepository implements CommonHbRepository {
 

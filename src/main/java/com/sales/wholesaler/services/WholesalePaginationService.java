@@ -74,7 +74,6 @@ public class WholesalePaginationService {
         }
     }
 
-    @Transactional(rollbackFor = {InternalException.class, RuntimeException.class, Exception.class})
     public UserPagination insertUserPagination(Pagination pagination, AuthUser loggedUser, Integer rowNumbers) {
         UserPagination userPagination = new UserPagination();
         Pagination savedPagination = paginationRepository.save(pagination);

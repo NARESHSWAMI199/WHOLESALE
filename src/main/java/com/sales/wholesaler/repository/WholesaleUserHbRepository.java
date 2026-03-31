@@ -1,6 +1,7 @@
 package com.sales.wholesaler.repository;
 
 import com.sales.claims.AuthUser;
+import com.sales.exceptions.MyException;
 import com.sales.request.MessageDto;
 import com.sales.request.UserRequest;
 import com.sales.utils.Utils;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
+@Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
 @RequiredArgsConstructor
 public class WholesaleUserHbRepository {
 

@@ -4,6 +4,7 @@ package com.sales.wholesaler.repository;
 import com.sales.claims.AuthUser;
 import com.sales.entities.City;
 import com.sales.entities.State;
+import com.sales.exceptions.MyException;
 import com.sales.request.AddressRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Component
-@Transactional
+@Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class})
 @RequiredArgsConstructor
 public class WholesaleAddressHbRepository {
 

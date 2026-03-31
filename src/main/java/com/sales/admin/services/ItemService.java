@@ -212,8 +212,8 @@ public class ItemService {
         itemRequest.setName(itemName);
 
         // retrieve category and subcategory
-        ItemCategory itemCategory = itemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Item category not found."));
-        ItemSubCategory itemSubCategory = itemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Item subcategory not found."));
+        ItemCategory itemCategory = itemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException(ResponseMessages.ITEM_CATEGORY_NOT_FOUND));
+        ItemSubCategory itemSubCategory = itemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException(ResponseMessages.ITEM_SUBCATEGORY_NOT_FOUND));
         itemRequest.setItemCategory(itemCategory);
         itemRequest.setItemSubCategory(itemSubCategory);
 
@@ -254,7 +254,6 @@ public class ItemService {
     }
 
 
-    @Transactional
     public Item createItem(ItemRequest itemRequest, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = new Item();
@@ -288,7 +287,6 @@ public class ItemService {
     }
 
 
-    @Transactional
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
         logger.info("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = findItemBySlug(itemRequest.getSlug());
@@ -525,14 +523,14 @@ public class ItemService {
 
     public CategoryDto getItemCategoryDtoById(int categoryId) {
         logger.debug("Entering getItemCategoryDtoById with categoryId: {}", categoryId);
-        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
+        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.ITEM_CATEGORY_NOT_FOUND));
         logger.debug("Exiting getItemCategoryDtoById with result: {}", result);
         return categoryMapper.toDto(result);
     }
 
     public ItemCategory getItemCategoryById(int categoryId) {
         logger.debug("Entering getItemCategoryById with categoryId: {}", categoryId);
-        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
+        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.ITEM_CATEGORY_NOT_FOUND));
         logger.debug("Exiting getItemCategoryById with result: {}", result);
         return result;
     }

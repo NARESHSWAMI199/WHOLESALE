@@ -393,7 +393,6 @@ public class UserService {
     }
 
 
-    @Transactional
     public User createUser(UserRequest userRequest, AuthUser loggedUser) {
         logger.debug("Creating user: {}", userRequest);
         User user = new User(loggedUser);
@@ -406,7 +405,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Transactional
     public int updateUser(UserRequest userRequest, AuthUser loggedUser) {
         logger.debug("Updating user: {}", userRequest);
         return userHbRepository.updateUser(userRequest, loggedUser);

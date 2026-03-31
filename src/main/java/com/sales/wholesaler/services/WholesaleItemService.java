@@ -164,7 +164,6 @@ public class WholesaleItemService {
         return wholesaleItemMapper.toDto(item);
     }
 
-    @Transactional
     private Item findItemBySlug(String slug) {
         logger.debug("Starting findItemBySLug method with slug: {}", slug);
         Item item = wholesaleItemRepository.findItemBySlug(slug);
@@ -267,7 +266,6 @@ public class WholesaleItemService {
         return responseObj;
     }
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
     public Item createItem(ItemRequest itemRequest, AuthUser loggedUser) throws MyException, IOException {
         logger.debug("Starting createItem method with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         User userForUpdate = User.builder()

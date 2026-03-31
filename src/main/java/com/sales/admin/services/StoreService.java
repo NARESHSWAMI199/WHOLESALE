@@ -231,7 +231,6 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class})
     public Store createStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws MyException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering createStore with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
         /** inserting address during create a wholesale */
@@ -261,7 +260,6 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
-    @Transactional(rollbackFor = {MyException.class, IllegalArgumentException.class, RuntimeException.class})
     public int updateStore(StoreCreationRequest storeCreationRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.info("Entering updateStore with storeCreationRequest: {}, loggedUser: {}", storeCreationRequest, loggedUser);
         AddressRequest addressRequest = getAddressObjFromStore(storeCreationRequest);
@@ -358,7 +356,6 @@ public class StoreService {
     }
 
 
-    @Transactional(rollbackFor = {IllegalArgumentException.class, MyException.class, RuntimeException.class, Exception.class})
     public int updateStoreImage(MultipartFile storeImage, String slug) throws MyException, IOException {
         logger.debug("Entering updateStoreImage with storeImage: {}, slug: {}", storeImage, slug);
         if (storeImage != null) {

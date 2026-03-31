@@ -30,15 +30,15 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @Builder
 public class User implements AuthUser, Serializable {
     @Transient
-    public boolean isOnline = false;
+    private boolean isOnline = false;
     @Transient
-    public Integer chatNotification = 0;
+    private Integer chatNotification = 0;
     @Transient
-    public boolean isBlocked = false;
+    private boolean isBlocked = false;
     @Transient
-    public String accepted;
+    private String accepted;
     @Transient
-    List<GrantedAuthority> authorities;
+    private List<GrantedAuthority> authorities;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
