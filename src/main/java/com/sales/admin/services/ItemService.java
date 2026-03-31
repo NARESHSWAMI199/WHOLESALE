@@ -234,7 +234,7 @@ public class ItemService {
             // updating item images
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);

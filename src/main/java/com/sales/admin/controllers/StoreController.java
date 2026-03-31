@@ -169,7 +169,7 @@ public class StoreController {
         try {
             int isUpdated = storeService.updateStoreImage(storeImage, slug);
             if (isUpdated > 0){
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_1);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS,200);
             }else{
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND);
