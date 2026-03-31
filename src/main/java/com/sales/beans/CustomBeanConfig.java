@@ -11,7 +11,7 @@ public class CustomBeanConfig {
 
 
     @Bean("safeLogger")
-    public Logger getLogger(){
+    public Logger getLogger() {
         return LoggerFactory.getLogger("test");
     }
 

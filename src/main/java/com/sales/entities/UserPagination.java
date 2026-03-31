@@ -27,10 +27,10 @@ public class UserPagination implements Serializable {
     private Integer userId;
 
     @ManyToOne
-    @JoinColumn(name="pagination_id")
+    @JoinColumn(name = "pagination_id")
     private Pagination pagination;
 
-    @Column(name="rows_number")
+    @Column(name = "rows_number")
     private Integer rowsNumber;
 
 

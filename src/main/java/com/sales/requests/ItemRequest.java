@@ -33,10 +33,10 @@ public class ItemRequest {
     @NotNull
     @NotBlank
     private String description;
-    private String inStock= ITEM_STOCK.OUT_OF_STOCK.getStock();  // default not in stock
-    private  String slug;
+    private String inStock = ITEM_STOCK.OUT_OF_STOCK.getStock();  // default not in stock
+    private String slug;
     private String label = ITEM_LABEL.NEW.getLabel(); // default label is new
-    private  Float capacity;
+    private Float capacity;
     private MultipartFile itemImage;
     @JsonIgnore
     private Integer storeId;

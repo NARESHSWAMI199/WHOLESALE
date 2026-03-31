@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SupportEmailsRepository extends JpaRepository<SupportEmail,Integer> {
+public interface SupportEmailsRepository extends JpaRepository<SupportEmail, Integer> {
 
-   SupportEmail findSupportEmailBySupportType(String supportType);
+    SupportEmail findSupportEmailBySupportType(String supportType);
 
 }

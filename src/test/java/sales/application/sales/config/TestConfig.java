@@ -13,15 +13,15 @@ public class TestConfig {
 
 
     @Bean
-   public UserControllerTest getUserController() {
-       return new UserControllerTest();
-   }
+    public UserControllerTest getUserController() {
+        return new UserControllerTest();
+    }
 
 
-   @Bean
+    @Bean
     public Logger getLogger() {
-       return LogManager.getLogger(this);
-   }
+        return LogManager.getLogger(this);
+    }
 
 
 }

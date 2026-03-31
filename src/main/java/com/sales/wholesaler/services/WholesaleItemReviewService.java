@@ -2,6 +2,7 @@ package com.sales.wholesaler.services;
 
 import com.sales.claims.AuthUser;
 import com.sales.entities.ItemReviews;
+import com.sales.global.ResponseMessages;
 import com.sales.request.ItemReviewsFilterRequest;
 import com.sales.wholesaler.dto.WholesaleItemReviewDto;
 import com.sales.wholesaler.mapper.WholesaleItemReviewMapper;
@@ -21,18 +22,18 @@ import static com.sales.specifications.ItemReviewSpecifications.*;
 
 @Service
 @RequiredArgsConstructor
-public class WholesaleItemReviewService  {
+public class WholesaleItemReviewService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewService.class);
     private final WholesaleItemReviewRepository wholesaleItemReviewRepository;
     private final WholesaleItemReviewMapper wholesaleItemReviewMapper;
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleItemReviewService.class);
 
     @Transactional
     public Page<WholesaleItemReviewDto> getAllItemReview(ItemReviewsFilterRequest filters, AuthUser loggedUser) {
         logger.debug("Starting getALlItemReview method with filters: {}, loggedUser: {}", filters, loggedUser);
-        if(filters.getItemId() == 0) {
+        if (filters.getItemId() == 0) {
             logger.error("Invalid itemId provided");
-            throw new IllegalArgumentException("Please provide a valid itemId.");
+            throw new IllegalArgumentException(ResponseMessages.PLEASE_PROVIDE_A_VALID_ITEMID);
         }
         Specification<ItemReviews> specification = Specification.allOf(
                 (containsName(filters.getSearchKey()))
@@ -42,9 +43,9 @@ public class WholesaleItemReviewService  {
                         .and(isItemId(filters.getItemId()))
                         .and(isParentComment(filters.getParentId()))
         );
-        Pageable pageable = getPageable(logger,filters);
-            Page<ItemReviews> all = wholesaleItemReviewRepository.findAll(specification, pageable);
-            return all.map(wholesaleItemReviewMapper::toDto);
+        Pageable pageable = getPageable(logger, filters);
+        Page<ItemReviews> all = wholesaleItemReviewRepository.findAll(specification, pageable);
+        return all.map(wholesaleItemReviewMapper::toDto);
     }
 
 

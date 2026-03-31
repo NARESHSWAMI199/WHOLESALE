@@ -21,10 +21,9 @@ public class GroupSpecifications {
     }
 
 
-
     public static Specification<Group> greaterThanOrEqualFromDate(Long fromDate) {
         return (root, query, criteriaBuilder) -> {
-            if (fromDate == null) return  null;
+            if (fromDate == null) return null;
             return criteriaBuilder.greaterThanOrEqualTo(root.get(Group_.CREATED_AT), fromDate);
         };
     }
@@ -37,7 +36,6 @@ public class GroupSpecifications {
     }
 
 
-
     public static Specification<Group> hasSlug(String slug) {
         return (root, query, criteriaBuilder) -> {
             if (slug == null || slug.isEmpty()) return null;
@@ -47,7 +45,7 @@ public class GroupSpecifications {
 
     public static Specification<Group> notSuperAdmin(AuthUser loggedUser) {
         return (root, query, criteriaBuilder) -> {
-            if(loggedUser.getUserType().equals("SA")) return  null;
+            if (loggedUser.getUserType().equals("SA")) return null;
             return criteriaBuilder.notEqual(root.get(Group_.ID), 0);
         };
     }

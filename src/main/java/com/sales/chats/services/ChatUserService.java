@@ -10,32 +10,33 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ChatUserService  {
+public class ChatUserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ChatUserService.class);
     private final ChatUserRepository chatUserRepository;
     private final ChatRepository chatRepository;
     private final ChatHbRepository chatHbRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
     private final ChatUserHbRepository chatUserHbRepository;
-    private static final Logger logger = LoggerFactory.getLogger(ChatUserService.class);
     private final BlockListService blockListService;
 
     public List<User> getAllChatUsers(AuthUser loggedUser, HttpServletRequest request) {
-        logger.debug("Starting getAllChatUsers method and the user id : {}",loggedUser.getId());
-        List<ChatUser> chatUserList = chatUserRepository.getChatUserByUserId(loggedUser.getId()).stream().filter(chatUser -> chatUser.getChatUser() !=null).toList();
+        logger.debug("Starting getAllChatUsers method and the user id : {}", loggedUser.getId());
+        List<ChatUser> chatUserList = chatUserRepository.getChatUserByUserId(loggedUser.getId()).stream().filter(chatUser -> chatUser.getChatUser() != null).toList();
         List<User> userList = chatUserList.stream().map(ChatUser::getChatUser).toList();
 
         for (User user : userList) {
@@ -51,17 +52,17 @@ public class ChatUserService  {
     }
 
     public ChatUser addNewChatUser(AuthUser sender, AuthUser receiver, String status) {
-        logger.debug("Starting addNewChatUser method with User receiver there the sender is : {} and the receiver is : {} ",sender.getId(),receiver.getId());
+        logger.debug("Starting addNewChatUser method with User receiver there the sender is : {} and the receiver is : {} ", sender.getId(), receiver.getId());
         ChatUser userFound = chatUserRepository.findByUserIdAndChatUser(sender.getId(), User.builder().id(receiver.getId()).build());
         if (userFound != null) {
             logger.debug("ChatUser already exists, returning existing user checking in addNewChatUser method");
             return userFound;
         }
         ChatUser chatUser = ChatUser.builder()
-            .userId(sender.getId())
-            .senderAcceptStatus(status)
-            .chatUser(User.builder().id(receiver.getId()).build())
-            .build();
+                .userId(sender.getId())
+                .senderAcceptStatus(status)
+                .chatUser(User.builder().id(receiver.getId()).build())
+                .build();
         ChatUser savedChatUser = chatUserRepository.save(chatUser); // Create operation
         logger.debug("Completed addNewChatUser method with User receiver");
         return savedChatUser;
@@ -72,7 +73,7 @@ public class ChatUserService  {
         User receiver = wholesaleUserRepository.findUserBySlug(receiverSlug);
         if (receiver == null) {
             logger.error("Receiver not found");
-            throw new MyException("Receiver not found.");
+            throw new MyException(ResponseMessages.RECEIVER_NOT_FOUND);
         }
         ChatUser userFound = chatUserRepository.findByUserIdAndChatUser(sender.getId(), receiver);
         if (userFound != null) {
@@ -81,10 +82,10 @@ public class ChatUserService  {
         }
 
         ChatUser chatUser = ChatUser.builder()
-            .userId(sender.getId())
-            .chatUser(receiver)
-            .senderAcceptStatus(status)
-            .build();
+                .userId(sender.getId())
+                .chatUser(receiver)
+                .senderAcceptStatus(status)
+                .build();
         ChatUser savedChatUser = chatUserRepository.save(chatUser); // Create operation
         logger.debug("Completed addNewChatUser method with receiverSlug");
         return savedChatUser;
@@ -99,35 +100,34 @@ public class ChatUserService  {
     }
 
 
-
-    public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser,User receiver) {
-        logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUserId : {} ",loggedUser.getId(),receiver.getId());
+    public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser, User receiver) {
+        logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUserId : {} ", loggedUser.getId(), receiver.getId());
         ChatUser chatUser = chatUserRepository.findByUserIdAndChatUser(loggedUser.getId(), receiver);
-        if(chatUser == null) throw new NotFoundException("User not found in your chat users list.");
+        if (chatUser == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND_IN_YOUR_CHAT_USERS_LIST);
         logger.debug("Completed isChatRequestAccepted method");
         return chatUser.getSenderAcceptStatus();
     }
 
 
-    public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser,String receiverSlug) {
-        logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUser : {} ",loggedUser.getId(),receiverSlug);
+    public String isChatRequestAcceptedByLoggedUser(AuthUser loggedUser, String receiverSlug) {
+        logger.debug("Starting isChatRequestAccepted method with userId : {} and chatUser : {} ", loggedUser.getId(), receiverSlug);
         User receiver = wholesaleUserRepository.findUserBySlug(receiverSlug);
-        if(receiver == null) throw new NotFoundException("Receiver not found.");
-        ChatUser chatUser = chatUserRepository.findByUserIdAndChatUser(loggedUser.getId(),receiver);
-        if(chatUser == null) throw new NotFoundException("Receiver not found.");
+        if (receiver == null) throw new NotFoundException(ResponseMessages.RECEIVER_NOT_FOUND);
+        ChatUser chatUser = chatUserRepository.findByUserIdAndChatUser(loggedUser.getId(), receiver);
+        if (chatUser == null) throw new NotFoundException(ResponseMessages.RECEIVER_NOT_FOUND);
         logger.debug("Completed isChatRequestAcceptedByLoggedUser method");
         return chatUser.getSenderAcceptStatus();
     }
 
 
     @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
-    public int removeChatUser(AuthUser loggedUser,String chatUserSlug,Boolean deleteChats) {
-        logger.debug("Going to remove contact from contact list with loggedUser  {} : and chatUserSlug {} ",loggedUser,chatUserSlug);
+    public int removeChatUser(AuthUser loggedUser, String chatUserSlug, Boolean deleteChats) {
+        logger.debug("Going to remove contact from contact list with loggedUser  {} : and chatUserSlug {} ", loggedUser, chatUserSlug);
         User contactUser = wholesaleUserRepository.findUserBySlug(chatUserSlug);
-        if(contactUser == null) throw new NotFoundException("No contact user found to delete.");
+        if (contactUser == null) throw new NotFoundException(ResponseMessages.NO_CONTACT_USER_FOUND_TO_DELETE);
         Integer deleted = chatUserRepository.deleteChatUserFromChatList(loggedUser.getId(), contactUser);
         if (deleted > 0 && deleteChats) {
-            chatHbRepository.deleteChats(loggedUser.getSlug(),chatUserSlug);
+            chatHbRepository.deleteChats(loggedUser.getSlug(), chatUserSlug);
         }
         return deleted;
     }

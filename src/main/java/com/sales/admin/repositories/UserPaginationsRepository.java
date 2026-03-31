@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UserPaginationsRepository extends JpaRepository<UserPagination,Integer> {
+public interface UserPaginationsRepository extends JpaRepository<UserPagination, Integer> {
     @Query(value = """
-    from UserPagination up 
-        left join Pagination p on p.id = up.pagination.id
-    where (p.canSee = 'S' or p.canSee = 'B') and up.userId = :userId 
-    order by p.id""")
+            from UserPagination up 
+                left join Pagination p on p.id = up.pagination.id
+            where (p.canSee = 'S' or p.canSee = 'B') and up.userId = :userId 
+            order by p.id""")
     List<UserPagination> getUserPaginationByUserId(@Param("userId") Integer userId);
 
 

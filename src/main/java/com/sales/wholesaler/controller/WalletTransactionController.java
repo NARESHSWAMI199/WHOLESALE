@@ -3,7 +3,6 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.SearchFilters;
 import com.sales.request.WalletFilterRequest;
 import com.sales.wholesaler.dto.WholesaleWalletTransactionDto;
 import com.sales.wholesaler.services.WalletTransactionService;

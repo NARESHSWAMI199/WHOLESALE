@@ -2,7 +2,7 @@ package com.sales.config;
 
 public class UnAuthorizedPaths {
     public static final  /* Paths which no need to authenticate */
-            String [] unAuthorizePaths = {"/admin/auth/login",
+            String[] unAuthorizePaths = {"/admin/auth/login",
             "/admin/auth/login/otp",
             "/admin/auth/sendOtp",
             "/admin/auth/register",

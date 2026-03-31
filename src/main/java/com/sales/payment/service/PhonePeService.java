@@ -8,10 +8,10 @@ import com.phonepe.sdk.pg.payments.v1.models.request.PgRefundRequest;
 import com.phonepe.sdk.pg.payments.v1.models.response.PgPaymentInstrument;
 import com.phonepe.sdk.pg.payments.v1.models.response.PgTransactionStatusResponse;
 import com.phonepe.sdk.pg.payments.v1.models.response.UPIPaymentInstrumentResponse;
-import com.sales.request.PhonePeDto;
 import com.sales.entities.PhonePeTrans;
 import com.sales.payment.repository.PhonePeHbRepository;
 import com.sales.payment.repository.PhonePeRepository;
+import com.sales.request.PhonePeDto;
 import com.sales.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,18 +24,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PhonePeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PhonePeService.class);
     private final PhonePeRepository phonePeRepository;
     private final PhonePeHbRepository phonePeHbRepository;
-    private static final Logger logger = LoggerFactory.getLogger(PhonePeService.class);
-
-    @Value("${phonepe.key}")
-    String saltKey;
-
     @Value("${phonepe.mid}")
     public String mid;
-
     @Value("${phonepe.env}")
     public String phonePeEnv;
+    @Value("${phonepe.key}")
+    String saltKey;
 
     public PhonePePaymentClient getPhonePeClient() {
         logger.debug("Starting getPhonePeClient method");
@@ -55,12 +52,12 @@ public class PhonePeService {
     public PhonePeTrans savePhonePeTransaction(PhonePeDto phonePeDto) {
         logger.debug("Starting savePhonePeTransaction method");
         PhonePeTrans phonePeTrans = PhonePeTrans.builder()
-            .merchantTransactionId(phonePeDto.getMerchantTransactionId())
-            .userId(phonePeDto.getUserId())
-            .amount(phonePeDto.getAmount())
-            .status("P")
-            .createdAt(Utils.getCurrentMillis())
-            .build();
+                .merchantTransactionId(phonePeDto.getMerchantTransactionId())
+                .userId(phonePeDto.getUserId())
+                .amount(phonePeDto.getAmount())
+                .status("P")
+                .createdAt(Utils.getCurrentMillis())
+                .build();
         PhonePeTrans savedTransaction = phonePeRepository.save(phonePeTrans); // Create operation
         logger.debug("Completed savePhonePeTransaction method");
         return savedTransaction;
@@ -106,12 +103,12 @@ public class PhonePeService {
     public PhonePeResponse takeRefund(PhonePeDto phonePeDto, String notifyUrl) {
         logger.debug("Starting takeRefund method");
         PgRefundRequest pgRefundRequest = PgRefundRequest.builder()
-            .amount(phonePeDto.getAmount() * 100)
-            .callbackUrl(notifyUrl)
-            .merchantId(mid)
-            .merchantTransactionId(phonePeDto.getMerchantTransactionId())
-            .originalTransactionId(phonePeDto.getMerchantTransactionId())
-            .build();
+                .amount(phonePeDto.getAmount() * 100)
+                .callbackUrl(notifyUrl)
+                .merchantId(mid)
+                .merchantTransactionId(phonePeDto.getMerchantTransactionId())
+                .originalTransactionId(phonePeDto.getMerchantTransactionId())
+                .build();
         PhonePePaymentClient phonepeClient = getPhonePeClient();
         PhonePeResponse refundResponse = phonepeClient.refund(pgRefundRequest);
         logger.debug("Completed takeRefund method");

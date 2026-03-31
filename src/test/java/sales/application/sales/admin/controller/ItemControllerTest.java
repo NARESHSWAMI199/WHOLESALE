@@ -32,15 +32,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest(classes=SalesApplication.class)
+@SpringBootTest(classes = SalesApplication.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class ItemControllerTest extends TestUtil {
 
 
-    /** @Important : Here we created new functions for each Test, but all called in one function
+    /**
+     * @Important : Here we created new functions for each Test, but all called in one function
      * If you want test to separately use @Test annotation and provide you custom slug.
-     * */
+     *
+     */
 
     private String token;
 
@@ -53,7 +55,7 @@ public class ItemControllerTest extends TestUtil {
     @Test
     public void testGetAllItems() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                     {}
                 """;
@@ -72,14 +74,12 @@ public class ItemControllerTest extends TestUtil {
     }
 
 
-
-
     @Test
     public void testAddItem() throws Exception {
         Store store = createStore();
         ItemSubCategory itemSubCategory = createItemSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         MockMultipartFile file = getImageMultipartFileToUpload("newItemImages");
         List<MockMultipartFile> imageFiles = List.of(file);
         MockMultipartHttpServletRequestBuilder requestBuilder = multipart("/admin/item/add");
@@ -147,7 +147,7 @@ public class ItemControllerTest extends TestUtil {
         Store store = createStore();
         Item item = createItem(store.getId());
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 
         String json = """
                 {
@@ -155,7 +155,7 @@ public class ItemControllerTest extends TestUtil {
                 "stock" : "Y"
                 }
                 """
-                .replace("{slug}",item.getSlug());
+                .replace("{slug}", item.getSlug());
         mockMvc.perform(post("/admin/item/stock")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -168,14 +168,13 @@ public class ItemControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testUpdateStatus() throws Exception {
         Store store = createStore();
         Item item = createItem(store.getId());
         createStoreSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
 //        String slug = "c626ff4b-0118-47d9-964a-a8b7f6ac8569";
 
         String json = """
@@ -184,7 +183,7 @@ public class ItemControllerTest extends TestUtil {
                 "status" : "A"
                 }
                 """
-                .replace("{slug}",item.getSlug());
+                .replace("{slug}", item.getSlug());
         mockMvc.perform(post("/admin/item/status")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -200,13 +199,13 @@ public class ItemControllerTest extends TestUtil {
     public void testDeleteItemWithWrongSlug() throws Exception {
         String slug = "sdfsdfs";
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 "slug" : "{slug}"
                 }
                 """
-                .replace("{slug}",slug);
+                .replace("{slug}", slug);
         mockMvc.perform(post("/admin/item/delete")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -219,20 +218,19 @@ public class ItemControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testDeleteItem() throws Exception {
         Store store = createStore();
         Item item = createItem(store.getId());
         createStoreSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 "slug" : "{slug}"
                 }
                 """
-                .replace("{slug}",item.getSlug());
+                .replace("{slug}", item.getSlug());
         mockMvc.perform(post("/admin/item/delete")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -248,7 +246,7 @@ public class ItemControllerTest extends TestUtil {
     @Test
     public void testGetSubcategory() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                   }
@@ -266,7 +264,7 @@ public class ItemControllerTest extends TestUtil {
     @Test
     public void testGetCategory() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                   }
@@ -282,16 +280,16 @@ public class ItemControllerTest extends TestUtil {
                 .andReturn();
 
         List categoryList = extractCategoryListFromResponse(result);
-        if(!categoryList.isEmpty()) {
+        if (!categoryList.isEmpty()) {
             Map<String, Object> categoryRequest = (Map<String, Object>) categoryList.get(0);
             Integer categoryId = (Integer) categoryRequest.get("id");
 
             // Getting subcategories also
             headers.set(GlobalConstant.AUTHORIZATION, token);
             String subCategoryJson = """
-                  {
-                    "categoryId" : {categoryId}
-                  }
+                    {
+                      "categoryId" : {categoryId}
+                    }
                     """
                     .replace("{categoryId}", categoryId + "");
             mockMvc.perform(post("/admin/item/subcategory")
@@ -307,14 +305,14 @@ public class ItemControllerTest extends TestUtil {
     @Test
     public void testCategoryAdd() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                   "category" : "Mock Test Category {random}",
                   "icon": "Mock test icon"
                   }
                 """
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6)); // random added due to duplicate category issue.
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6)); // random added due to duplicate category issue.
         mockMvc.perform(post("/admin/item/category/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -329,7 +327,7 @@ public class ItemControllerTest extends TestUtil {
     public void testCategoryUpdate() throws Exception {
         ItemCategory itemCategory = createItemCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                   "id" : {id},
@@ -337,9 +335,9 @@ public class ItemControllerTest extends TestUtil {
                   "icon": "Mock test icon"
                   }
                 """
-                .replace("{id}",String.valueOf(itemCategory.getId()))
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6)); // randomly added due to duplicate category issue.
-                mockMvc.perform(post("/admin/item/category/update")
+                .replace("{id}", String.valueOf(itemCategory.getId()))
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6)); // randomly added due to duplicate category issue.
+        mockMvc.perform(post("/admin/item/category/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .headers(headers)
@@ -353,7 +351,7 @@ public class ItemControllerTest extends TestUtil {
     @Test
     public void testSubCategoryAdd() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                     "categoryId" : 0,
@@ -362,7 +360,7 @@ public class ItemControllerTest extends TestUtil {
                     "icon" : "test"
                   }
                 """
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6)); // random added due to duplicate category issue.
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6)); // random added due to duplicate category issue.
         mockMvc.perform(post("/admin/item/subcategory/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -373,12 +371,11 @@ public class ItemControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testSubCategoryUpdate() throws Exception {
         ItemSubCategory itemSubCategory = createItemSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                   {
                     "id" : {id},
@@ -388,9 +385,9 @@ public class ItemControllerTest extends TestUtil {
                     "icon" : "test"
                   }
                 """
-                .replace("{id}",String.valueOf(itemSubCategory.getId()))
-                .replace("{random}", UUID.randomUUID().toString().substring(0,6)); // randomly added due to duplicate category issue.
-                mockMvc.perform(post("/admin/item/subcategory/update")
+                .replace("{id}", String.valueOf(itemSubCategory.getId()))
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6)); // randomly added due to duplicate category issue.
+        mockMvc.perform(post("/admin/item/subcategory/update")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .headers(headers)
@@ -401,26 +398,25 @@ public class ItemControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testDeleteCategoryViaStaff() throws Exception {
         ItemCategory itemCategory = createItemCategory();
         token = loginUser(GlobalConstantTest.STAFF);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                     "slug" : "{slug}"
                 }
                 """
-                .replace("{slug}",itemCategory.getSlug());
+                .replace("{slug}", itemCategory.getSlug());
         mockMvc.perform(post("/admin/item/category/delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .headers(headers)
         ).andExpectAll(
                 status().is(403), // Only super admin can delete item's category
-                jsonPath("$.message",is("Only super admin can delete item's category."))
+                jsonPath("$.message", is("Only super admin can delete item's category."))
         );
     }
 
@@ -429,13 +425,13 @@ public class ItemControllerTest extends TestUtil {
     public void testDeleteCategoryViaSuperAdmin() throws Exception {
         ItemCategory itemCategory = createItemCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                     "slug" : "{slug}"
                 }`
                 """
-                .replace("{slug}",itemCategory.getSlug()); // use @Test and use valid slug for separate test
+                .replace("{slug}", itemCategory.getSlug()); // use @Test and use valid slug for separate test
         mockMvc.perform(post("/admin/item/category/delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -450,13 +446,13 @@ public class ItemControllerTest extends TestUtil {
         token = loginUser(GlobalConstantTest.STAFF);
         ItemSubCategory itemSubCategory = createItemSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                     "slug" : "{slug}"
                 }`
                 """
-                .replace("{slug}",itemSubCategory.getSlug()); // use @Test and use valid slug for separate test
+                .replace("{slug}", itemSubCategory.getSlug()); // use @Test and use valid slug for separate test
         mockMvc.perform(post("/admin/item/subcategory/delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -471,13 +467,13 @@ public class ItemControllerTest extends TestUtil {
     public void testDeleteSubcategoryViaSuperAdmin() throws Exception {
         ItemSubCategory itemSubCategory = createItemSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization",token);
+        headers.set("Authorization", token);
         String json = """
                 {
                     "slug" : "{slug}"
                 }`
                 """
-                .replace("{slug}",itemSubCategory.getSlug()); // use @Test and use valid slug for separate test
+                .replace("{slug}", itemSubCategory.getSlug()); // use @Test and use valid slug for separate test
         mockMvc.perform(post("/admin/item/subcategory/delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)

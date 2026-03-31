@@ -20,7 +20,7 @@ import java.util.Map;
 //@Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        entityManagerFactoryRef ="salesEntityManagerFactory",
+        entityManagerFactoryRef = "salesEntityManagerFactory",
         basePackages = {"com.sales.repositories"},
         transactionManagerRef = "salesTransactionManager"
 
@@ -31,7 +31,7 @@ public class SalesConfig {
 
     //	create a DataSource
     @Primary
-    @Bean(name="salesDatasource")
+    @Bean(name = "salesDatasource")
     @ConfigurationProperties(prefix = "spring.sales.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
@@ -40,10 +40,10 @@ public class SalesConfig {
     //	Entity Manger Factory
     @Primary
     @Bean(name = "salesEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder, @Qualifier("salesDatasource") DataSource dataSource ) {
-        Map<String,Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto","none");
-        properties.put("hibernate.dialect","org.hibernate.dialect.MySQLDialect");
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(EntityManagerFactoryBuilder builder, @Qualifier("salesDatasource") DataSource dataSource) {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         return builder.dataSource(dataSource).properties(properties).packages("com.sales.entities").persistenceUnit("Sales").build();
     }
 

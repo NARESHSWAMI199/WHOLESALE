@@ -3,6 +3,7 @@ package com.sales.wholesaler.repository;
 
 import com.sales.exceptions.MyException;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class WholesalePermissionHbRepository {
     public int assignPermissionsToWholesaler(int userId, List<Integer> permissions) throws MyException {
         if (permissions.contains(GlobalConstant.suId)) permissions.remove((Integer) GlobalConstant.suId);
         deleteWholesalerPermission(userId);
-        if (permissions.isEmpty()) throw new MyException("Please provide at least one permission.");
+        if (permissions.isEmpty()) throw new MyException(ResponseMessages.PLEASE_PROVIDE_AT_LEAST_ONE_PERMISSION);
         StringBuilder values = new StringBuilder();
         for (int i = 0; i < permissions.size(); i++) {
             values.append("(").append(userId).append(",").append(permissions.get(i)).append(")");

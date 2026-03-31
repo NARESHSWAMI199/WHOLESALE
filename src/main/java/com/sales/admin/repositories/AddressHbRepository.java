@@ -2,15 +2,15 @@ package com.sales.admin.repositories;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.request.AddressRequest;
 import com.sales.entities.City;
 import com.sales.entities.State;
+import com.sales.request.AddressRequest;
 import com.sales.utils.Utils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ public class AddressHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateAddress(AddressRequest addressRequest, AuthUser loggedUser){
-        String hqQuery ="update Address set " +
-                "street =:street,"+
-                "zipCode =:zipCode,"+
-                "city =:city,"+
+    public int updateAddress(AddressRequest addressRequest, AuthUser loggedUser) {
+        String hqQuery = "update Address set " +
+                "street =:street," +
+                "zipCode =:zipCode," +
+                "city =:city," +
                 "state =:state," +
                 "latitude =:latitude," +
                 "altitude =:altitude, " +
@@ -42,26 +42,26 @@ public class AddressHbRepository {
                 .build();
 
         Query query = entityManager.createQuery(hqQuery);
-        query.setParameter("street",addressRequest.getStreet());
-        query.setParameter("zipCode",addressRequest.getZipCode());
-        query.setParameter("city",city);
-        query.setParameter("state",state);
-        query.setParameter("latitude",addressRequest.getLatitude());
-        query.setParameter("altitude",addressRequest.getAltitude());
+        query.setParameter("street", addressRequest.getStreet());
+        query.setParameter("zipCode", addressRequest.getZipCode());
+        query.setParameter("city", city);
+        query.setParameter("state", state);
+        query.setParameter("latitude", addressRequest.getLatitude());
+        query.setParameter("altitude", addressRequest.getAltitude());
         query.setParameter("updatedBy", loggedUser.getId());
         query.setParameter("updatedAt", Utils.getCurrentMillis());
-        query.setParameter("id",addressRequest.getAddressId());
-        return  query.executeUpdate();
+        query.setParameter("id", addressRequest.getAddressId());
+        return query.executeUpdate();
     }
 
-    public List<City> getCityList(int stateId){
+    public List<City> getCityList(int stateId) {
         String hql = "from City where stateId = :stateId";
         Query query = entityManager.createQuery(hql);
         query.setParameter("stateId", stateId);
         return query.getResultList();
     }
 
-    public List<State> getStateList(){
+    public List<State> getStateList() {
         String hql = "from State";
         Query query = entityManager.createQuery(hql);
         return query.getResultList();

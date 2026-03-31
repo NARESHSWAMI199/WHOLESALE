@@ -27,7 +27,7 @@ class UploadImageValidatorTest {
         ImageIO.write(img, "png", baos);
         MockMultipartFile file = new MockMultipartFile("file", "test.png", "image/png", baos.toByteArray());
 
-        boolean ok = UploadImageValidator.isValidImage(file, 10, 10, 200, 200, new double[]{1.0}, new String[]{"png","jpg","jpeg"});
+        boolean ok = UploadImageValidator.isValidImage(file, 10, 10, 200, 200, new double[]{1.0}, new String[]{"png", "jpg", "jpeg"});
         assertTrue(ok);
     }
 
@@ -58,7 +58,7 @@ class UploadImageValidatorTest {
         ImageIO.write(img, "png", baos);
         MockMultipartFile file = new MockMultipartFile("file", "test.bmp", "image/bmp", baos.toByteArray());
 
-        boolean ok = UploadImageValidator.isValidImage(file, 10, 10, 200, 200, new double[]{0.5}, new String[]{"png","jpg"});
+        boolean ok = UploadImageValidator.isValidImage(file, 10, 10, 200, 200, new double[]{0.5}, new String[]{"png", "jpg"});
         assertFalse(ok);
     }
 
@@ -69,7 +69,8 @@ class UploadImageValidatorTest {
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                if (x < 6) img.setRGB(x, y, Color.WHITE.getRGB()); else img.setRGB(x, y, Color.BLACK.getRGB());
+                if (x < 6) img.setRGB(x, y, Color.WHITE.getRGB());
+                else img.setRGB(x, y, Color.BLACK.getRGB());
             }
         }
         File f1 = File.createTempFile("white-mid-", ".png");
@@ -87,7 +88,8 @@ class UploadImageValidatorTest {
         assertThrows(MyException.class, () -> UploadImageValidator.hasWhiteBackground(f2));
 
         // cleanup
-        f1.delete(); f2.delete();
+        f1.delete();
+        f2.delete();
     }
 
 }

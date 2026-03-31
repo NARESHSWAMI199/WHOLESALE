@@ -5,8 +5,8 @@ import com.sales.SalesApplication;
 import com.sales.admin.dto.UserDto;
 import com.sales.admin.services.UserService;
 import com.sales.claims.SalesUser;
-import com.sales.request.UserSearchFilters;
 import com.sales.entities.User;
+import com.sales.request.UserSearchFilters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,37 +27,38 @@ import java.util.UUID;
 public class UserServiceTest extends TestUtil {
 
 
+    private final String email = "test.naresh@gmail.com";
+    private final String password = "123456";
     @Autowired
     private UserService userService;
 
-    private final String email = "test.naresh@gmail.com";
-    private final String password = "123456";
-
     @Test
-    public void testFindUserUsingEmailAndPassword(){
+    public void testFindUserUsingEmailAndPassword() {
         String email = createRandomEmail();
         String password = UUID.randomUUID().toString();
-        String slug =UUID.randomUUID().toString();
-        createUser(slug,email, password, GlobalConstantTest.ADMIN);
-        User user = userService.findByEmailAndPassword(email,password);
-        Assertions.assertEquals("naresh",user.getUsername());
-        Assertions.assertEquals("SA",user.getUserType());
+        String slug = UUID.randomUUID().toString();
+        createUser(slug, email, password, GlobalConstantTest.ADMIN);
+        User user = userService.findByEmailAndPassword(email, password);
+        Assertions.assertEquals("naresh", user.getUsername());
+        Assertions.assertEquals("SA", user.getUserType());
 
     }
 
 
     @Test
-    public void testFindUserUsingEmailAndPasswordWithWrongDetails(){
-        Assertions.assertThrows(UsernameNotFoundException.class,() -> userService.findByEmailAndPassword(email,UUID.randomUUID().toString()));
+    public void testFindUserUsingEmailAndPasswordWithWrongDetails() {
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userService.findByEmailAndPassword(email, UUID.randomUUID().toString()));
     }
+
     @Test
     public void testFindUserUsingEmailAndPasswordWithBlankPassword() {
-        createUser(UUID.randomUUID().toString(),email,password,GlobalConstantTest.STAFF);
-        Assertions.assertThrows(UsernameNotFoundException.class,() -> userService.findByEmailAndPassword(email,null));
+        createUser(UUID.randomUUID().toString(), email, password, GlobalConstantTest.STAFF);
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userService.findByEmailAndPassword(email, null));
     }
+
     @Test
-    public void testFindUserUsingEmailAndPasswordWithBlank(){
-        Assertions.assertThrows(UsernameNotFoundException.class,() -> userService.findByEmailAndPassword(null,null));
+    public void testFindUserUsingEmailAndPasswordWithBlank() {
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userService.findByEmailAndPassword(null, null));
     }
 
     @Test

@@ -46,13 +46,13 @@ public class Item implements Serializable {
     @Column(name = "total_reports_count")
     Integer totalReportsCount;
     @Column(name = "status")
-    String status="A";
+    String status = "A";
     @Column(name = "is_deleted")
-    String isDeleted="N";
+    String isDeleted = "N";
     @Column(name = "created_at")
     Long createdAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by" , referencedColumnName = "user_id")
+    @JoinColumn(name = "created_by", referencedColumnName = "user_id")
     User createdBy;
     @Column(name = "updated_at")
     Long updatedAt;

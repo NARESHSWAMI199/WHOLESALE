@@ -23,10 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class WholesaleFuturePlansControllerTest extends TestUtil {
 
-    private String token;
-
     @org.springframework.beans.factory.annotation.Autowired
     protected WholesaleFuturePlansRepository wholesaleFuturePlansRepository;
+    private String token;
 
     @BeforeEach
     public void loginUserTest() throws Exception {

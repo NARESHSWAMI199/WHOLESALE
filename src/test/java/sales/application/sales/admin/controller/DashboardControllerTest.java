@@ -47,7 +47,7 @@ public class DashboardControllerTest extends TestUtil {
     @Test
     public void testGraphData() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -74,7 +74,7 @@ public class DashboardControllerTest extends TestUtil {
     @Test
     public void testCounts() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         mockMvc.perform(MockMvcRequestBuilders.get("/admin/dashboard/counts")
                 .headers(headers)
         ).andExpectAll(

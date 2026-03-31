@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CashfreeFilters  extends SearchFilters{
+public class CashfreeFilters extends SearchFilters {
     String transactionId;
     String paymentStatus;
 }

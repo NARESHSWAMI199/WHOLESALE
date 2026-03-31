@@ -16,11 +16,9 @@ import java.util.function.Function;
 
 @Component
 public class JwtToken implements Serializable {
+    public static final long JWT_TOKEN_VALIDITY = 5L * 60 * 60; // 5 hours in seconds
     @Serial
     private static final long serialVersionUID = -2550185165626007488L;
-
-    public static final long JWT_TOKEN_VALIDITY = 5L * 60 * 60; // 5 hours in seconds
-
     @Value("${jwt.secret}")
     private String secret;
 
@@ -38,6 +36,7 @@ public class JwtToken implements Serializable {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
+
     //for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();

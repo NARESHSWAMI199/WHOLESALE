@@ -11,8 +11,8 @@ import com.sales.claims.SalesUser;
 import com.sales.entities.MeasurementUnit;
 import com.sales.entities.Store;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.requests.ItemRequest;
@@ -53,14 +53,19 @@ import java.util.Map;
 public class ItemController {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private final WriteExcelUtil writeExcel;
     private final ItemService itemService;
     private final StoreService storeService;
     private final ReadExcel readExcel;
     private final ItemReportService itemReportService;
     private final ItemReviewService itemReviewService;
-
-    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
+    @Value("${item.get}")
+    String filePath;
+    @Value("${excel.update.template}")
+    String updateItemTemplate;
+    @Value("${excel.notUpdated.absolute}")
+    String excelNotUpdateItemsFolderPath;
 
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('item.all')")
@@ -89,7 +94,6 @@ public class ItemController {
         }
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(schema = @Schema(example = """
@@ -123,7 +127,6 @@ public class ItemController {
         Map<String, Object> responseObj = itemService.createOrUpdateItem(itemRequest, loggedUser, path);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @PostMapping(value = {"/importExcel/{wholesaleSlug}"})
     @PreAuthorize("hasAuthority('item.import')")
@@ -166,7 +169,6 @@ public class ItemController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @PostMapping(value = {"/exportExcel/{wholesaleSlug}", "exportExcel"})
     @PreAuthorize("hasAuthority('item.export')")
     @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
@@ -203,7 +205,6 @@ public class ItemController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('item.delete')")
     @Operation(summary = "Delete item", description = "Deletes an item by its slug")
@@ -216,7 +217,6 @@ public class ItemController {
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(schema = @Schema(example = """
@@ -244,6 +244,8 @@ public class ItemController {
     }
 
 
+    // ================= Item category
+
     @PostMapping("/status")
     @PreAuthorize("hasAuthority('item.status')")
     @Operation(summary = "Update item status", description = "Updates the status of an item")
@@ -262,10 +264,6 @@ public class ItemController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
-    @Value("${item.get}")
-    String filePath;
-
     @GetMapping("/image/{slug}/{filename}")
     @Operation(summary = "Get item image", description = "Retrieves an image file for a specific item")
     public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename, @PathVariable("slug") String slug) throws Exception {
@@ -276,10 +274,6 @@ public class ItemController {
         Resource resource = new UrlResource(path.toUri());
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
     }
-
-
-    // ================= Item category
-
 
     @PostMapping("category")
     @PreAuthorize("hasAuthority('item.category')")
@@ -311,6 +305,8 @@ public class ItemController {
     }
 
 
+    // ================= Item subcategory
+
     @PostMapping("category/delete")
     @PreAuthorize("hasAuthority('item.category.delete')")
     @Operation(summary = "Delete item category", description = "Deletes an item category by ID")
@@ -329,7 +325,6 @@ public class ItemController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @GetMapping("category/{categoryId}")
     @PreAuthorize("hasAuthority('item.category.detail')")
     @Operation(summary = "Get item category by ID", description = "Retrieves details of a specific item category by its ID")
@@ -338,9 +333,6 @@ public class ItemController {
         CategoryDto itemCategory = itemService.getItemCategoryDtoById(categoryId);
         return new ResponseEntity<>(itemCategory, HttpStatus.OK);
     }
-
-
-    // ================= Item subcategory
 
     @PostMapping("subcategory")
     @PreAuthorize("hasAnyAuthority('item.subcategory.all','item.subcategory')")
@@ -371,7 +363,6 @@ public class ItemController {
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
 
-
     @PostMapping("subcategory/delete")
     @PreAuthorize("hasAuthority('item.subcategory.delete')")
     @Operation(summary = "Delete item subcategory", description = "Deletes an item subcategory by ID")
@@ -399,11 +390,6 @@ public class ItemController {
         return new ResponseEntity<>(itemMeasurementUnitList, HttpStatus.OK);
     }
 
-
-    @Value("${excel.update.template}")
-    String updateItemTemplate;
-
-
     @GetMapping(value = {"download/update/template"})
     @Operation(summary = "Download update template", description = "Downloads the Excel template for updating items")
     public ResponseEntity<Object> downloadExcelUpdateTemplate() throws IOException {
@@ -415,11 +401,6 @@ public class ItemController {
         headers.setContentDispositionFormData("attachment", "update_item_template.xlsx");
         return new ResponseEntity<>(resource.getContentAsByteArray(), headers, org.springframework.http.HttpStatus.OK);
     }
-
-
-    @Value("${excel.notUpdated.absolute}")
-    String excelNotUpdateItemsFolderPath;
-
 
     @GetMapping(value = {"notUpdated/{wholesaleSlug}/{filename}"})
     @Operation(summary = "Download not updated items Excel", description = "Downloads the Excel file containing items that were not updated during import")

@@ -42,7 +42,7 @@ public class CashfreeTrans implements Serializable {
     @Column(name = "message")
     String message;
 
-    @Column(name="payment_time")
+    @Column(name = "payment_time")
     String paymentTime;
 
     @Column(name = "payment_group") // payment type like: upi or credit_card.

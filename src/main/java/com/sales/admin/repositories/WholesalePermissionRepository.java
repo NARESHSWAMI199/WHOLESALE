@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WholesalePermissionRepository extends JpaRepository<WholesalerPermissions,Integer> {
+public interface WholesalePermissionRepository extends JpaRepository<WholesalerPermissions, Integer> {
 }

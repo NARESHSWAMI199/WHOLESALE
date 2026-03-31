@@ -22,7 +22,7 @@ import static com.sales.utils.Utils.getCurrentMillis;
 public class Group implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     int id;
 
     @Column(name = "name")
@@ -46,13 +46,13 @@ public class Group implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_permissions",
-            joinColumns = @JoinColumn(name = "group_id" , referencedColumnName = "id"),
+            joinColumns = @JoinColumn(name = "group_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id", referencedColumnName = "id")
     )
     private Set<Permission> permissions = new HashSet<>();
 
 
-    public Group (AuthUser loggedUser) {
+    public Group(AuthUser loggedUser) {
         this.slug = UUID.randomUUID().toString();
         this.createdAt = getCurrentMillis();
         this.createdBy = loggedUser.getId();

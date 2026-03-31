@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StatusRequest {
     String slug;
-    String status="D";
+    String status = "D";
 }

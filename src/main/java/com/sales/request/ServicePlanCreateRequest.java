@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @Builder
-public class ServicePlanCreateRequest{
+public class ServicePlanCreateRequest {
     private String name;
     private String slug;
     private String status;

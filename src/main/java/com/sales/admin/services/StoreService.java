@@ -8,16 +8,15 @@ import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.mapper.SubcategoryMapper;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
-import com.sales.request.*;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.request.*;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -46,6 +46,7 @@ import static com.sales.specifications.StoreSpecifications.*;
 @RequiredArgsConstructor
 public class StoreService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
     private final StoreRepository storeRepository;
     private final ItemRepository itemRepository;
     private final StoreHbRepository storeHbRepository;
@@ -55,7 +56,6 @@ public class StoreService {
     private final AddressHbRepository addressHbRepository;
     private final UserRepository userRepository;
     private final AddressService addressService;
-    private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
     private final StoreMapper storeMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
@@ -168,7 +168,7 @@ public class StoreService {
             StoreSubCategory storeSubCategory = storeSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
             storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid arguments for category and subcategory");
+            throw new IllegalArgumentException(ResponseMessages.INVALID_ARGUMENTS_FOR_CATEGORY_AND_SUBCATEGORY);
         }
 
         if (!Utils.isEmpty(storeCreationRequest.getStoreSlug()) || path.contains("update")) { // We are going to update the store.
@@ -185,7 +185,7 @@ public class StoreService {
             // before update store and store's address get address id from store
             Integer addressId = storeRepository.getAddressIdBySlug(storeCreationRequest.getStoreSlug());
             if (addressId == null)
-                throw new IllegalArgumentException("Store address not found.");  // wrong wholesale slug.
+                throw new IllegalArgumentException(ResponseMessages.STORE_ADDRESS_NOT_FOUND);  // wrong wholesale slug.
             storeCreationRequest.setAddressId(addressId);
 
             int isUpdated = updateStore(storeCreationRequest, loggedUser);
@@ -243,7 +243,7 @@ public class StoreService {
         /** @END inserting  address during create a wholesale */
         Optional<User> storeOwner = userRepository.findByWholesalerSlug(storeCreationRequest.getUserSlug());
         if (storeOwner.isEmpty())
-            throw new PermissionDeniedDataAccessException("User must be wholesaler.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.USER_MUST_BE_WHOLESALER, new Exception());
 
 
         // Saving the store data
@@ -289,7 +289,7 @@ public class StoreService {
 
         String slug = deleteRequest.getSlug();
         Store store = storeRepository.findStoreBySlug(slug);
-        if (store == null) throw new NotFoundException("No store found to delete.");
+        if (store == null) throw new NotFoundException(ResponseMessages.NO_STORE_FOUND_TO_DELETE);
         User user = store.getUser();
         if (user != null) userHbRepository.deleteUserBySlug(user.getSlug());
         int result = storeHbRepository.deleteStore(slug, loggedUser);
@@ -322,11 +322,12 @@ public class StoreService {
 
     public Store getStoreByUserSlug(String userSlug) {
         logger.debug("Entering getStoreByUserSlug with userSlug: {}", userSlug);
-        if (Utils.isEmpty(userSlug)) throw new IllegalArgumentException("User slug can't be null or blank.");
+        if (Utils.isEmpty(userSlug))
+            throw new IllegalArgumentException(ResponseMessages.USER_SLUG_CAN_T_BE_NULL_OR_BLANK);
         User user = userRepository.findUserBySlug(userSlug);
-        if (user == null) throw new NotFoundException("No user found.");
+        if (user == null) throw new NotFoundException(ResponseMessages.NO_USER_FOUND);
         Store store = storeRepository.findStoreByUserId(user.getId());
-        if (store == null) throw new NotFoundException("Store not found.");
+        if (store == null) throw new NotFoundException(ResponseMessages.STORE_NOT_FOUND);
         // setting total items to with store detail
         store.setTotalStoreItems(itemRepository.totalItemCountByWholesaleId(store.getId()));
         logger.debug("Exiting getStoreByUserSlug");
@@ -343,7 +344,7 @@ public class StoreService {
         switch (statusRequest.getStatus()) {
             case "A", "D":
                 Store store = storeRepository.findStoreBySlug(statusRequest.getSlug());
-                if (store == null) throw new NotFoundException("No store found to update.");
+                if (store == null) throw new NotFoundException(ResponseMessages.NO_STORE_FOUND_TO_UPDATE);
                 String status = statusRequest.getStatus();
                 // updating store user status also
                 store.getUser().setStatus(statusRequest.getStatus());
@@ -352,7 +353,7 @@ public class StoreService {
                 logger.debug("Exiting updateStatusBySlug");
                 return result;
             default:
-                throw new IllegalArgumentException("Status must be A or D.");
+                throw new IllegalArgumentException(ResponseMessages.STATUS_MUST_BE_A_OR_D);
         }
     }
 
@@ -374,7 +375,7 @@ public class StoreService {
                 logger.debug("Exiting updateStoreImage");
                 return result;
             } else {
-                throw new IllegalArgumentException("Image is not fit in accept ratio. please resize you image before upload.");
+                throw new IllegalArgumentException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOU_IMAGE_BEFORE_UPLOAD);
             }
         }
         logger.debug("Exiting updateStoreImage");
@@ -452,10 +453,10 @@ public class StoreService {
         // Validating required fields if they are null, this will throw an Exception
         Utils.checkRequiredFields(deleteRequest, List.of("slug"));
         if (!user.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("Only super admin can delete a store category.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.ONLY_SUPER_ADMIN_CAN_DELETE_STORE_CATEGORY, new Exception());
         String slug = deleteRequest.getSlug();
         Integer categoryId = storeHbRepository.getStoreCategoryIdBySLug(slug);
-        if (categoryId == null) throw new NotFoundException("Store's category not found.");
+        if (categoryId == null) throw new NotFoundException(ResponseMessages.STORE_S_CATEGORY_NOT_FOUND);
         storeHbRepository.switchCategoryToOther(categoryId);  // before delete category assign store to the other category.
         int result = storeHbRepository.deleteStoreCategory(slug);
         logger.debug("Exiting deleteStoreCategory");
@@ -468,9 +469,9 @@ public class StoreService {
         Utils.checkRequiredFields(deleteRequest, List.of("slug"));
         String slug = deleteRequest.getSlug();
         if (!user.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("Only super admin can delete a store subcategory.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.ONLY_SUPER_ADMIN_CAN_DELETE_STORE_SUBCATEGORY, new Exception());
         Integer subCategoryId = storeSubCategoryRepository.getStoreSubCategoryIdBySlug(slug);
-        if (subCategoryId == null) throw new NotFoundException("Store's subcategory not found.");
+        if (subCategoryId == null) throw new NotFoundException(ResponseMessages.STORE_S_SUBCATEGORY_NOT_FOUND);
         storeHbRepository.switchSubCategoryToOther(subCategoryId);
         int result = storeHbRepository.deleteStoreSubCategory(slug);
         logger.debug("Exiting deleteStoreSubCategory");

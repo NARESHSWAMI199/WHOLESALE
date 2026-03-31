@@ -3,10 +3,10 @@ package com.sales.chats.controllers;
 import com.sales.chats.services.ChatRoomService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
+import com.sales.request.ChatRoomDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,30 +40,28 @@ public class ChatRoomController {
 
     @PostMapping("add")
     @Operation(summary = "Add new chat room", description = "Creates a new chat room")
-    public ResponseEntity<Map<String,String>> addNewChatRoom(@Valid @RequestBody ChatRoomDto chatRoomDto) {
-        Map<String,String> result = new HashMap<>();
+    public ResponseEntity<Map<String, String>> addNewChatRoom(@Valid @RequestBody ChatRoomDto chatRoomDto) {
+        Map<String, String> result = new HashMap<>();
         ChatRoom chatRoom = chatRoomService.createRoom(chatRoomDto);
-        result.put("roomId",chatRoom.getSlug());
-        return new ResponseEntity<>(result,HttpStatus.valueOf(201));
+        result.put("roomId", chatRoom.getSlug());
+        return new ResponseEntity<>(result, HttpStatus.valueOf(201));
     }
 
     @PostMapping("update")
     @Operation(summary = "Update chat room", description = "Updates an existing chat room")
     public ResponseEntity<Map<String, Object>> updateChatRoom(Authentication authentication, @RequestBody ChatRoomDto chatRoomDto, HttpServletRequest request) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         int isUpdated = chatRoomService.updateRoom(chatRoomDto, loggedUser);
-        if(isUpdated > 0){
+        if (isUpdated > 0) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CHAT_ROOM_UPDATED_SUCCESSFULLY);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else{
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ROOM_FOUND_FOR_WITH_SPACE + chatRoomDto.getSlug());
-            result.put("status",404);
+            result.put("status", 404);
         }
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
-
-
 
 
 }

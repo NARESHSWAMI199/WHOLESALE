@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WholesalerPlansRepository extends JpaRepository<WholesalerPlans,Integer> , JpaSpecificationExecutor<WholesalerPlans> {
+public interface WholesalerPlansRepository extends JpaRepository<WholesalerPlans, Integer>, JpaSpecificationExecutor<WholesalerPlans> {
     WholesalerPlans findByUserId(Integer userId);
     /*
     @Query(value = "select " +
@@ -22,7 +22,6 @@ public interface WholesalerPlansRepository extends JpaRepository<WholesalerPlans
             "from ServicePlan sp INNER JOIN WholesalerPlans up ON up.planId = sp.id where up.userId = :userId and :specification")
     List<Map<String,Object>> getAllUserPlansByUserId(Integer userId, Specification<WholesalerPlans> specification , Pageable pageable);
     */
-
 
 
 }

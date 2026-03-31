@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record StateDto(
-    int id,
-    String stateName
+        int id,
+        String stateName
 ) {
 }

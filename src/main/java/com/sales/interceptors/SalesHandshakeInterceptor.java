@@ -13,7 +13,7 @@ public class SalesHandshakeInterceptor implements HandshakeInterceptor {
 
     WholesaleUserService wholesaleUserService = null;
 
-    public SalesHandshakeInterceptor (WholesaleUserService wholesaleUserService){
+    public SalesHandshakeInterceptor(WholesaleUserService wholesaleUserService) {
         this.wholesaleUserService = wholesaleUserService;
     }
 

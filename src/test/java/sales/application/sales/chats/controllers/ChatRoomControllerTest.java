@@ -13,8 +13,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import sales.application.sales.testglobal.GlobalConstantTest;
 import sales.application.sales.util.TestUtil;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -56,9 +54,9 @@ public class ChatRoomControllerTest extends TestUtil {
         headers.set(GlobalConstant.AUTHORIZATION, token);
 
         mockMvc.perform(post("/chat_room/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .headers(headers)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(headers)
+                        .content(json))
                 .andExpect(status().is(201))
                 .andExpect(jsonPath("$.roomId").exists())
                 .andDo(print());
@@ -76,12 +74,12 @@ public class ChatRoomControllerTest extends TestUtil {
         HttpHeaders headers = new HttpHeaders();
         headers.set(GlobalConstant.AUTHORIZATION, token);
         MvcResult result = mockMvc.perform(post("/chat_room/add")
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .headers(headers)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andDo(print())
                 .andReturn();
-        
+
         System.out.println("Response Status: " + result.getResponse().getStatus());
         System.out.println("Response Body: " + result.getResponse().getContentAsString());
     }
@@ -96,8 +94,8 @@ public class ChatRoomControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat_room/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
@@ -113,8 +111,8 @@ public class ChatRoomControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat_room/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
     }
@@ -133,9 +131,9 @@ public class ChatRoomControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat_room/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andDo(print());
     }
 
@@ -153,9 +151,9 @@ public class ChatRoomControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/chat_room/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .headers(headers))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .headers(headers))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }

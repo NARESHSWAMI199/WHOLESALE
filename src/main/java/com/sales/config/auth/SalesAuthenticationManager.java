@@ -22,11 +22,11 @@ public class SalesAuthenticationManager implements AuthenticationManager {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = (String) authentication.getCredentials();
-        User user = userRepository.findByEmailAndPassword(email,password).orElseThrow(() -> new UsernameNotFoundException("Invalid Credentials !"));
+        User user = userRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new UsernameNotFoundException("Invalid Credentials !"));
         AuthUser userDetails = new SalesUser(user);
         //TODO : make sure password encrypt here..
         return new UsernamePasswordAuthenticationToken(
-                userDetails,password,null
+                userDetails, password, null
         );
     }
 }

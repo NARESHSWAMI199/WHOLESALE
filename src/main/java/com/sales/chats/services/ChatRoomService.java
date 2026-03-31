@@ -4,16 +4,17 @@ package com.sales.chats.services;
 import com.sales.chats.repositories.ChatRoomHbRepository;
 import com.sales.chats.repositories.ChatRoomRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.ChatRoomDto;
 import com.sales.entities.ChatRoom;
 import com.sales.entities.ChatRoomUser;
 import com.sales.entities.User;
 import com.sales.exceptions.NotFoundException;
+import com.sales.global.ResponseMessages;
+import com.sales.request.ChatRoomDto;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.repository.WholesaleUserRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +22,19 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChatRoomService  {
+public class ChatRoomService {
 
 
     private final ChatRoomRepository chatRoomRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
     private final ChatRoomHbRepository chatRoomHbRepository;
-    public List<ChatRoom> getAllChatRoom(){
+
+    public List<ChatRoom> getAllChatRoom() {
         return chatRoomRepository.findAll();
     }
 
 
-    @Transactional(rollbackFor = {NotFoundException.class, RuntimeException.class,Exception.class})
+    @Transactional(rollbackFor = {NotFoundException.class, RuntimeException.class, Exception.class})
     public ChatRoom createRoom(ChatRoomDto chatRoomDto) {
         // saving room
         ChatRoom chatRoom = ChatRoom.builder()
@@ -42,13 +44,13 @@ public class ChatRoomService  {
                 .createdAt(Utils.getCurrentMillis())
                 .updatedAt(Utils.getCurrentMillis())
                 .build();
-        ChatRoom inserted =  chatRoomRepository.save(chatRoom);
+        ChatRoom inserted = chatRoomRepository.save(chatRoom);
 
 
         List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
-        for(String slug :chatRoomDto.getUsers()) {
+        for (String slug : chatRoomDto.getUsers()) {
             User user = wholesaleUserRepository.findUserBySlug(slug);
-            if(user == null) throw new NotFoundException("Chat users are not valid.");
+            if (user == null) throw new NotFoundException(ResponseMessages.CHAT_USERS_ARE_NOT_VALID);
             ChatRoomUser chatRoomUser = ChatRoomUser.builder()
                     .user(user)
                     .roomId(inserted.getId())
@@ -59,17 +61,14 @@ public class ChatRoomService  {
         // this will auto save
         inserted.setChatRoomUsers(chatRoomUsers);
 
-        return  inserted;
+        return inserted;
     }
-
 
 
     @Transactional
     public int updateRoom(ChatRoomDto chatRoomDto, AuthUser loggedUser) {
         return chatRoomHbRepository.updateChatRoom(chatRoomDto);
     }
-
-
 
 
 }

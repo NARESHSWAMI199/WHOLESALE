@@ -13,14 +13,14 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface UserRepository  extends JpaRepository<User, Integer> , JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
     @Query(value = "from User where email=:email and password=:password and (userType='S' or userType='SA') ")
     Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
 
     @Query(value = "from User where slug=:slug and userType='W'")
-    Optional<User> findByWholesalerSlug(@Param("slug")String slug);
+    Optional<User> findByWholesalerSlug(@Param("slug") String slug);
 
     User findUserBySlug(String slug);
 
@@ -35,6 +35,7 @@ public interface UserRepository  extends JpaRepository<User, Integer> , JpaSpeci
 
     @Query(value = "select count(id) as count from User where userType !='SA'")
     Integer totalUserCount();
+
     @Query(value = "select count(id) as count from User where status=:status")
     Integer optionUserCount(@Param("status") String status);
 
@@ -43,17 +44,17 @@ public interface UserRepository  extends JpaRepository<User, Integer> , JpaSpeci
     Integer getUserWithUserType(@Param("userType") String userType);
 
     @Query(value = "select count(id) as count from User where status=:status and userType=:userType")
-    Integer getUserWithUserType(@Param("status") String status,@Param("userType") String userType);
+    Integer getUserWithUserType(@Param("status") String status, @Param("userType") String userType);
 
 //
 //    @Query(value = "select ug.groupId as groupId from UserGroups ug left join User u on ug.userId = u.id where u.slug = :slug")
 //    List<Integer> getUserGroupsIdBySlug(String slug);
 
     @Query("""
-        select ug.id as id
-        from User u join u.groups ug
-        where u.slug = :slug
-    """)
+                select ug.id as id
+                from User u join u.groups ug
+                where u.slug = :slug
+            """)
     List<Integer> findGroupIdsBySlug(String slug);
 
 

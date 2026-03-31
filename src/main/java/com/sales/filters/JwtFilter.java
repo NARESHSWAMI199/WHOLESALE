@@ -40,7 +40,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserCacheService userCacheService;
 
 
-
     private final AntPathMatcher matcher = new AntPathMatcher();
 
     @Override
@@ -56,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         String authHeader = request.getHeader(GlobalConstant.AUTHORIZATION);
-        log.info("The request token : {}",authHeader);
+        log.info("The request token : {}", authHeader);
         if (authHeader != null && authHeader.startsWith(GlobalConstant.AUTH_TOKEN_PREFIX)) {
             String token = authHeader.substring(7);
             String slug = jwtUtil.getSlugFromToken(token);
@@ -64,13 +63,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 MDC.put("userSlug", slug);
             }
             User user = userCacheService.getCacheUser(slug);
-            if(user == null){
+            if (user == null) {
                 user = userRepository.findUserBySlug(slug);
                 List<GrantedAuthority> authorities = grantedAuthorities(user);
                 user.setAuthorities(authorities);
                 userCacheService.saveCacheUser(user);
             }
-            log.info("The request user : {}",user);
+            log.info("The request user : {}", user);
             AuthUser userDetails = new SalesUser(user);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
@@ -82,11 +81,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
-    private List<GrantedAuthority> grantedAuthorities(User user){
+    private List<GrantedAuthority> grantedAuthorities(User user) {
         Set<String> permissions = new HashSet<>();
-        if(user.getUserType().equals(USER_TYPES.STAFF.getType())  || user.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType())){
+        if (user.getUserType().equals(USER_TYPES.STAFF.getType()) || user.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType())) {
             permissions = userRepository.findAllPermissionsByUserId(user.getId());
-        }else if(user.getUserType().equals(USER_TYPES.WHOLESALER.getType())){
+        } else if (user.getUserType().equals(USER_TYPES.WHOLESALER.getType())) {
             permissions = storePermissionsRepository.getAllAssignedPermissionByUserId(user.getId());
         }
         List<GrantedAuthority> authorities = new ArrayList<>();

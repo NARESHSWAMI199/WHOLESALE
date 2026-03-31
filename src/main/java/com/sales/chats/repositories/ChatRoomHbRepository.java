@@ -4,9 +4,9 @@ package com.sales.chats.repositories;
 import com.sales.request.ChatRoomDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
@@ -21,8 +21,8 @@ public class ChatRoomHbRepository {
         String hql = "update set name=:name,description =:description where slug=:slug";
         Query query = entityManager.createQuery(hql);
         query.setParameter("name", chatRoomDto.getName());
-        query.setParameter("description",chatRoomDto.getDescription());
-        query.setParameter("slug",chatRoomDto.getSlug());
+        query.setParameter("description", chatRoomDto.getDescription());
+        query.setParameter("slug", chatRoomDto.getSlug());
         return query.executeUpdate();
     }
 

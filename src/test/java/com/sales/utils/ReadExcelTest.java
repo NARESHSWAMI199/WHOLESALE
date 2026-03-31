@@ -31,7 +31,7 @@ class ReadExcelTest {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             workbook.write(baos);
 
-            MockMultipartFile file = new MockMultipartFile("file","test.xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",baos.toByteArray());
+            MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", baos.toByteArray());
 
             ReadExcel reader = new ReadExcel();
             Map<String, List<String>> parsed = reader.getExcelDataInJsonFormat(file);

@@ -16,6 +16,8 @@ import java.io.Serializable;
 @Builder
 public class Address implements Serializable {
 
+    @Column(name = "altitude")
+    Float altitude;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -25,19 +27,17 @@ public class Address implements Serializable {
     private String street;
     @Column(name = "zip_code")
     private String zipCode;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city", referencedColumnName = "id")
     private City city;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "state", referencedColumnName = "id")
     private State state;
     @Column(name = "latitude")
     private Float latitude;
-    @Column(name = "altitude")
-    Float altitude;
-/**-------------> COMMON COLUMNS ---------------------*/
+    /**
+     * -------------> COMMON COLUMNS ---------------------
+     */
     @Column(name = "created_at")
     private Long createdAt;
     @Column(name = "created_by")

@@ -1,4 +1,5 @@
-INSERT IGNORE INTO item_subcategories
+INSERT
+IGNORE INTO item_subcategories
 (slug, category_id, subcategory, unit, icon, updated_at, is_deleted) VALUES
 
 ('other',0,'Other',NULL,NULL,UNIX_TIMESTAMP()*1000,'N'),

@@ -1,4 +1,5 @@
-INSERT IGNORE INTO `permissions` (`permission`, `display_name`, `permission_for`) VALUES
+INSERT
+IGNORE INTO `permissions` (`permission`, `display_name`, `permission_for`) VALUES
 
 -- Dashboard
 ('dashboard.count',                'Show Dashboard Statistics',           'Dashboard'),

@@ -53,23 +53,49 @@ class UtilsTest {
     void testCanUpdateAStaffAndStatus() {
         AuthUser authUser = new AuthUser() {
             @Override
-            public int getId() { return 5; }
+            public int getId() {
+                return 5;
+            }
+
             @Override
-            public String getSlug() { return "other"; }
+            public String getSlug() {
+                return "other";
+            }
+
             @Override
-            public String getUserType() { return "U"; }
+            public String getUserType() {
+                return "U";
+            }
+
             @Override
-            public Integer getActivePlan() { return 0; }
+            public Integer getActivePlan() {
+                return 0;
+            }
+
             @Override
-            public java.util.Collection getAuthorities() { return null; }
+            public java.util.Collection getAuthorities() {
+                return null;
+            }
+
             @Override
-            public String getPassword() { return null; }
+            public String getPassword() {
+                return null;
+            }
+
             @Override
-            public String getUsername() { return null; }
+            public String getUsername() {
+                return null;
+            }
+
             @Override
-            public String getEmail() { return null; }
+            public String getEmail() {
+                return null;
+            }
+
             @Override
-            public boolean isEnabled() { return true; }
+            public boolean isEnabled() {
+                return true;
+            }
         };
         // should throw because userType S and different slug
         assertThrows(org.springframework.dao.PermissionDeniedDataAccessException.class, () -> Utils.canUpdateAStaff("slug", "S", authUser));
@@ -77,23 +103,49 @@ class UtilsTest {
         // canUpdateAStaffStatus: should throw when slug equals logged user's slug and userType S
         AuthUser authUser2 = new AuthUser() {
             @Override
-            public int getId() { return 5; }
+            public int getId() {
+                return 5;
+            }
+
             @Override
-            public String getSlug() { return "slug"; }
+            public String getSlug() {
+                return "slug";
+            }
+
             @Override
-            public String getUserType() { return "U"; }
+            public String getUserType() {
+                return "U";
+            }
+
             @Override
-            public Integer getActivePlan() { return 0; }
+            public Integer getActivePlan() {
+                return 0;
+            }
+
             @Override
-            public java.util.Collection getAuthorities() { return null; }
+            public java.util.Collection getAuthorities() {
+                return null;
+            }
+
             @Override
-            public String getPassword() { return null; }
+            public String getPassword() {
+                return null;
+            }
+
             @Override
-            public String getUsername() { return null; }
+            public String getUsername() {
+                return null;
+            }
+
             @Override
-            public String getEmail() { return null; }
+            public String getEmail() {
+                return null;
+            }
+
             @Override
-            public boolean isEnabled() { return true; }
+            public boolean isEnabled() {
+                return true;
+            }
         };
         assertThrows(org.springframework.dao.PermissionDeniedDataAccessException.class, () -> Utils.canUpdateAStaffStatus("slug", "S", authUser2));
     }
@@ -176,8 +228,6 @@ class UtilsTest {
         assertEquals("https://localhost", Utils.getHostUrl(req));
     }
 
-    static class Dto { private String name; public String getName(){ return name; } public void setName(String name){this.name=name;} public Integer getId(){return null;} }
-
     @Test
     void testCheckRequiredFieldsAndSanitize() throws Exception {
         Dto d = new Dto();
@@ -190,6 +240,22 @@ class UtilsTest {
 
         assertEquals("null", Utils.sanitizeForLog(null));
         assertEquals("abc_123", Utils.sanitizeForLog("abc@123"));
+    }
+
+    static class Dto {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getId() {
+            return null;
+        }
     }
 
 }

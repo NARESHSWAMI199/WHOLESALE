@@ -5,9 +5,9 @@ import com.sales.claims.AuthUser;
 import com.sales.request.UserPaginationRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
@@ -16,7 +16,7 @@ public class WholesalePaginationHbRepository {
 
     private final EntityManager entityManager;
 
-    public int updateUserPaginations(UserPaginationRequest userPaginationRequest, AuthUser loggedUser){
+    public int updateUserPaginations(UserPaginationRequest userPaginationRequest, AuthUser loggedUser) {
         String hql = """
                 update UserPagination 
                 set rowsNumber =:rowsNumber

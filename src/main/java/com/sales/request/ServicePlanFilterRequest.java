@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ServicePlanFilterRequest extends SearchFilters{
+public class ServicePlanFilterRequest extends SearchFilters {
     private String name;
     private String slug;
     private String status;

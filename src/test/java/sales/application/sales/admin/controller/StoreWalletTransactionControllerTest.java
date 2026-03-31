@@ -1,8 +1,8 @@
 package sales.application.sales.admin.controller;
 
 import com.sales.SalesApplication;
-import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.WalletTransaction;
+import com.sales.request.WalletTransactionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

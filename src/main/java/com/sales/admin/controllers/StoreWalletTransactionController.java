@@ -2,7 +2,6 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.services.StoreWalletTransactionService;
-import com.sales.request.SearchFilters;
 import com.sales.entities.WalletTransaction;
 import com.sales.request.WalletFilterRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,16 +18,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("admin/store/wallet/transactions/")
 @RequiredArgsConstructor
 @Tag(name = "Store Wallet Transactions", description = "APIs for managing store wallet transactions")
-public class StoreWalletTransactionController  {
+public class StoreWalletTransactionController {
 
     private final StoreWalletTransactionService storeWalletTransactionService;
 
     @PreAuthorize("hasAuthority('wallet.transactions')")
     @PostMapping("all/{userSlug}")
     @Operation(summary = "Get wallet transactions by user", description = "Retrieves a paginated list of wallet transactions for a specific user")
-    public ResponseEntity<Page<WalletTransaction>> getAllWalletTransactionsByUserId(@PathVariable String userSlug, HttpServletRequest request, @RequestBody WalletFilterRequest searchFilters){
+    public ResponseEntity<Page<WalletTransaction>> getAllWalletTransactionsByUserId(@PathVariable String userSlug, HttpServletRequest request, @RequestBody WalletFilterRequest searchFilters) {
         Page<WalletTransaction> transactions = storeWalletTransactionService.getAllWalletTransactionByUserId(searchFilters, userSlug);
-        return new ResponseEntity<>(transactions,HttpStatus.valueOf(200));
+        return new ResponseEntity<>(transactions, HttpStatus.valueOf(200));
     }
 
 

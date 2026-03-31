@@ -60,50 +60,50 @@ logging:
           interceptor: TRACE
 
 
-phonepe :
-  key : d021e28d-bc19-4fea-b622-41942867d395
-  mid : M22LJRRT3FAKQ
-  env : PROD
+phonepe:
+  key: d021e28d-bc19-4fea-b622-41942867d395
+  mid: M22LJRRT3FAKQ
+  env: PROD
 
-cashfree :
-  key : cfsk_ma_test_4101943cd010dd3f59d86a25d03df53a_cce9da94
-  mid : TEST10390991bf0adc9155492e36f12619909301
-  env : PROD
+cashfree:
+  key: cfsk_ma_test_4101943cd010dd3f59d86a25d03df53a_cce9da94
+  mid: TEST10390991bf0adc9155492e36f12619909301
+  env: PROD
   callback_uri: https://373d-202-157-76-122.ngrok-free.app
   redirect_uri: http://localhost:3000
 
 
 
 # ------------------ public folder path
-public_folder :
-  absolute : /Users/nareshswami/Documents/springboot/backend/sales-admin/src/main/resources/public
+public_folder:
+  absolute: /Users/nareshswami/Documents/springboot/backend/sales-admin/src/main/resources/public
   #  absolute : C:\Users\abc\Documents\demo\sales-backend\src\main\resources\public
-  get : src/main/resources/public
+  get: src/main/resources/public
 
-profile :
-  absolute : ${public_folder.absolute}/profiles/
-  get : ${public_folder.get}/profiles/
+profile:
+  absolute: ${public_folder.absolute}/profiles/
+  get: ${public_folder.get}/profiles/
 
-store :
-  absolute  : ${public_folder.absolute}/stores/
-  get : ${public_folder.get}/stores/
+store:
+  absolute: ${public_folder.absolute}/stores/
+  get: ${public_folder.get}/stores/
 
 item:
   absolute: ${public_folder.absolute}/items/
   get: ${public_folder.get}/items/
 
-removebg :
-  absolute : ${public_folder.absolute}/removebg/
-  get : ${public_folder.get}/removebg/
+removebg:
+  absolute: ${public_folder.absolute}/removebg/
+  get: ${public_folder.get}/removebg/
 
-chat :
-  absolute : ${public_folder.absolute}/chat/
+chat:
+  absolute: ${public_folder.absolute}/chat/
   get: ${public_folder.get}/chat/
 
 excel:
-  export :
-    absolute : ${public_folder.absolute}/items_excels/
-  update :
-    template : ${public_folder.get}/items_excels/update_items/update_item_template.xlsx
+  export:
+    absolute: ${public_folder.absolute}/items_excels/
+  update:
+    template: ${public_folder.get}/items_excels/update_items/update_item_template.xlsx
   notUpdated:
     absolute: ${public_folder.absolute}/items_excels/not_updated_items/

@@ -13,8 +13,8 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.utils.Utils;
@@ -47,6 +47,7 @@ import static com.sales.specifications.UserSpecifications.*;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final UserHbRepository userHbRepository;
     private final PermissionHbRepository permissionHbRepository;
@@ -54,8 +55,6 @@ public class UserService {
     private final SupportEmailsRepository supportEmailsRepository;
     private final StoreRepository storeRepository;
     private final UserCacheService userCacheService;
-
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final StoreService storeService;
     private final PaginationService paginationService;
     private final UserMapper userMapper;
@@ -76,7 +75,7 @@ public class UserService {
     }
 
     public User findUserByOtpAndEmail(String email, String password) {
-        logger.debug("Finding user by OTP and email: {}",email);
+        logger.debug("Finding user by OTP and email: {}", email);
         // Here password key has otp
         return userRepository.findUserByOtpAndEmail(email, password);
     }
@@ -268,7 +267,7 @@ public class UserService {
                 ));
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + userRequest.getUserType());
+                throw new IllegalStateException(String.format(ResponseMessages.UNEXPECTED_VALUE, userRequest.getUserType()));
         }
         ;
 
@@ -297,7 +296,7 @@ public class UserService {
                 userRequest.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) &&
                 !loggedUser.getSlug().equals(userRequest.getSlug())
         ))
-            throw new PermissionDeniedDataAccessException("You don't have permissions to create a admin contact to administrator.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.YOU_DON_T_HAVE_PERMISSIONS_TO_CREATE_ADMIN_CONTACT, new Exception());
 
         Utils.mobileAndEmailValidation(
                 userRequest.getEmail(),
@@ -358,7 +357,7 @@ public class UserService {
                 List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();
                 int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(userRequest.getUserId(), defaultPermissions);
                 if (isAssigned < 1)
-                    throw new MyException("Something went wrong during update wholesaler's permissions. please contact to administrator.");
+                    throw new MyException(ResponseMessages.SOMETHING_WENT_WRONG_DURING_UPDATE_WHOLESALER_S_PERMISSIONS_PLEASE_CONTACT_TO_ADMINISTRATOR);
             }
 
             if (!Utils.isEmpty(userRequest.getUserType()) &&
@@ -388,7 +387,7 @@ public class UserService {
         ) {
             int isAssigned = permissionHbRepository.assignGroupsToUser(userRequest.getUserId(), userRequest.getGroupList(), loggedUser);
             if (isAssigned < 1)
-                throw new MyException("Something went wrong during update user's groups. please contact to administrator.");
+                throw new MyException(ResponseMessages.SOMETHING_WENT_WRONG_DURING_UPDATE_USER_S_GROUPS_PLEASE_CONTACT_TO_ADMINISTRATOR);
         }
         return responseObj;
     }
@@ -439,7 +438,7 @@ public class UserService {
 
         String slug = deleteRequest.getSlug();
         User user = getUserDetail(slug);
-        if (user == null) throw new NotFoundException("User not found to delete.");
+        if (user == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND_TO_DELETE);
         // if logged user doesn't have permission, then can't delete it this will throw an Exception
         Utils.canUpdateAStaff(slug, user.getUserType(), loggedUser);
         if (user.getUserType().equals(USER_TYPES.WHOLESALER.getType())) storeService.deleteStoreByUserId(user.getId());
@@ -473,7 +472,7 @@ public class UserService {
                     String status = statusRequest.getStatus();
                     /* Getting user and updating status */
                     User user = userRepository.findUserBySlug(statusRequest.getSlug());
-                    if (user == null) throw new NotFoundException("No user not found to update.");
+                    if (user == null) throw new NotFoundException(ResponseMessages.NO_USER_NOT_FOUND_TO_UPDATE);
                     Utils.canUpdateAStaffStatus(statusRequest.getSlug(), user.getUserType(), loggedUser);
                     user.setStatus(status);
                     // if userType is wholesaler no need to go further
@@ -494,7 +493,7 @@ public class UserService {
                     user = userRepository.save(user);
                     return user.getId();
                 default:
-                    throw new IllegalArgumentException("Status must be A or D.");
+                    throw new IllegalArgumentException(ResponseMessages.STATUS_MUST_BE_A_OR_D);
             }
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -566,9 +565,9 @@ public class UserService {
         Map<String, Object> responseObject = new HashMap<>();
         if (Utils.isEmpty(userRequest.getSlug()) ||
                 !userRequest.getUserType().equals(USER_TYPES.WHOLESALER.getType()))
-            throw new MyException("There is nothing to update.");
+            throw new MyException(ResponseMessages.THERE_IS_NOTHING_TO_UPDATE);
         User user = getUserDetail(userRequest.getSlug());
-        if (user == null) throw new NotFoundException("User not found.");
+        if (user == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND);
         int isUpdated = permissionHbRepository.assignPermissionsToWholesaler(user.getId(), userRequest.getStorePermissions());
         if (isUpdated > 0) {
             // Evict wholesaler from redis

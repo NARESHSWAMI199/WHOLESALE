@@ -24,14 +24,14 @@ import java.util.Map;
 @RequestMapping("admin/store/wallet")
 @RequiredArgsConstructor
 @Tag(name = "Wallet Management", description = "APIs for managing user wallets and payments")
-public class WalletController  {
+public class WalletController {
 
     private final WalletService walletService;
 
     @PreAuthorize("hasAuthority('wallet.detail')")
     @GetMapping("/{userSlug}")
     @Operation(summary = "Get wallet details", description = "Retrieves wallet details for a specific user")
-    public ResponseEntity<WalletDto> getWalletDetail(@PathVariable String userSlug, HttpServletRequest request){
+    public ResponseEntity<WalletDto> getWalletDetail(@PathVariable String userSlug, HttpServletRequest request) {
         WalletDto walletDetail = walletService.getWalletDetail(userSlug);
         return new ResponseEntity<>(walletDetail, HttpStatus.OK);
     }
@@ -40,17 +40,17 @@ public class WalletController  {
     @PreAuthorize("hasAuthority('wallet.pay')")
     @GetMapping("pay/{userSlug}/{servicePlanSlug}")
     @Operation(summary = "Pay using wallet", description = "Processes payment for a service plan using the user's wallet")
-    public ResponseEntity<Map<String,Object>> payUsingWallet(@PathVariable String userSlug , @PathVariable String servicePlanSlug,HttpServletRequest request) {
-        Map<String,Object> result = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> payUsingWallet(@PathVariable String userSlug, @PathVariable String servicePlanSlug, HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
         boolean payment = walletService.paymentViaWallet(servicePlanSlug, userSlug);
-        if(payment){
+        if (payment) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLAN_PURCHASED_SUCCESSFULLY);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else{
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.INEFFICIENT_AMOUNT_IN_WALLET);
-            result.put(ConstantResponseKeys.STATUS,400);
+            result.put(ConstantResponseKeys.STATUS, 400);
         }
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
 
 }

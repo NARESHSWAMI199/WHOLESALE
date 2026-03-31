@@ -14,6 +14,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WholesalerPlans implements Serializable {
+    @Transient
+    boolean isExpired;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,7 +23,6 @@ public class WholesalerPlans implements Serializable {
     private String slug;
     @Column(name = "user_id")
     private Integer userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", referencedColumnName = "id")
     private ServicePlan servicePlan;
@@ -31,11 +32,7 @@ public class WholesalerPlans implements Serializable {
     private Long expiryDate;
     @Column(name = "created_by")
     private Integer createdBy;
-
-    @Column(name = "plan_id",insertable = false,updatable = false)
+    @Column(name = "plan_id", insertable = false, updatable = false)
     private Integer planId;
-
-    @Transient
-    boolean isExpired;
 
 }

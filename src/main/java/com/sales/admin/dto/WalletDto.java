@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record WalletDto(
-    int id,
-    Integer userId,
-    Float amount
+        int id,
+        Integer userId,
+        Float amount
 ) {
 }

@@ -2,7 +2,6 @@ package com.sales.wholesaler.controller;
 
 
 import com.sales.claims.AuthUser;
-import com.sales.entities.Wallet;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
 import com.sales.jwtUtils.JwtToken;
@@ -28,7 +27,7 @@ import java.util.Map;
 @RequestMapping("wholesale/wallet")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Wallet Management", description = "APIs for managing wallet operations for wholesalers")
-public class WholesaleWalletController  {
+public class WholesaleWalletController {
 
     private final JwtToken jwtToken;
     private final WholesaleUserService wholesaleUserService;
@@ -36,8 +35,8 @@ public class WholesaleWalletController  {
 
     @GetMapping("/")
     @Operation(summary = "Get wallet details", description = "Retrieves the wallet details for the authenticated wholesaler user")
-    public ResponseEntity<WholesaleWalletDto> getWalletDetail(HttpServletRequest request){
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
+    public ResponseEntity<WholesaleWalletDto> getWalletDetail(HttpServletRequest request) {
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
         WholesaleWalletDto walletDetail = wholesaleWalletService.getWalletDetail(loggedUser.getId());
         return new ResponseEntity<>(walletDetail, HttpStatus.OK);
     }
@@ -46,18 +45,18 @@ public class WholesaleWalletController  {
     @GetMapping("pay/{servicePlanSlug}")
 //    @PreAuthorize("hasAuthority('wholesale.wallet.pay')")
     @Operation(summary = "Pay using wallet", description = "Makes a payment for a service plan using the wholesaler's wallet balance")
-    public ResponseEntity<Map<String,Object>> payUsingWallet(@PathVariable String servicePlanSlug,HttpServletRequest request) {
-        AuthUser loggedUser = Utils.getUserFromRequest(request,jwtToken,wholesaleUserService);
-        Map<String,Object> result = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> payUsingWallet(@PathVariable String servicePlanSlug, HttpServletRequest request) {
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        Map<String, Object> result = new HashMap<>();
         boolean payment = wholesaleWalletService.paymentViaWallet(servicePlanSlug, loggedUser);
-        if(payment){
+        if (payment) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.PLAN_PURCHASED_SUCCESSFULLY);
-            result.put(ConstantResponseKeys.STATUS,200);
-        }else{
+            result.put(ConstantResponseKeys.STATUS, 200);
+        } else {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.INEFFICIENT_AMOUNT_IN_WALLET);
-            result.put("status",400);
+            result.put("status", 400);
         }
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get("status")));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
 
 }

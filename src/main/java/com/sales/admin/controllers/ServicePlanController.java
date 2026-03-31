@@ -36,23 +36,22 @@ import java.util.Map;
 @RequestMapping("admin/plans/")
 @RequiredArgsConstructor
 @Tag(name = "Service Plans", description = "APIs for managing service plans and user plans")
-public class ServicePlanController  {
+public class ServicePlanController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServicePlanController.class);
     private final UserService userService;
     private final ServicePlanService servicePlanService;
-    
-    private static final Logger logger = LoggerFactory.getLogger(ServicePlanController.class);
 
-
-    @PostMapping(value = {"user-plans/{userSlug}","user-plans"})
+    @PostMapping(value = {"user-plans/{userSlug}", "user-plans"})
     @PreAuthorize("hasAnyAuthority('user.plan.all','user.plan.detail')")
     @Operation(summary = "Get user plans", description = "Retrieves a paginated list of plans for a specific user or all users")
-    public ResponseEntity< Page<PlanDto>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters){
+    public ResponseEntity<Page<PlanDto>> getUserPlans(@PathVariable(required = false) String userSlug, @RequestBody UserPlanRequest searchFilters) {
         logger.debug("Fetching user plans for userSlug: {}", userSlug);
         Integer userId = userService.getUserIdBySlug(userSlug);
-        if(!Utils.isEmpty(userSlug) && userId == null) throw new IllegalArgumentException("User not found.");
+        if (!Utils.isEmpty(userSlug) && userId == null)
+            throw new IllegalArgumentException(ResponseMessages.USER_NOT_FOUND);
         Page<PlanDto> allUserPlans = servicePlanService.getAllUserPlans(userId, searchFilters);
-        return new ResponseEntity<>(allUserPlans,HttpStatus.OK);
+        return new ResponseEntity<>(allUserPlans, HttpStatus.OK);
     }
 
 
@@ -68,49 +67,49 @@ public class ServicePlanController  {
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
-               {
-                     "planName": "string",
-                      "months": 0,
-                      "price": 0,
-                      "discount": 0,
-                      "description": "string"
-                }
-            """))
+                       {
+                             "planName": "string",
+                              "months": 0,
+                              "price": 0,
+                              "discount": 0,
+                              "description": "string"
+                        }
+                    """))
     )
     @PostMapping("add")
     @PreAuthorize("hasAuthority('service-plans.add')")
     @Operation(summary = "Add service plan", description = "Creates a new service plan")
-    public ResponseEntity<Map<String,Object>> insertServicePlans(Authentication authentication,HttpServletRequest request , @RequestBody ServicePlanCreateRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> insertServicePlans(Authentication authentication, HttpServletRequest request, @RequestBody ServicePlanCreateRequest servicePlanRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Inserting new service plan: {}", servicePlanRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String,Object> result = new HashMap<>();
-        ServicePlan servicePlan = servicePlanService.insertServicePlan(loggedUser,servicePlanRequest);
-        result.put(ConstantResponseKeys.RES,servicePlan);
+        Map<String, Object> result = new HashMap<>();
+        ServicePlan servicePlan = servicePlanService.insertServicePlan(loggedUser, servicePlanRequest);
+        result.put(ConstantResponseKeys.RES, servicePlan);
         result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SERVICE_PLAN_ADDED_SUCCESSFULLY);
-        result.put(ConstantResponseKeys.STATUS , 201);
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+        result.put(ConstantResponseKeys.STATUS, 201);
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 
 
     @PreAuthorize("hasAuthority('service-plans.status.update')")
     @PostMapping("status")
     @Operation(summary = "Update service plan status", description = "Updates the status of a service plan")
-    public ResponseEntity<Map<String,Object>> updateStatus(Authentication authentication,HttpServletRequest request, @RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> updateStatus(Authentication authentication, HttpServletRequest request, @RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Updating status for service plan: {}", statusRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String, Object> result = servicePlanService.updateServicePlanStatus(statusRequest, loggedUser);
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 
 
     @PreAuthorize("hasAuthority('service-plans.delete')")
     @PostMapping("delete")
     @Operation(summary = "Delete service plan", description = "Deletes a service plan")
-    public ResponseEntity<Map<String,Object>> deleteStatus(Authentication authentication, @RequestBody DeleteRequest deleteRequest, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> deleteStatus(Authentication authentication, @RequestBody DeleteRequest deleteRequest, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting service plan: {}", deleteRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        Map<String, Object> result = servicePlanService.deletedServicePlan(deleteRequest,loggedUser);
-        return new ResponseEntity<>(result,HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+        Map<String, Object> result = servicePlanService.deletedServicePlan(deleteRequest, loggedUser);
+        return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
     }
 
 }

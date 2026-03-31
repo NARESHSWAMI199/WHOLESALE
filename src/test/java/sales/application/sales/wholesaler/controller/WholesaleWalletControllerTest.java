@@ -31,7 +31,7 @@ public class WholesaleWalletControllerTest extends TestUtil {
 
     @Test
     public void testGetWalletWithoutLogin() throws Exception {
-        mockMvc.perform(get("/wholesale/wallet/") )
+        mockMvc.perform(get("/wholesale/wallet/"))
                 .andExpect(status().is(401));
     }
 

@@ -1,26 +1,23 @@
 package com.sales.admin.controllers;
 
 import com.sales.admin.dto.CategoryDto;
+import com.sales.admin.dto.StoreDto;
 import com.sales.admin.dto.SubcategoryDto;
 import com.sales.admin.mapper.StoreMapper;
 import com.sales.admin.services.StoreService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.*;
 import com.sales.entities.Store;
-import com.sales.admin.dto.StoreDto;
-import com.sales.entities.StoreCategory;
-import com.sales.entities.StoreSubCategory;
 import com.sales.exceptions.MyException;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
+import com.sales.request.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,18 +49,19 @@ import java.util.Map;
 @Tag(name = "Store Management", description = "APIs for managing stores, categories, and related operations")
 public class StoreController {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreController.class);
     private final StoreService storeService;
     private final StoreMapper storeMapper;
-    
-    private static final Logger logger = LoggerFactory.getLogger(StoreController.class);
+    @Value("${store.get}")
+    String filePath;
 
     @Transactional(readOnly = true)
     @PostMapping("/all")
     @PreAuthorize("hasAuthority('store.all')")
     @Operation(summary = "Get all stores", description = "Retrieves a paginated list of all stores with optional search filters")
-    public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody StoreFilterRequest searchFilters){
+    public ResponseEntity<Page<StoreDto>> getAllStore(@RequestBody StoreFilterRequest searchFilters) {
         logger.debug("Fetching all stores with filters: {}", searchFilters);
-        Page<StoreDto> storePage =  storeService.getAllStore(searchFilters);
+        Page<StoreDto> storePage = storeService.getAllStore(searchFilters);
         return new ResponseEntity<>(storePage, HttpStatus.OK);
     }
 
@@ -70,151 +69,139 @@ public class StoreController {
     @PostMapping("delete")
     @PreAuthorize("hasAuthority('store.delete')")
     @Operation(summary = "Delete store", description = "Deletes a store by its slug")
-    public ResponseEntity<Map<String,Object>> deleteStore(Authentication authentication,HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> deleteStore(Authentication authentication, HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store with slug: {}", deleteRequest.getSlug());
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
-        int isUpdated = storeService.deleteStoreBySlug(deleteRequest,loggedUser);
+        int isUpdated = storeService.deleteStoreBySlug(deleteRequest, loggedUser);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_HAS_BEEN_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-        }else{
+        } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_STORE_FOUND_TO_DELETE);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
-
 
     @Transactional(readOnly = true)
     @GetMapping("/detail/{slug}")
     @PreAuthorize("hasAuthority('store.detail')")
     @Operation(summary = "Get store details", description = "Retrieves detailed information about a store by its slug")
-    public ResponseEntity<Map<String,Object>> getStoreDetailBySlug(@PathVariable String slug) {
+    public ResponseEntity<Map<String, Object>> getStoreDetailBySlug(@PathVariable String slug) {
         logger.debug("Fetching store details for params: {}", slug);
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         Store store = storeService.getStoreDetails(slug);
-        if (store!= null){
+        if (store != null) {
             responseObj.put(ConstantResponseKeys.RES, storeMapper.toDto(store));
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-        }else {
+        } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_STORE_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @Transactional(readOnly = true)
     @GetMapping("/detailbyuser/{userSLug}")
     @PreAuthorize("hasAuthority('store.user')")
     @Operation(summary = "Get store details by user slug", description = "Retrieves store details associated with a user by user slug")
-    public ResponseEntity<Map<String,Object>> getUserDetailByUserSlug(@PathVariable("userSLug") String slug) {
+    public ResponseEntity<Map<String, Object>> getUserDetailByUserSlug(@PathVariable("userSLug") String slug) {
         logger.debug("Fetching store details for user slug: {}", slug);
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         Store store = storeService.getStoreByUserSlug(slug);
-        if (store!= null){
+        if (store != null) {
             responseObj.put(ConstantResponseKeys.RES, storeMapper.toDto(store));
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-        }else {
+        } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
-
-
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(
             schema = @Schema(example = """
-                {
-                    "storeSlug" : "string (during update only)",
-                    "userSlug" : "string (during create only)",
-                    "storeName" : "string",
-                    "storeEmail" : "string",
-                    "description" : "string",
-                    "categoryId" : 0,
-                    "subCategoryId"  : 0,
-                    "storePhone" : "string",
-                    "zipCode" : "string(6 digit)",
-                    "city" : "cityId",
-                    "state" : "stateId",
-                    "street" : "string"
-                }
-                """)
+                    {
+                        "storeSlug" : "string (during update only)",
+                        "userSlug" : "string (during create only)",
+                        "storeName" : "string",
+                        "storeEmail" : "string",
+                        "description" : "string",
+                        "categoryId" : 0,
+                        "subCategoryId"  : 0,
+                        "storePhone" : "string",
+                        "zipCode" : "string(6 digit)",
+                        "city" : "cityId",
+                        "state" : "stateId",
+                        "street" : "string"
+                    }
+                    """)
     ))
     @Transactional
-    @PostMapping(value = {"/add","/update"})
+    @PostMapping(value = {"/add", "/update"})
     @PreAuthorize("hasAnyAuthority('store.add','store.update','store.edit')")
     @Operation(summary = "Add or update store", description = "Creates a new store or updates an existing store based on the provided data")
-    public ResponseEntity<Map<String,Object>> addStoreOrUpdateStore(Authentication authentication,HttpServletRequest request, @Valid @ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> addStoreOrUpdateStore(Authentication authentication, HttpServletRequest request, @Valid @ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Adding or updating store with details: {}", storeCreationRequest);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String path = request.getRequestURI().toLowerCase();
-        Map<String,Object> responseObj = storeService.createOrUpdateStore(storeCreationRequest,loggedUser,path);
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        Map<String, Object> responseObj = storeService.createOrUpdateStore(storeCreationRequest, loggedUser, path);
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
-    /** currently we do not use it for upload store image */
+    /**
+     * currently we do not use it for upload store image
+     */
     @Transactional
     @PostMapping("profile/{slug}")
     @PreAuthorize("hasAnyAuthority('store.profile.update','store.profile.edit')")
     @Operation(summary = "Upload store image", description = "Uploads and updates the profile image for a store")
-    public ResponseEntity<Map<String,Object>> uploadStoreImage(HttpServletRequest request, @RequestPart MultipartFile storeImage , @PathVariable String slug) {
-        logger.debug("Uploading store image for slug: {}",slug);
-        Map<String,Object> responseObj = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> uploadStoreImage(HttpServletRequest request, @RequestPart MultipartFile storeImage, @PathVariable String slug) {
+        logger.debug("Uploading store image for slug: {}", slug);
+        Map<String, Object> responseObj = new HashMap<>();
         try {
             int isUpdated = storeService.updateStoreImage(storeImage, slug);
-            if (isUpdated > 0){
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_1);
-                responseObj.put(ConstantResponseKeys.STATUS,200);
-            }else{
+            if (isUpdated > 0) {
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
+                responseObj.put(ConstantResponseKeys.STATUS, 200);
+            } else {
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_RECORD_FOUND);
-                responseObj.put(ConstantResponseKeys.STATUS,404);
+                responseObj.put(ConstantResponseKeys.STATUS, 404);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            responseObj.put(ConstantResponseKeys.MESSAGE,e.getMessage());
-            responseObj.put(ConstantResponseKeys.STATUS,500);
+            responseObj.put(ConstantResponseKeys.MESSAGE, e.getMessage());
+            responseObj.put(ConstantResponseKeys.STATUS, 500);
         }
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
 
 
     }
-
-
 
     @Transactional
     @PostMapping("/status")
     @PreAuthorize("hasAuthority('store.status')")
     @Operation(summary = "Update store status", description = "Updates the status of a store (active/inactive)")
-    public ResponseEntity<Map<String,Object>> updateStoreStatus (@RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> updateStoreStatus(@RequestBody StatusRequest statusRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Updating store status for slug: {}", statusRequest.getSlug());
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         int isUpdated = storeService.updateStatusBySlug(statusRequest);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_S_STATUS_HAS_BEEN_SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
-        }else{
+        } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_STORE_FOUND);
             responseObj.put(ConstantResponseKeys.STATUS, 404);
         }
-        return new ResponseEntity<>(responseObj,HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
-
-
-    @Value("${store.get}")
-    String filePath;
 
     @GetMapping("/image/{slug}/{filename}")
     @Operation(summary = "Get store image", description = "Retrieves the profile image of a store")
-    public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename , @PathVariable String slug) throws Exception {
-        logger.debug("Fetching store image: {} for slug: {}",filename, slug);
+    public ResponseEntity<Resource> getFile(@PathVariable(required = true) String filename, @PathVariable String slug) throws Exception {
+        logger.debug("Fetching store image: {} for slug: {}", filename, slug);
         Path filePathObj = Paths.get(filePath);
         Path userSlug = filePathObj.resolve(slug).normalize();
         Path path = userSlug.resolve(filename).normalize();
@@ -223,7 +210,7 @@ public class StoreController {
     }
 
 
-    @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
     @PostMapping("category")
     @Operation(summary = "Get all store categories", description = "Retrieves a list of all store categories with optional filters")
     public ResponseEntity<List<CategoryDto>> getAllStoreCategory(@RequestBody SearchFilters searchFilters) {
@@ -233,18 +220,18 @@ public class StoreController {
     }
 
     @PreAuthorize("hasAnyAuthority('store.category.add','store.category.update','store.category.edit')")
-    @PostMapping(value = {"category/add","category/update"})
+    @PostMapping(value = {"category/add", "category/update"})
     @Operation(summary = "Add or update store category", description = "Creates a new store category or updates an existing one")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> saveOrUpdateItemCategory(@RequestBody CategoryRequest categoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating store category with details: {}", categoryRequest);
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         CategoryDto updatedStoreCategory = storeService.saveOrUpdateStoreCategory(categoryRequest);
-        if(updatedStoreCategory != null) {
-             result.put(ConstantResponseKeys.RES,updatedStoreCategory);
-            if(categoryRequest.getId() !=null && categoryRequest.getId() != 0) {
+        if (updatedStoreCategory != null) {
+            result.put(ConstantResponseKeys.RES, updatedStoreCategory);
+            if (categoryRequest.getId() != null && categoryRequest.getId() != 0) {
                 result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_UPDATED);
                 result.put(ConstantResponseKeys.STATUS, 200);
-            }else {
+            } else {
                 result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.CATEGORY_SUCCESSFULLY_INSERTED);
                 result.put(ConstantResponseKeys.STATUS, 201);
             }
@@ -265,11 +252,11 @@ public class StoreController {
     @PostMapping("category/delete")
     @PreAuthorize("hasAuthority('store.category.delete')")
     @Operation(summary = "Delete store category", description = "Deletes a store category by its slug")
-    public ResponseEntity<Map<String,Object>> deleteItemCategoryById(Authentication authentication,HttpServletRequest request ,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> deleteItemCategoryById(Authentication authentication, HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store category with slug: {}", deleteRequest.getSlug());
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser user = (SalesUser) authentication.getPrincipal();
-        int isUpdated = storeService.deleteStoreCategory(deleteRequest,user);
+        int isUpdated = storeService.deleteStoreCategory(deleteRequest, user);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_S_CATEGORY_WAS_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -281,7 +268,7 @@ public class StoreController {
     }
 
 
-    @Transactional(rollbackFor = {MyException.class ,RuntimeException.class})
+    @Transactional(rollbackFor = {MyException.class, RuntimeException.class})
     @PostMapping("subcategory")
     @Operation(summary = "Get all store subcategories", description = "Retrieves a list of all store subcategories with optional filters")
     public ResponseEntity<List<SubcategoryDto>> getStoreSubCategory(@RequestBody SubCategoryFilterRequest searchFilters) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -294,11 +281,11 @@ public class StoreController {
     @PostMapping("subcategory/delete")
     @PreAuthorize("hasAuthority('store.subcategory.delete')")
     @Operation(summary = "Delete store subcategory", description = "Deletes a store subcategory by its slug")
-    public ResponseEntity<Map<String,Object>> deleteItemSubCategoryById(Authentication authentication,HttpServletRequest request,@RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> deleteItemSubCategoryById(Authentication authentication, HttpServletRequest request, @RequestBody DeleteRequest deleteRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Deleting store subcategory with slug: {}", deleteRequest.getSlug());
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser user = (SalesUser) authentication.getPrincipal();
-        int isUpdated = storeService.deleteStoreSubCategory(deleteRequest,user);
+        int isUpdated = storeService.deleteStoreSubCategory(deleteRequest, user);
         if (isUpdated > 0) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_S_SUBCATEGORY_SUCCESSFULLY_DELETED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
@@ -310,25 +297,24 @@ public class StoreController {
     }
 
 
-    @PostMapping(value = {"subcategory/add","subcategory/update"})
+    @PostMapping(value = {"subcategory/add", "subcategory/update"})
     @PreAuthorize("hasAnyAuthority('store.subcategory.add','store.subcategory.update','store.subcategory.edit')")
-    public ResponseEntity<Map<String,Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public ResponseEntity<Map<String, Object>> saveOrUpdateItemSubCategory(@RequestBody SubCategoryRequest subCategoryRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Saving or updating store subcategory with details: {}", subCategoryRequest);
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         SubcategoryDto updatedStoreSubCategory = storeService.saveOrUpdateStoreSubCategory(subCategoryRequest);
-        if(updatedStoreSubCategory != null) {
-            result.put(ConstantResponseKeys.RES,updatedStoreSubCategory);
-            if(subCategoryRequest.getId() != null) {
+        if (updatedStoreSubCategory != null) {
+            result.put(ConstantResponseKeys.RES, updatedStoreSubCategory);
+            if (subCategoryRequest.getId() != null) {
                 result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUBCATEGORY_SUCCESSFULLY_UPDATED);
                 result.put(ConstantResponseKeys.STATUS, 200);
-            }else {
+            } else {
                 result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUBCATEGORY_SUCCESSFULLY_INSERTED);
                 result.put(ConstantResponseKeys.STATUS, 201);
             }
         }
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get("status")));
     }
-
 
 
 }

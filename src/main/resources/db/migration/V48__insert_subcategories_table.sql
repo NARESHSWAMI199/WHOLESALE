@@ -1,4 +1,5 @@
-INSERT IGNORE INTO store_subcategories
+INSERT
+IGNORE INTO store_subcategories
 (slug, category_id, subcategory, icon, updated_at, is_deleted)
 VALUES
 -- Kirana & General Store
@@ -70,4 +71,5 @@ VALUES
 ('bathroom-cleaners', 10, 'Bathroom Cleaners', 'bathroom.png', UNIX_TIMESTAMP()*1000, 'N'),
 ('disposables', 10, 'Disposables', 'disposable.png', UNIX_TIMESTAMP()*1000, 'N')
 
-ON DUPLICATE KEY UPDATE slug = slug;
+ON DUPLICATE KEY
+UPDATE slug = slug;

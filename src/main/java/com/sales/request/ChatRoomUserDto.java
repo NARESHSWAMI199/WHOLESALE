@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChatRoomUserDto {
-     Long id;
-     String userSlug;
-     String roomSlug;
+    Long id;
+    String userSlug;
+    String roomSlug;
 }

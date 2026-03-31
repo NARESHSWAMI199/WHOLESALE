@@ -42,8 +42,8 @@ public class WholesaleStoreControllerTest extends TestUtil {
         StoreSubCategory storeSubCategory = createStoreSubCategory();
         City city = createCity();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        String randomEmail = UUID.randomUUID().toString().substring(0,6) + "@mocktest.in";
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String randomEmail = UUID.randomUUID().toString().substring(0, 6) + "@mocktest.in";
         String randomPhone = getRandomMobileNumber();
         MockMultipartFile file = getImageMultipartFileToUpload("storePic");
         String json = """
@@ -60,15 +60,14 @@ public class WholesaleStoreControllerTest extends TestUtil {
                   "subCategoryId" : "{subCategoryId}"
                 }
                 """
-                .replace("{email}",randomEmail)
-                .replace("{phone}",randomPhone)
-                .replace("{city}",String.valueOf(city.getId()))
-                .replace("{state}",String.valueOf(city.getStateId()))
-                .replace("{categoryId}",String.valueOf(storeSubCategory.getCategoryId()))
-                .replace("{subCategoryId}",String.valueOf(storeSubCategory.getId()))
-                ;
+                .replace("{email}", randomEmail)
+                .replace("{phone}", randomPhone)
+                .replace("{city}", String.valueOf(city.getId()))
+                .replace("{state}", String.valueOf(city.getStateId()))
+                .replace("{categoryId}", String.valueOf(storeSubCategory.getCategoryId()))
+                .replace("{subCategoryId}", String.valueOf(storeSubCategory.getId()));
 
-        Map<String,String> params = new Gson().fromJson(json,Map.class);
+        Map<String, String> params = new Gson().fromJson(json, Map.class);
         MockMultipartHttpServletRequestBuilder multipart = MockMvcRequestBuilders.multipart("/wholesale/store/add");
         params.forEach(multipart::param);
         mockMvc.perform(multipart
@@ -80,13 +79,14 @@ public class WholesaleStoreControllerTest extends TestUtil {
                 MockMvcResultMatchers.status().is(409)
         ).andDo(MockMvcResultHandlers.print());
     }
+
     @Test
     public void testUpdateStore() throws Exception {
         StoreSubCategory storeSubCategory = createStoreSubCategory();
         City city = createCity();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        String randomEmail = UUID.randomUUID().toString().substring(0,6) + "@mocktest.in";
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String randomEmail = UUID.randomUUID().toString().substring(0, 6) + "@mocktest.in";
         String randomPhone = getRandomMobileNumber();
         MockMultipartFile file = getImageMultipartFileToUpload("storePic");
         String json = """
@@ -104,16 +104,15 @@ public class WholesaleStoreControllerTest extends TestUtil {
                   "subCategoryId" : "{subCategoryId}"
                 }
                 """
-                .replace("{storeSlug}",storeSlug)
-                .replace("{email}",randomEmail)
-                .replace("{phone}",randomPhone)
-                .replace("{city}",String.valueOf(city.getId()))
-                .replace("{state}",String.valueOf(city.getStateId()))
-                .replace("{categoryId}",String.valueOf(storeSubCategory.getCategoryId()))
-                .replace("{subCategoryId}",String.valueOf(storeSubCategory.getId()))
-                ;
+                .replace("{storeSlug}", storeSlug)
+                .replace("{email}", randomEmail)
+                .replace("{phone}", randomPhone)
+                .replace("{city}", String.valueOf(city.getId()))
+                .replace("{state}", String.valueOf(city.getStateId()))
+                .replace("{categoryId}", String.valueOf(storeSubCategory.getCategoryId()))
+                .replace("{subCategoryId}", String.valueOf(storeSubCategory.getId()));
 
-        Map<String,String> params = new Gson().fromJson(json,Map.class);
+        Map<String, String> params = new Gson().fromJson(json, Map.class);
         MockMultipartHttpServletRequestBuilder multipart = MockMvcRequestBuilders.multipart("/wholesale/store/update");
         params.forEach(multipart::param);
         mockMvc.perform(multipart
@@ -124,10 +123,11 @@ public class WholesaleStoreControllerTest extends TestUtil {
                 MockMvcResultMatchers.status().is(200)
         ).andDo(MockMvcResultHandlers.print());
     }
+
     @Test
     public void testUpdateNotifications() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                     "seenIds" : [0,0]
@@ -143,11 +143,10 @@ public class WholesaleStoreControllerTest extends TestUtil {
     }
 
 
-
     @Test
     public void testUpdateNotificationsWithoutParams() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -164,25 +163,26 @@ public class WholesaleStoreControllerTest extends TestUtil {
     @Test
     public void testNotifications() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {}
                 """;
         mockMvc.perform(MockMvcRequestBuilders.post("/wholesale/store/notifications")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .headers(headers)
-        ).andExpectAll(
-                    MockMvcResultMatchers.status().isOk()
-        )
-        .andDo(MockMvcResultHandlers.print())
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(headers)
+                ).andExpectAll(
+                        MockMvcResultMatchers.status().isOk()
+                )
+                .andDo(MockMvcResultHandlers.print())
 
         ;
     }
+
     @Test
     public void testGetWholesaleStoreCategory() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/store/category")
                 .headers(headers)
         ).andExpectAll(
@@ -190,12 +190,13 @@ public class WholesaleStoreControllerTest extends TestUtil {
         ).andReturn();
 
     }
+
     @Test
     public void testGetWholesaleStoreSubcategory() throws Exception {
         StoreSubCategory storeSubCategory = createStoreSubCategory();
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
-        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/store/subcategory/"+storeSubCategory.getId())
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/store/subcategory/" + storeSubCategory.getId())
                 .headers(headers)
         ).andExpectAll(
                 MockMvcResultMatchers.status().isOk()

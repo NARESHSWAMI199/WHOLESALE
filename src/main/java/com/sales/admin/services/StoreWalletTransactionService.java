@@ -3,12 +3,12 @@ package com.sales.admin.services;
 import com.sales.admin.repositories.StoreWalletTransactionRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.admin.repositories.WalletRepository;
-import com.sales.request.SearchFilters;
-import com.sales.request.WalletFilterRequest;
-import com.sales.request.WalletTransactionRequest;
 import com.sales.entities.Wallet;
 import com.sales.entities.WalletTransaction;
 import com.sales.exceptions.NotFoundException;
+import com.sales.global.ResponseMessages;
+import com.sales.request.WalletFilterRequest;
+import com.sales.request.WalletTransactionRequest;
 import com.sales.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,33 +28,27 @@ import static com.sales.specifications.WalletTransactionSpecification.*;
 public class StoreWalletTransactionService {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(StoreWalletTransactionService.class);
     private final UserRepository userRepository;
     private final StoreWalletTransactionRepository storeWalletTransactionRepository;
     private final WalletRepository walletRepository;
 
-      
-  private static final Logger logger = LoggerFactory.getLogger(StoreWalletTransactionService.class);
-
-
-
-
-    public Page<WalletTransaction> getAllWalletTransactionByUserId(WalletFilterRequest searchFilters, String userSlug){
+    public Page<WalletTransaction> getAllWalletTransactionByUserId(WalletFilterRequest searchFilters, String userSlug) {
         Integer userId = userRepository.getUserIdBySlug(userSlug);
-        if (userId == null) throw new NotFoundException("User not found.");
+        if (userId == null) throw new NotFoundException(ResponseMessages.USER_NOT_FOUND);
         Specification<WalletTransaction> specification = Specification.allOf(
-            hasSlug(searchFilters.getSlug())
-            .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
-            .and(lessThanOrEqualToToDate(searchFilters.getToDate())
-            .and(hasUserId(userId))
-        ));
-        Pageable pageable = getPageable(logger,searchFilters);
-        return storeWalletTransactionRepository.findAll(specification,pageable);
+                hasSlug(searchFilters.getSlug())
+                        .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
+                        .and(lessThanOrEqualToToDate(searchFilters.getToDate())
+                                .and(hasUserId(userId))
+                        ));
+        Pageable pageable = getPageable(logger, searchFilters);
+        return storeWalletTransactionRepository.findAll(specification, pageable);
     }
 
 
-
     public WalletTransaction addWalletTransaction(WalletTransactionRequest walletTransactionDto, Integer userId) {
-        logger.debug("The addWalletTransaction method started with wallTransactionDto : {}",walletTransactionDto);
+        logger.debug("The addWalletTransaction method started with wallTransactionDto : {}", walletTransactionDto);
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .slug(UUID.randomUUID().toString())
                 .userId(userId)
@@ -63,12 +57,12 @@ public class StoreWalletTransactionService {
                 .createdAt(Utils.getCurrentMillis())
                 .status(walletTransactionDto.getStatus())
                 .build();
-        logger.debug("The addWalletTransaction method ended with wallTransactionDto : {}",walletTransaction);
+        logger.debug("The addWalletTransaction method ended with wallTransactionDto : {}", walletTransaction);
 
-        if(!Utils.isEmpty(walletTransactionDto.getTransactionType()) && walletTransactionDto.getTransactionType().equalsIgnoreCase("CR")){
+        if (!Utils.isEmpty(walletTransactionDto.getTransactionType()) && walletTransactionDto.getTransactionType().equalsIgnoreCase("CR")) {
             Integer added = walletRepository.addMoneyInWallet(walletTransaction.getAmount(), userId, Utils.getCurrentMillis());
-            logger.debug("Added money in wallet rows was updated : {} ",added);
-            if(added < 1){ // if a user isn't found in wallet.
+            logger.debug("Added money in wallet rows was updated : {} ", added);
+            if (added < 1) { // if a user isn't found in wallet.
                 Wallet wallet = Wallet.builder()
                         .userId(userId)
                         .amount(walletTransaction.getAmount())
@@ -76,9 +70,9 @@ public class StoreWalletTransactionService {
                         .build();
                 walletRepository.save(wallet);
             }
-        }else{
+        } else {
             Integer deducted = walletRepository.deductMoneyFromWallet(walletTransaction.getAmount(), userId, Utils.getCurrentMillis());
-            logger.debug("Detected money in wallet rows was updated : {} ",deducted);
+            logger.debug("Detected money in wallet rows was updated : {} ", deducted);
         }
 
         return storeWalletTransactionRepository.save(walletTransaction);

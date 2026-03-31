@@ -3,10 +3,10 @@ package com.sales.scheduler;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Transactional
@@ -18,7 +18,7 @@ public class ItemRatingScheduler {
 
 
     @Scheduled(cron = "0 0 */3 * * *") // Run in every 3 hours.
-    public void updateItemRatingCount(){
+    public void updateItemRatingCount() {
         String hql = """
                 UPDATE Item i
                 SET i.totalRatingCount = COALESCE(
@@ -34,7 +34,7 @@ public class ItemRatingScheduler {
 
 
     @Scheduled(cron = "0 0 */3 * * *") // Run in every 3 hours.
-    public void updateItemRatingAvg(){
+    public void updateItemRatingAvg() {
         String hql = """
                 UPDATE Item i
                 SET i.rating = COALESCE(

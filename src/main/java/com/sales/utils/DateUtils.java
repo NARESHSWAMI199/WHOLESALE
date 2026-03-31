@@ -5,7 +5,8 @@ import java.time.ZoneId;
 
 public class DateUtils {
 
-    private DateUtils(){}
+    private DateUtils() {
+    }
 
     public static long getStartOfMonthEpochMillis(int year, int month) {
         LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);

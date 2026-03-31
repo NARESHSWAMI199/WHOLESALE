@@ -15,8 +15,8 @@ import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.request.enums.ITEM_LABEL;
@@ -51,6 +51,7 @@ import static com.sales.specifications.ItemsSpecifications.*;
 public class ItemService {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
     private final ItemRepository itemRepository;
     private final WriteExcelUtil writeExcel;
     private final ItemCategoryRepository itemCategoryRepository;
@@ -62,9 +63,6 @@ public class ItemService {
     private final ItemMapper itemMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
-
     @Value("${item.absolute}")
     String itemImagePath;
 
@@ -201,13 +199,13 @@ public class ItemService {
 
         // Validate inStock
         if (!(ITEM_STOCK.OUT_OF_STOCK.getStock().equals(itemRequest.getInStock()) || ITEM_STOCK.INSTOCK.getStock().equals(itemRequest.getInStock())))
-            throw new IllegalArgumentException("inStock must be 'Y' or 'N'.");
+            throw new IllegalArgumentException(ResponseMessages.INSTOCK_MUST_BE_Y_OR_N);
         // Validate label
         if (!(ITEM_LABEL.NEW.getLabel().equals(itemRequest.getLabel()) || ITEM_LABEL.OLD.getLabel().equals(itemRequest.getLabel())))
-            throw new IllegalArgumentException("label must be 'O' or 'N'.");
+            throw new IllegalArgumentException(ResponseMessages.LABEL_MUST_BE_O_OR_N);
         // Validate price and discount
         if (itemRequest.getPrice() < itemRequest.getDiscount() || itemRequest.getDiscount() < 0)
-            throw new IllegalArgumentException("Discount can't be greater then price and can't be less then 0.");
+            throw new IllegalArgumentException(ResponseMessages.DISCOUNT_CAN_T_BE_GREATER_THEN_PRICE_AND_CAN_T_BE_LESS_THEN_0);
 
         // Verify item name syntax
         String itemName = Utils.isValidName(itemRequest.getName(), "item");
@@ -228,13 +226,13 @@ public class ItemService {
             if (storeId != null) {
                 itemRequest.setStoreId(storeId);
             } else {
-                throw new NotFoundException("No store found for update this item.");
+                throw new NotFoundException(ResponseMessages.NO_STORE_FOUND_FOR_UPDATE_THIS_ITEM);
             }
             int isUpdated = updateItem(itemRequest, loggedUser);
             // updating item images
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
@@ -261,7 +259,7 @@ public class ItemService {
         logger.debug("Entering createItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = new Item();
         Store store = storeRepository.findStoreBySlug(itemRequest.getWholesaleSlug());
-        if (store == null) throw new IllegalArgumentException("Not a valid store.");
+        if (store == null) throw new IllegalArgumentException(ResponseMessages.NOT_A_VALID_STORE);
         User userForUpdate = User.builder()
                 .id(loggedUser.getId())
                 .username(loggedUser.getUsername())
@@ -294,7 +292,7 @@ public class ItemService {
     public int updateItem(ItemRequest itemRequest, AuthUser loggedUser) {
         logger.info("Entering updateItem with itemRequest: {}, loggedUser: {}", itemRequest, loggedUser);
         Item item = findItemBySlug(itemRequest.getSlug());
-        if(item == null) throw new NotFoundException("Item not found.");
+        if (item == null) throw new NotFoundException(ResponseMessages.ITEM_NOT_FOUND_1);
         String title = "Item " + item.getName() + " updated.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " updated by admin previous data was " +
                 item.toString()
@@ -322,10 +320,10 @@ public class ItemService {
     public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering deleteItem with deleteRequest: {}, loggedUser: {}", deleteRequest, loggedUser);
         if (!USER_TYPES.SUPER_ADMIN.getType().equals(loggedUser.getUserType()))
-            throw new MyException("Only Superuser has permission to delete it.");
+            throw new MyException(ResponseMessages.ONLY_SUPERUSER_HAS_PERMISSION_TO_DELETE_IT);
         String slug = deleteRequest.getSlug();
         Item item = findItemBySlug(slug);
-        if (item == null) throw new NotFoundException("Item not found to delete.");
+        if (item == null) throw new NotFoundException(ResponseMessages.ITEM_NOT_FOUND_TO_DELETE);
         String title = "Item " + item.getName() + " deleted.";
         String messageBody = "Item " + item.getName() + " key : " + item.getSlug() + " deleted by admin. If you have any issue please contact to administrator.";
         sendNotification(title, messageBody, item.getWholesaleId(), loggedUser);
@@ -339,12 +337,12 @@ public class ItemService {
         logger.debug("Entering updateStock with stock: {}, slug: {}", stock, slug);
         if (!Utils.isEmpty(slug)) {
             if (Utils.isEmpty(stock) || !(stock.equals("Y") || stock.equals("N")))
-                throw new IllegalArgumentException("The key stock must be 'Y' or 'N'.");
+                throw new IllegalArgumentException(ResponseMessages.THE_KEY_STOCK_MUST_BE_Y_OR_N);
             int result = itemHbRepository.updateStock(stock, slug);
             logger.debug("Exiting updateStock with result: {}", result);
             return result;
         }
-        throw new IllegalArgumentException("The key slug can't be blank.");
+        throw new IllegalArgumentException(ResponseMessages.THE_KEY_SLUG_CAN_T_BE_BLANK);
     }
 
     public int updateStatusBySlug(StatusRequest statusRequest, AuthUser loggedUser) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -369,7 +367,7 @@ public class ItemService {
                 logger.debug("Exiting updateStatusBySlug with result: {}", result);
                 return result;
             default:
-                throw new IllegalArgumentException("Status must be A or D.");
+                throw new IllegalArgumentException(ResponseMessages.STATUS_MUST_BE_A_OR_D);
         }
     }
 
@@ -424,12 +422,12 @@ public class ItemService {
                 String inStock = inStockList.get(i);
                 if (!Utils.isEmpty(label)) label = String.valueOf(labelList.get(i).charAt(0)).toUpperCase();
                 if (!Utils.isEmpty(inStock)) inStock = String.valueOf(inStockList.get(i).charAt(0)).toUpperCase();
-                if (!prefix.contains(label)) throw new MyException("Label must be New or Old.");
-                if (!prefix.contains(inStock)) throw new MyException("Stock must be Yes or NO.");
+                if (!prefix.contains(label)) throw new MyException(ResponseMessages.LABEL_MUST_BE_NEW_OR_OLD);
+                if (!prefix.contains(inStock)) throw new MyException(ResponseMessages.STOCK_MUST_BE_YES_OR_NO);
                 Float capacity = capacityList.get(i).isEmpty() ? 0f : Float.parseFloat(capacityList.get(i));
                 Float discount = discountList.get(i).isEmpty() ? 0f : Float.parseFloat(discountList.get(i));
                 Float price = priceList.get(i).isEmpty() ? 0f : Float.parseFloat(priceList.get(i));
-                if (price < discount) throw new MyException("Price can't be less then discount.");
+                if (price < discount) throw new MyException(ResponseMessages.PRICE_CAN_T_BE_LESS_THEN_DISCOUNT);
 
                 // creating itemRequest object for update action
                 ItemRequest itemRequest = new ItemRequest();
@@ -505,14 +503,14 @@ public class ItemService {
                 File file = new File(filePath);
 
                 itemImage.transferTo(file);
-                //if (!UploadImageValidator.hasWhiteBackground(new File(filePath))) throw new MyException("Image must have a white background");
+                //if (!UploadImageValidator.hasWhiteBackground(new File(filePath))) throw new MyException(ResponseMessages.IMAGE_MUST_HAVE_A_WHITE_BACKGROUND);
                 logger.debug("Exiting saveItemImageName with result: {}", fileOriginalName);
                 return fileOriginalName;
             } else {
-                throw new MyException("Image is not fit in accept ratio. please resize you image before upload.");
+                throw new MyException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOU_IMAGE_BEFORE_UPLOAD);
             }
         }
-        throw new MyException("Item image can't be null. Something went wrong please contact to administrator.");
+        throw new MyException(ResponseMessages.ITEM_IMAGE_CAN_T_BE_NULL_SOMETHING_WENT_WRONG_PLEASE_CONTACT_TO_ADMINISTRATOR);
     }
 
 
@@ -527,14 +525,14 @@ public class ItemService {
 
     public CategoryDto getItemCategoryDtoById(int categoryId) {
         logger.debug("Entering getItemCategoryDtoById with categoryId: {}", categoryId);
-        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Item category not found."));
+        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
         logger.debug("Exiting getItemCategoryDtoById with result: {}", result);
         return categoryMapper.toDto(result);
     }
 
     public ItemCategory getItemCategoryById(int categoryId) {
         logger.debug("Entering getItemCategoryById with categoryId: {}", categoryId);
-        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("Item category not found."));
+        ItemCategory result = itemCategoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
         logger.debug("Exiting getItemCategoryById with result: {}", result);
         return result;
     }
@@ -546,9 +544,9 @@ public class ItemService {
         String slug = deleteRequest.getSlug();
         // only super admin can delete it subcategory
         if (!loggedUser.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("Only super admin can delete item's category.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.ONLY_SUPER_ADMIN_CAN_DELETE_ITEM_S_CATEGORY, new Exception());
         Integer categoryId = itemCategoryRepository.getItemCategoryIdBySlug(slug);
-        if (categoryId == null) throw new NotFoundException("Category not found.");
+        if (categoryId == null) throw new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND);
         itemHbRepository.switchCategoryToOther(categoryId); // before delete category, assign item to another category.
         int result = itemHbRepository.deleteItemCategory(slug);
         logger.debug("Exiting deleteItemCategory with result: {}", result);
@@ -563,9 +561,9 @@ public class ItemService {
         String slug = deleteRequest.getSlug();
         // only super admin can delete it subcategory
         if (!loggedUser.getUserType().equals("SA"))
-            throw new PermissionDeniedDataAccessException("Only super admin can delete subcategory.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.ONLY_SUPER_ADMIN_CAN_DELETE_SUBCATEGORY, new Exception());
         Integer subCategoryId = itemSubCategoryRepository.getItemSubCategoryIdBySlug(slug);
-        if (subCategoryId == null) throw new NotFoundException("Subcategory not found.");
+        if (subCategoryId == null) throw new NotFoundException(ResponseMessages.SUBCATEGORY_NOT_FOUND);
         itemHbRepository.switchSubCategoryToOther(subCategoryId); // before delete category assign item to other subcategory.
         int result = itemHbRepository.deleteItemSubCategory(slug);
         logger.debug("Exiting deleteItemSubCategory with result: {}", result);

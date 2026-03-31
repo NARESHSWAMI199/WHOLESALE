@@ -6,8 +6,8 @@ import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
 import com.sales.global.STATUS;
 import com.sales.jwtUtils.JwtToken;
 import com.sales.request.LoginRequest;
@@ -55,13 +55,14 @@ import java.util.Map;
 @Tag(name = "Wholesale User Authentication and Management", description = "APIs for wholesaler user authentication, profile management, and user operations")
 public class WholesaleUserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleUserController.class);
     private final WholesaleUserService wholesaleUserService;
     private final WholesaleStoreService wholesaleStoreService;
     private final WholesalePaginationService wholesalePaginationService;
     private final JwtToken jwtToken;
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleUserController.class);
     private final UserCacheService userCacheService;
-
+    @Value("${profile.get}")
+    String filePath;
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
@@ -103,7 +104,6 @@ public class WholesaleUserController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @PostMapping("/login/otp")
     @Operation(summary = "Login via OTP", description = "Authenticates a wholesaler user using OTP verification")
     public ResponseEntity<Map<String, Object>> loginUserViaOtp(@RequestBody LoginRequest loginRequest) {
@@ -131,7 +131,6 @@ public class WholesaleUserController {
         logger.debug("Completed loginUserViaOtp method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
@@ -171,7 +170,6 @@ public class WholesaleUserController {
         logger.debug("Completed validateUserOtp method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(
             example = """
@@ -242,7 +240,6 @@ public class WholesaleUserController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @PostMapping("/password")
     @PreAuthorize("hasAuthority('wholesale.password.reset')")
     @Operation(summary = "Reset user password", description = "Resets the password for the authenticated wholesaler user")
@@ -257,7 +254,6 @@ public class WholesaleUserController {
         logger.debug("Completed resetUserPasswordBySlug method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
-
 
     @PostMapping("/update_profile")
     @PreAuthorize("hasAnyAuthority('wholesale.profile.update','wholesale.profile.edit')")
@@ -279,9 +275,6 @@ public class WholesaleUserController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
 
     }
-
-    @Value("${profile.get}")
-    String filePath;
 
     @GetMapping("/profile/{slug}/{filename}")
     @Operation(summary = "Get profile image", description = "Retrieves the profile image file for a specific user")

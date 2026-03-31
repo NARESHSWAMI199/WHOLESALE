@@ -3,8 +3,8 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.GraphRequest;
 import com.sales.global.ConstantResponseKeys;
+import com.sales.request.GraphRequest;
 import com.sales.wholesaler.services.WholesaleItemService;
 import com.sales.wholesaler.services.WholesaleStoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,26 +26,26 @@ import java.util.Map;
 @RequestMapping("wholesale/dashboard")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Dashboard", description = "APIs for wholesale dashboard data")
-public class WholesaleDashboardController  {
+public class WholesaleDashboardController {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleDashboardController.class);
     private final WholesaleStoreService wholesaleStoreService;
     private final WholesaleItemService wholesaleItemService;
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleDashboardController.class);
 
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('wholesale.dashboard.count')")
     @Operation(summary = "Get dashboard counts", description = "Retrieves counts for items, new items, old items, in stock, and out of stock for the wholesale store")
-    public ResponseEntity<Map<String, Object>> getAllDashboardCount(Authentication authentication,HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> getAllDashboardCount(Authentication authentication, HttpServletRequest request) {
         logger.debug("Starting getAllDashboardCount method");
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        Map<String,Object> responseObj = new HashMap<>();
-        responseObj.put("items" , wholesaleItemService.getItemCounts(storeId));
-        responseObj.put("newItems" , wholesaleItemService.getItemCountsForNewLabel(storeId));
-        responseObj.put("oldItems" , wholesaleItemService.getItemCountsForOldLabel(storeId) );
-        responseObj.put("inStock" , wholesaleItemService.getItemCountsForInStock(storeId));
-        responseObj.put("outStock" , wholesaleItemService.getItemCountsForOutStock(storeId));
+        Map<String, Object> responseObj = new HashMap<>();
+        responseObj.put("items", wholesaleItemService.getItemCounts(storeId));
+        responseObj.put("newItems", wholesaleItemService.getItemCountsForNewLabel(storeId));
+        responseObj.put("oldItems", wholesaleItemService.getItemCountsForOldLabel(storeId));
+        responseObj.put("inStock", wholesaleItemService.getItemCountsForInStock(storeId));
+        responseObj.put("outStock", wholesaleItemService.getItemCountsForOutStock(storeId));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed getAllDashboardCount method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
@@ -56,10 +56,10 @@ public class WholesaleDashboardController  {
     @Operation(summary = "Get graph data by months", description = "Retrieves graph data for item counts by months based on filters for the wholesale store")
     public ResponseEntity<Map<String, Object>> getAllGraphData(Authentication authentication, HttpServletRequest request, @RequestBody GraphRequest graphRequest) {
         logger.debug("Starting getAllGraphData method");
-        Map<String,Object> responseObj = new HashMap<>();
+        Map<String, Object> responseObj = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Integer storeId = wholesaleStoreService.getStoreIdByUserSlug(loggedUser.getId());
-        responseObj.put(ConstantResponseKeys.RES ,wholesaleItemService.getItemCountByMonths(graphRequest,storeId));
+        responseObj.put(ConstantResponseKeys.RES, wholesaleItemService.getItemCountByMonths(graphRequest, storeId));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
         logger.debug("Completed getAllGraphData method");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));

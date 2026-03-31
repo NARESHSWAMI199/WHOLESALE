@@ -24,7 +24,7 @@ public class ItemCategory implements Serializable {
     @Column(name = "slug")
     String slug;
 
-    @Column(name="category")
+    @Column(name = "category")
     String category;
 
     @Column(name = "icon")

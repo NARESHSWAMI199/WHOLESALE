@@ -44,7 +44,7 @@ public class StorePromotion implements Serializable {
     @Column(name = "max_repeat")
     Integer maxRepeat;
 
-    @Column(name="state")
+    @Column(name = "state")
     Integer stateId;
 
     @Column(name = "city")
@@ -64,7 +64,6 @@ public class StorePromotion implements Serializable {
 
     @Column(name = "is_deleted")
     String isDeleted;
-
 
 
 }

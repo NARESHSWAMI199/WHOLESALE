@@ -6,10 +6,6 @@ import com.sales.admin.repositories.ItemHbRepository;
 import com.sales.admin.repositories.StoreRepository;
 import com.sales.admin.repositories.UserRepository;
 import com.sales.claims.AuthUser;
-import com.sales.global.STATUS;
-import com.sales.request.DeleteRequest;
-import com.sales.request.GraphRequest;
-import com.sales.request.ItemFilterRequest;
 import com.sales.entities.Item;
 import com.sales.entities.ItemCategory;
 import com.sales.entities.ItemSubCategory;
@@ -17,8 +13,12 @@ import com.sales.entities.User;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.global.STATUS;
+import com.sales.request.DeleteRequest;
+import com.sales.request.GraphRequest;
+import com.sales.request.ItemFilterRequest;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.DateUtils;
 import com.sales.utils.UploadImageValidator;
@@ -32,18 +32,18 @@ import com.sales.wholesaler.mapper.WholesaleCategoryMapper;
 import com.sales.wholesaler.mapper.WholesaleItemMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
-import org.springframework.dao.PermissionDeniedDataAccessException;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -70,13 +70,11 @@ public class WholesaleItemService {
     private final WholesaleItemMapper wholesaleItemMapper;
     private final WholesaleCategoryMapper wholesaleCategoryMapper;
     private final WholesaleSubcategoryMapper wholesaleSubcategoryMapper;
-
-    @Value("${item.absolute}")
-    String itemImagePath;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
-
+    @Value("${item.absolute}")
+    String itemImagePath;
 
     public Page<WholesaleItemListDto> getAllItems(ItemFilterRequest searchFilters, Integer storeId) {
         logger.debug("Starting getAllItems method with searchFilters: {}, storeId: {}", searchFilters, storeId);
@@ -219,7 +217,7 @@ public class WholesaleItemService {
 
         // Discount can't be less than item's price
         if (itemRequest.getPrice() < itemRequest.getDiscount())
-            throw new IllegalArgumentException("Discount can't be greater then price.");
+            throw new IllegalArgumentException(ResponseMessages.DISCOUNT_CAN_T_BE_GREATER_THEN_PRICE);
         // If item name not in proper syntax this will throw Exception
         String itemName = Utils.isValidName(itemRequest.getName(), "item");
         itemRequest.setName(itemName);
@@ -228,9 +226,9 @@ public class WholesaleItemService {
         itemRequest.setStoreId(storeId);
 
         // Getting category and subcategory from database behalf on provided Ids.
-        ItemCategory itemCategory = wholesaleItemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException("Store item category not found."));
+        ItemCategory itemCategory = wholesaleItemCategoryRepository.findById(itemRequest.getCategoryId()).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
         itemRequest.setItemCategory(itemCategory);
-        ItemSubCategory itemSubCategory = wholesaleItemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store item subcategory not found."));
+        ItemSubCategory itemSubCategory = wholesaleItemSubCategoryRepository.findById(itemRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException(ResponseMessages.CATEGORY_NOT_FOUND));
         itemRequest.setItemSubCategory(itemSubCategory);
 
         Map<String, Object> responseObj = new HashMap<>();
@@ -243,14 +241,14 @@ public class WholesaleItemService {
 
             // Getting item's status from database and validating the item not blocked
             String itemStatus = getItemStatus(itemRequest.getSlug());
-            if (itemStatus == null) throw new NotFoundException("No item found to update.");
-            if (itemStatus.equals("D")) throw new MyException("You can't update a blocked item.");
+            if (itemStatus == null) throw new Exception(ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
+            if (itemStatus.equals("D")) throw new Exception(ResponseMessages.YOU_CAN_T_UPDATE_A_BLOCKED_ITEM);
 
             // Update item images
             updateStoreImage(itemRequest.getPreviousItemImages(), itemRequest.getNewItemImages(), itemRequest.getSlug(), "update");
             int isUpdated = updateItem(itemRequest, loggedUser); // Update operation
             if (isUpdated > 0) {
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
                 responseObj.put(ConstantResponseKeys.STATUS, 200);
             } else {
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_ITEM_FOUND_TO_UPDATE);
@@ -345,14 +343,14 @@ public class WholesaleItemService {
                 String filePath = dirPath + fileOriginalName;
                 File file = new File(filePath);
                 itemImage.transferTo(file);
-                //if (!UploadImageValidator.hasWhiteBackground(new File(filePath))) throw new MyException("Image must have a white background");
+                //if (!UploadImageValidator.hasWhiteBackground(new File(filePath))) throw new Exception(ResponseMessages.IMAGE_MUST_HAVE_A_WHITE_BACKGROUND);
                 logger.debug("Completed saveItemImageName method");
                 return fileOriginalName;
             } else {
-                throw new MyException("Image is not fit in accept ratio. please resize you image before upload.");
+                throw new MyException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOU_IMAGE_BEFORE_UPLOAD);
             }
         }
-        throw new MyException("Something went wrong.Please contact to administrator");
+        throw new MyException(ResponseMessages.SOMETHING_WENT_WRONG_PLEASE_CONTACT_TO_ADMINISTRATOR);
     }
 
 
@@ -366,13 +364,13 @@ public class WholesaleItemService {
     public int deleteItem(DeleteRequest deleteRequest, AuthUser loggedUser) {
         logger.debug("Starting deleteItem method with deleteRequest: {}", deleteRequest);
         Item item = findItemBySlug(deleteRequest.getSlug());
-        if (item == null) throw new NotFoundException("No item found to delete.");
+        if (item == null) throw new NotFoundException(ResponseMessages.NO_ITEM_FOUND_TO_DELETE);
         if (STATUS.DE_ACTIVE.getStatus().equals(item.getStatus()))
-            throw new IllegalArgumentException("Can't delete deactivated items.");
+            throw new IllegalArgumentException(ResponseMessages.CAN_T_DELETE_DEACTIVATED_ITEMS);
         // Make sure the right user deleting the items.
         Integer storeOwnerId = wholesaleStoreRepository.findUserIdByStoreId(item.getWholesaleId());
         if (loggedUser.getId() != storeOwnerId)
-            throw new PermissionDeniedDataAccessException("You are not authorized to delete this item.", new Exception());
+            throw new PermissionDeniedDataAccessException(ResponseMessages.YOU_ARE_NOT_AUTHORIZED_TO_DELETE_THIS_ITEM, new Exception());
         int deleteCount = wholesaleItemHbRepository.deleteItem(deleteRequest.getSlug());
         logger.debug("Completed deleteItem method");
         return deleteCount;
@@ -444,7 +442,8 @@ public class WholesaleItemService {
     public String createItemsExcelSheet(ItemFilterRequest searchFilters, AuthUser loggedUser) throws IOException {
         logger.debug("Entering createItemsExcelSheet with searchFilters: {}", searchFilters);
         Integer wholesaleId = storeRepository.getStoreIdByUserId(loggedUser.getId());
-        if (Objects.isNull(wholesaleId)) throw new IllegalArgumentException("Logged user store's entry not found.");
+        if (Objects.isNull(wholesaleId))
+            throw new IllegalArgumentException(ResponseMessages.LOGGED_USER_STORE_S_ENTRY_NOT_FOUND);
         Specification<Item> specification = Specification.allOf(
                 (containsName(searchFilters.getSearchKey().trim())
                         .or(hasSlug(searchFilters.getSearchKey())))
@@ -515,7 +514,7 @@ public class WholesaleItemService {
                 Objects.isNull(priceList) ||
                 Objects.isNull(discountList) ||
                 Objects.isNull(inStockList)
-        ) throw new MyException("Excel sheet columns missing.");
+        ) throw new MyException(ResponseMessages.EXCEL_SHEET_COLUMNS_MISSING);
 
         for (int i = 0; i < nameList.size(); i++) {
             Map<String, Object> itemStringDetail = null;
@@ -527,12 +526,12 @@ public class WholesaleItemService {
                 String inStock = inStockList.get(i);
                 if (!Utils.isEmpty(label)) label = String.valueOf(labelList.get(i).charAt(0)).toUpperCase();
                 if (!Utils.isEmpty(inStock)) inStock = String.valueOf(inStockList.get(i).charAt(0)).toUpperCase();
-                if (!prefix.contains(label)) throw new MyException("Label must be New or Old.");
-                if (!prefix.contains(inStock)) throw new MyException("Stock must be Yes or NO.");
+                if (!prefix.contains(label)) throw new MyException(ResponseMessages.LABEL_MUST_BE_NEW_OR_OLD);
+                if (!prefix.contains(inStock)) throw new MyException(ResponseMessages.STOCK_MUST_BE_YES_OR_NO);
                 Float capacity = capacityList.get(i).isEmpty() ? 0f : Float.parseFloat(capacityList.get(i));
                 Float discount = discountList.get(i).isEmpty() ? 0f : Float.parseFloat(discountList.get(i));
                 Float price = priceList.get(i).isEmpty() ? 0f : Float.parseFloat(priceList.get(i));
-                if (price < discount) throw new MyException("Price can't be less then discount.");
+                if (price < discount) throw new MyException(ResponseMessages.PRICE_CAN_T_BE_LESS_THEN_DISCOUNT);
 
                 // creating itemRequest object for update action
                 ItemRequest itemRequest = new ItemRequest();

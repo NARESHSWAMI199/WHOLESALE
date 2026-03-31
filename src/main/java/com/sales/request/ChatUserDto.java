@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ChatUserDto {
-    
+
     String receiverSlug;
     String status;
 

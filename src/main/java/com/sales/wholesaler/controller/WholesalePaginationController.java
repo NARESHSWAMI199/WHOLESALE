@@ -3,9 +3,9 @@ package com.sales.wholesaler.controller;
 
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.request.UserPaginationRequest;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
+import com.sales.request.UserPaginationRequest;
 import com.sales.wholesaler.services.WholesalePaginationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,4 +1,5 @@
-INSERT IGNORE INTO store_categories (slug, category, icon, is_deleted) VALUES
+INSERT
+IGNORE INTO store_categories (slug, category, icon, is_deleted) VALUES
 ('kirana-store', 'Kirana & General Store', 'kirana.png', 'N'),
 ('fruits-vegetables', 'Fruits & Vegetables', 'fruits.png', 'N'),
 ('dairy-products', 'Dairy Products', 'dairy.png', 'N'),

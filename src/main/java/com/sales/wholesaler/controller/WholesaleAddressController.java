@@ -22,14 +22,14 @@ import java.util.List;
 @RequestMapping("/wholesale/address")
 @RequiredArgsConstructor
 @Tag(name = "Wholesale Address Management", description = "APIs for managing addresses for wholesalers")
-public class WholesaleAddressController  {
+public class WholesaleAddressController {
 
-    private final AddressService addressService;
     private static final Logger logger = LoggerFactory.getLogger(WholesaleAddressController.class);
+    private final AddressService addressService;
 
     @GetMapping("/city/{stateId}")
     @Operation(summary = "Get cities by state", description = "Retrieves the list of cities for a given state ID")
-    public ResponseEntity<List<City>> getCityList(@PathVariable Integer stateId ) {
+    public ResponseEntity<List<City>> getCityList(@PathVariable Integer stateId) {
         logger.debug("Starting getCityList method");
         List<City> cityList = addressService.getCityList(stateId);
         logger.debug("Completed getCityList method");
@@ -42,7 +42,7 @@ public class WholesaleAddressController  {
         logger.debug("Starting getStateList method");
         List<State> stateList = addressService.getStateList();
         logger.debug("Completed getStateList method");
-        return new ResponseEntity<>(stateList,HttpStatus.OK);
+        return new ResponseEntity<>(stateList, HttpStatus.OK);
     }
 
 

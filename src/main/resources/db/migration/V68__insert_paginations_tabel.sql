@@ -1,4 +1,5 @@
-INSERT IGNORE INTO paginations (field_for,can_see) VALUES
+INSERT
+IGNORE INTO paginations (field_for,can_see) VALUES
 	 ('Items','B'),
 	 ('Stores','S'),
 	 ('Old items','W'),

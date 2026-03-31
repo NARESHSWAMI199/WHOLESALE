@@ -105,8 +105,8 @@ public class PaginationControllerTest extends TestUtil {
                 """.formatted(pagination.getId(), targetUser.getId());
 
         var result = mockMvc.perform(post("/admin/pagination/update").contentType(MediaType.APPLICATION_JSON).content(json).headers(headers))
-          .andDo(print())
-          .andReturn();
+                .andDo(print())
+                .andReturn();
 
         int status = result.getResponse().getStatus();
         org.junit.jupiter.api.Assertions.assertEquals(200, status, "Response body: " + result.getResponse().getContentAsString());
@@ -127,8 +127,8 @@ public class PaginationControllerTest extends TestUtil {
                 """;
 
         mockMvc.perform(post("/admin/pagination/update").contentType(MediaType.APPLICATION_JSON).content(json).headers(headers))
-          .andExpect(status().is4xxClientError())
-          .andDo(print());
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
     }
 
 }

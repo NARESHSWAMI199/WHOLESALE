@@ -1,4 +1,5 @@
-INSERT IGNORE INTO store_permissions (permission, display_name, default_permission, permission_for) VALUES
+INSERT
+IGNORE INTO store_permissions (permission, display_name, default_permission, permission_for) VALUES
 
 -- IMAGE / TOOLS
 ('remove.bg.image.upload', 'Remove Background Image Upload', 'Y', 'Item'),

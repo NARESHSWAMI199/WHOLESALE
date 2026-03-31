@@ -1,18 +1,16 @@
 package com.sales.wholesaler.services;
 
 import com.sales.admin.repositories.AddressRepository;
-import com.sales.admin.repositories.PermissionHbRepository;
-import com.sales.admin.repositories.StorePermissionsRepository;
 import com.sales.claims.AuthUser;
-import com.sales.request.AddressRequest;
-import com.sales.request.SearchFilters;
-import com.sales.request.StoreCreationRequest;
 import com.sales.entities.*;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
-import com.sales.global.ResponseMessages;
 import com.sales.global.GlobalConstant;
+import com.sales.global.ResponseMessages;
+import com.sales.request.AddressRequest;
+import com.sales.request.SearchFilters;
+import com.sales.request.StoreCreationRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.wholesaler.dto.WholesaleCategoryDto;
@@ -24,7 +22,6 @@ import com.sales.wholesaler.mapper.WholesaleStoreMapper;
 import com.sales.wholesaler.mapper.WholesaleStoreNotificationMapper;
 import com.sales.wholesaler.mapper.WholesaleSubcategoryMapper;
 import com.sales.wholesaler.repository.*;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -50,6 +48,7 @@ import static com.sales.utils.Utils.getCurrentMillis;
 @RequiredArgsConstructor
 public class WholesaleStoreService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
     private final WholesaleCategoryRepository wholesaleCategoryRepository;
     private final WholesaleSubCategoryRepository wholesaleSubCategoryRepository;
     private final WholesaleAddressHbRepository wholesaleAddressHbRepository;
@@ -63,10 +62,6 @@ public class WholesaleStoreService {
     private final WholesaleSubcategoryMapper wholesaleSubCategoryMapper;
     private final WholesalePermissionHbRepository permissionHbRepository;
     private final WholsaleStorePermissionsRepository storePermissionsRepository;
-
-
-    private static final Logger logger = LoggerFactory.getLogger(WholesaleStoreService.class);
-
     @Value("${store.absolute}")
     String storeImagePath;
 
@@ -90,7 +85,7 @@ public class WholesaleStoreService {
             StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
             storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
-            throw new MyException("Invalid arguments for category and subcategory");
+            throw new MyException(ResponseMessages.INVALID_ARGUMENTS_FOR_CATEGORY_AND_SUBCATEGORY);
         }
         Store store = getStoreByUserId(loggedUser.getId());
         String slug = store.getSlug();
@@ -99,7 +94,7 @@ public class WholesaleStoreService {
         // before update store and store's address get address id from store
         Integer addressId = wholesaleStoreRepository.getAddressIdBySlug(storeCreationRequest.getStoreSlug());
         if (addressId == null)
-            throw new IllegalArgumentException("No store found to update.");  // wrong wholesale slug.
+            throw new IllegalArgumentException(ResponseMessages.NO_STORE_FOUND_TO_UPDATE);  // wrong wholesale slug.
         storeCreationRequest.setAddressId(addressId);
 
         String imageName = getStoreImagePath(storeCreationRequest.getStorePic(), slug);
@@ -110,7 +105,7 @@ public class WholesaleStoreService {
         }
         int isUpdated = updateStore(storeCreationRequest, loggedUser); // Update operation
         if (isUpdated > 0) {
-            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED_2);
+            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_UPDATED);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
         } else {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.NO_STORE_FOUND_TO_UPDATE);
@@ -187,7 +182,7 @@ public class WholesaleStoreService {
                 logger.debug("Completed getStoreImagePath method");
                 return fileOriginalName;
             } else {
-                throw new MyException("Image is not fit in accept ratio. please resize your image before upload.");
+                throw new MyException(ResponseMessages.IMAGE_IS_NOT_FIT_IN_ACCEPT_RATIO_PLEASE_RESIZE_YOUR_IMAGE_BEFORE_UPLOAD);
             }
         }
         return null;
@@ -209,7 +204,7 @@ public class WholesaleStoreService {
             StoreSubCategory storeSubCategory = wholesaleSubCategoryRepository.findById(storeCreationRequest.getSubCategoryId()).orElseThrow(() -> new NotFoundException("Store subcategory not found."));
             storeCreationRequest.setStoreSubCategory(storeSubCategory);
         } catch (Exception e) {
-            throw new MyException("Invalid arguments for category and subcategory");
+            throw new MyException(ResponseMessages.INVALID_ARGUMENTS_FOR_CATEGORY_AND_SUBCATEGORY);
         }
 
         /* inserting  address during create a wholesale */
@@ -233,7 +228,7 @@ public class WholesaleStoreService {
         if (imageName != null) {
             store.setAvtar(imageName); /** I know save function called before set this, but it will save automatically due to same transaction */
         } else {
-            throw new MyException("Store image can't be blank.");
+            throw new MyException(ResponseMessages.STORE_IMAGE_CAN_T_BE_BLANK);
         }
         logger.debug("Completed createStore method");
 
@@ -241,7 +236,7 @@ public class WholesaleStoreService {
         List<Integer> defaultPermissions = storePermissionsRepository.getAllDefaultPermissionsIds();
         int isAssigned = permissionHbRepository.assignPermissionsToWholesaler(loggedUser.getId(), defaultPermissions);
         if (isAssigned < 1)
-            throw new MyException("Something went wrong during update wholesaler's permissions. please contact to administrator.");
+            throw new MyException(ResponseMessages.SOMETHING_WENT_WRONG_DURING_UPDATE_WHOLESALER_S_PERMISSIONS_PLEASE_CONTACT_TO_ADMINISTRATOR);
         return insertedStore;
     }
 

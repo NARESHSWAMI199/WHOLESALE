@@ -1,4 +1,5 @@
-INSERT IGNORE INTO `users` (slug,otp,username,email,contact,password,avtar,user_type,status,is_deleted,created_at,updated_at,last_seen,created_by,updated_by,active_plan) VALUES
+INSERT
+IGNORE INTO `users` (slug,otp,username,email,contact,password,avtar,user_type,status,is_deleted,created_at,updated_at,last_seen,created_by,updated_by,active_plan) VALUES
 	 ('dfgdsvdfge',NULL,'naresh','admin@gmail.com','9876543211','123456','daa66_jrejdknaresh-removebg-preview_(1).png','SA','A','N',1723998053886,1728148676361,NULL,NULL,0,NULL),
 	 ('327517f6-465d-4da2-8105-5dd9c62d678c',NULL,'test','wholesaler@gmail.com','9876543214','123456',NULL,'W','A','N',1726505439062,1726505527769,NULL,1,1,NULL),
 	 ('ad708d9c-0251-4283-902f-20d9e043ae9b',NULL,'test1','retailer@gmail.com','9876543212','123456',NULL,'R','A','N',1726505677696,1727462144600,NULL,1,1,NULL),

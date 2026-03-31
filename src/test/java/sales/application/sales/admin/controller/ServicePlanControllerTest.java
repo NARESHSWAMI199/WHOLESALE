@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,20 +43,20 @@ public class ServicePlanControllerTest extends TestUtil {
     public void createServicePlansViaStaffAccount() throws Exception {
         token = loginUser(GlobalConstantTest.STAFF);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
-              {
-                "planName": "Mock test",
-                "months": 1,
-                "price": 18,
-                "discount": 10,
-                "description": "this is dummy plan for mock test"
-            }
-            """;
+                  {
+                    "planName": "Mock test",
+                    "months": 1,
+                    "price": 18,
+                    "discount": 10,
+                    "description": "this is dummy plan for mock test"
+                }
+                """;
         mockMvc.perform(MockMvcRequestBuilders.post("/admin/plans/add")
-                    .content(json)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .headers(headers)
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(headers)
                 )
                 .andExpectAll(
                         status().is(403) // because only super admin can a service plan
@@ -67,22 +66,23 @@ public class ServicePlanControllerTest extends TestUtil {
 
 
     }
+
     @Test
     public void createServicePlansViaSuperAdminAccount() throws Exception {
         token = loginUser(GlobalConstantTest.ADMIN);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
-              {
-                "planName": "Mock test {random}",
-                "months": 1,
-                "price": {price},
-                "discount": 0,
-                "description": "this is dummy plan for mock test"
-            }
-            """
-            .replace("{random}", UUID.randomUUID().toString().substring(0,6))
-            .replace("{price}", new Random().nextInt(99)+"");
+                  {
+                    "planName": "Mock test {random}",
+                    "months": 1,
+                    "price": {price},
+                    "discount": 0,
+                    "description": "this is dummy plan for mock test"
+                }
+                """
+                .replace("{random}", UUID.randomUUID().toString().substring(0, 6))
+                .replace("{price}", new Random().nextInt(99) + "");
         MvcResult result = mockMvc.perform(post("/admin/plans/add")
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +113,7 @@ public class ServicePlanControllerTest extends TestUtil {
     @Test
     public void testGetAllServicePlans() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                     {}
                 """;
@@ -131,7 +131,7 @@ public class ServicePlanControllerTest extends TestUtil {
     @Test
     public void testGetAllUserPlans() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                     {}
                 """;
@@ -150,15 +150,15 @@ public class ServicePlanControllerTest extends TestUtil {
     @Test
     public void testGetAllUserPlansWithNoPlansWholesaler() throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         ServicePlan servicePlan = createServicePlan(new Date());
-        System.err.println("serviceId : "+servicePlan.getId());
-        System.err.println("services : "+servicePlanRepository.findAll());
+        System.err.println("serviceId : " + servicePlan.getId());
+        System.err.println("services : " + servicePlanRepository.findAll());
         String json = """
                     {}
                 """;
 
-        mockMvc.perform(post("/admin/plans/user-plans/"+GlobalConstantTest.WHOLESALER_SLUG) // make sure wholesale user doesn't have any plan
+        mockMvc.perform(post("/admin/plans/user-plans/" + GlobalConstantTest.WHOLESALER_SLUG) // make sure wholesale user doesn't have any plan
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(headers)
@@ -169,20 +169,18 @@ public class ServicePlanControllerTest extends TestUtil {
     }
 
 
-
-//    @Test
+    //    @Test
     public void testServicePlansStatusWithStaffAccount(String slug) throws Exception {
         token = loginUser(GlobalConstantTest.STAFF);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         //By default status id deactivate
         String json = """
                     {
                     "slug" : "{slug}"
                     }
                 """
-                .replace("{slug}",slug)
-                ;
+                .replace("{slug}", slug);
 
         mockMvc.perform(post("/admin/plans/status") // make sure wholesale user doesn't have any plan
                 .content(json)
@@ -193,43 +191,41 @@ public class ServicePlanControllerTest extends TestUtil {
         ).andDo(print());
     }
 
-//@Test
-public void testServicePlansStatusWithSuperAdminAccount(String slug) throws Exception {
-    token = loginUser(GlobalConstantTest.ADMIN);
-    HttpHeaders headers = new HttpHeaders();
-    headers.set(GlobalConstant.AUTHORIZATION,token);
-    String json = """
-                {
-                "slug" : "{slug}",
-                "status" : "A"
-                }
-            """
-        .replace("{slug}",slug);
+    //@Test
+    public void testServicePlansStatusWithSuperAdminAccount(String slug) throws Exception {
+        token = loginUser(GlobalConstantTest.ADMIN);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(GlobalConstant.AUTHORIZATION, token);
+        String json = """
+                    {
+                    "slug" : "{slug}",
+                    "status" : "A"
+                    }
+                """
+                .replace("{slug}", slug);
 
-    mockMvc.perform(post("/admin/plans/status") // make sure wholesale user doesn't have any plan
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON)
-            .headers(headers)
-    ).andExpectAll(
-            status().is(200)
-    ).andDo(print());
-}
+        mockMvc.perform(post("/admin/plans/status") // make sure wholesale user doesn't have any plan
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers)
+        ).andExpectAll(
+                status().is(200)
+        ).andDo(print());
+    }
 
 
-
-//    @Test
+    //    @Test
     public void testServicePlansDeleteWithStaffAccount(String slug) throws Exception {
         token = loginUser(GlobalConstantTest.STAFF);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         //By default status id deactivate
         String json = """
                     {
                     "slug" : "{slug}"
                     }
                 """
-                .replace("{slug}",slug)
-                ;
+                .replace("{slug}", slug);
 
         mockMvc.perform(post("/admin/plans/delete") // make sure wholesale user doesn't have any plan
                 .content(json)
@@ -241,19 +237,18 @@ public void testServicePlansStatusWithSuperAdminAccount(String slug) throws Exce
     }
 
 
-//    @Test
+    //    @Test
     public void testServicePlansDeleteWithSuperAdminAccount(String slug) throws Exception {
         token = loginUser(GlobalConstantTest.ADMIN);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION,token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         //By default status id deactivate
         String json = """
                     {
                     "slug" : "{slug}"
                     }
                 """
-                .replace("{slug}",slug)
-                ;
+                .replace("{slug}", slug);
 
         mockMvc.perform(post("/admin/plans/delete") // make sure wholesale user doesn't have any plan
                 .content(json)

@@ -14,7 +14,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -24,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -146,18 +146,6 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
         return query.executeUpdate();
     }
 
-
-    /// For updateItemsViaExcelSheet
-
-    @Getter
-    @Setter
-    @ToString
-    public static class ItemUpdateError {
-        Map<String, Object> itemRowDetail;
-        String errorMessage;
-    }
-
-
     public int updateExcelSheetItems(ItemRequest WholesaleItemDto, Integer userId, Integer wholesaleId) {
         String hql = """
                    update Item set name=:name,
@@ -182,6 +170,16 @@ public class WholesaleItemHbRepository implements CommonHbRepository {
                 .setParameter("slug", WholesaleItemDto.getSlug())
                 .setParameter("wholesaleId", wholesaleId);
         return query.executeUpdate();
+    }
+
+    /// For updateItemsViaExcelSheet
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ItemUpdateError {
+        Map<String, Object> itemRowDetail;
+        String errorMessage;
     }
 
 

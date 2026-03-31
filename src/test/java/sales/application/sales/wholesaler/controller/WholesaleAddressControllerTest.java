@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = SalesApplication.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class WholesaleAddressControllerTest extends  TestUtil{
+public class WholesaleAddressControllerTest extends TestUtil {
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,7 +60,7 @@ public class WholesaleAddressControllerTest extends  TestUtil{
                 .build();
         stateRepository.save(state);
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
@@ -73,7 +73,6 @@ public class WholesaleAddressControllerTest extends  TestUtil{
                 status().is(200)
         ).andDo(print());
     }
-
 
 
     @Test
@@ -92,12 +91,12 @@ public class WholesaleAddressControllerTest extends  TestUtil{
         cityRepository.save(city);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set(GlobalConstant.AUTHORIZATION , token);
+        headers.set(GlobalConstant.AUTHORIZATION, token);
         String json = """
                 {
                 }
                 """;
-        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/address/city/"+state.getId())
+        mockMvc.perform(MockMvcRequestBuilders.get("/wholesale/address/city/" + state.getId())
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(headers)

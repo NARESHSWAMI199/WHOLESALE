@@ -3,9 +3,9 @@ package sales.application.sales.chats.services;
 import com.sales.SalesApplication;
 import com.sales.chats.services.ChatService;
 import com.sales.claims.SalesUser;
-import com.sales.request.MessageDto;
 import com.sales.entities.User;
 import com.sales.exceptions.MyException;
+import com.sales.request.MessageDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,8 +40,8 @@ public class ChatServiceTest extends TestUtil {
 
     @Test
     public void sendMessage_happyPath_savesAndMarksSent() throws Exception {
-        User receiver = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
-        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User receiver = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
+        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
 
         when(wholesaleUserRepository.findUserBySlug(receiver.getSlug())).thenReturn(receiver);
         when(blockListService.isSenderBlockedByReceiver(any(), any())).thenReturn(false);
@@ -58,7 +58,7 @@ public class ChatServiceTest extends TestUtil {
 
     @Test
     public void verifyBeforeSend_throwsWhenRecipientMissing() {
-        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         when(wholesaleUserRepository.findUserBySlug(anyString())).thenReturn(null);
 
         assertThrows(MyException.class, () -> chatService.verifyBeforeSend(new SalesUser(sender), null));
@@ -66,12 +66,12 @@ public class ChatServiceTest extends TestUtil {
 
     @Test
     public void saveAllImages_acceptsValidImage() throws Exception {
-        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         // Using a small png in resources (test resources should have image added) ; fallback to creating bytes
         MockMultipartFile file = new MockMultipartFile("images", "test-image.png", "image/png", "abc".getBytes());
 
         MessageDto dto = new MessageDto();
-        dto.setReceiver("r"+java.util.UUID.randomUUID());
+        dto.setReceiver("r" + java.util.UUID.randomUUID());
         dto.setImages(List.of(file));
 
         var saved = chatService.saveAllImages(dto, new SalesUser(sender));
@@ -81,10 +81,10 @@ public class ChatServiceTest extends TestUtil {
 
     @Test
     public void saveAllImages_invalidImage_throws() throws Exception {
-        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw","W");
+        User sender = createUser(java.util.UUID.randomUUID().toString(), createRandomEmail(), "pw", "W");
         MockMultipartFile file = new MockMultipartFile("images", "test.txt", "text/plain", "abc".getBytes());
         MessageDto dto = new MessageDto();
-        dto.setReceiver("r"+java.util.UUID.randomUUID());
+        dto.setReceiver("r" + java.util.UUID.randomUUID());
         dto.setImages(List.of(file));
 
         assertThrows(MyException.class, () -> chatService.saveAllImages(dto, new SalesUser(sender)));

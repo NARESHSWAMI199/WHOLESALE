@@ -22,12 +22,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReadExcel {
 
-    
+
     private final Logger logger = LoggerFactory.getLogger(ReadExcel.class);
 
-    public Map<String,List<String>> getExcelDataInJsonFormat(MultipartFile excelFile) {
+    public Map<String, List<String>> getExcelDataInJsonFormat(MultipartFile excelFile) {
 
-        Map<String,List<String>> result = new HashMap<>();
+        Map<String, List<String>> result = new HashMap<>();
         List<String> columnsList = new ArrayList<>();
         try {
             DataFormatter formatter = new DataFormatter();
@@ -68,7 +68,7 @@ public class ReadExcel {
                 }
             }
         } catch (Exception e) {
-            logger.error("Exception during creating excel file : {} ",e.getMessage());
+            logger.error("Exception during creating excel file : {} ", e.getMessage());
             throw new MyException(e.getMessage());
         }
         logger.debug("Excel file reading END.... ");

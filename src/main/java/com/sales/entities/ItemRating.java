@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class ItemRating implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id ;
+    long id;
 
     @Column(name = "item_id")
     Long itemId;
@@ -34,7 +34,6 @@ public class ItemRating implements Serializable {
 
     @Column(name = "updated_at")
     Long updatedAt;
-
 
 
 }
