@@ -103,7 +103,7 @@ public class UserController {
             responseObj.put(ConstantResponseKeys.STATUS, 401);
         } else if (user.isEnabled()) {
             Map<String, Object> paginations = paginationService.findUserPaginationsByUserId(user);
-            responseObj.put(ConstantResponseKeys.TOKEN, GlobalConstant.AUTH_TOKEN_PREFIX + jwtToken.generateToken(user.getSlug()));
+            responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_LOGGED_IN);
             responseObj.put("user", user);
             responseObj.put(ConstantResponseKeys.PAGINATIONS, paginations);
