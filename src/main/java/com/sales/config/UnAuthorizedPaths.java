@@ -42,6 +42,7 @@ public class UnAuthorizedPaths {
             "/wholesale/store/add",
             "/wholesale/auth/detail",
             "/future/plans/**",
-            "/wholesale/wallet/**"
+            "/wholesale/wallet/",
+            "/wholesale/wallet/pay/**"
     };
 }

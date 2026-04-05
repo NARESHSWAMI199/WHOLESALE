@@ -39,7 +39,12 @@ public class WalletTransactionHbRepository implements CommonHbRepository {
         CriteriaQuery<WholesaleWalletTransactionDto> criteriaQuery = criteriaBuilder.createQuery(WholesaleWalletTransactionDto.class);
         Root<WalletTransaction> root = criteriaQuery.from(WalletTransaction.class);
         criteriaQuery.multiselect(
-                root.get(WalletTransaction_.id)
+                root.get(WalletTransaction_.slug),
+                root.get(WalletTransaction_.userId),
+                root.get(WalletTransaction_.amount),
+                root.get(WalletTransaction_.createdAt),
+                root.get(WalletTransaction_.transactionType),
+                root.get(WalletTransaction_.status)
         );
 
         if (spec != null) {
