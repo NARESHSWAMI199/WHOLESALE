@@ -491,7 +491,7 @@ public class ItemService {
                     GlobalConstant.minHeight, GlobalConstant.maxWidth, GlobalConstant.maxHeight,
                     GlobalConstant.allowedAspectRatios, GlobalConstant.allowedFormats)) {
 
-                String fileOriginalName = UUID.randomUUID() + itemImage.getOriginalFilename().replaceAll(" ", "_");
+                String fileOriginalName = UUID.randomUUID() + Objects.requireNonNull(itemImage.getOriginalFilename()).replaceAll("[^a-zA-Z0-9]", "");
                 String dirPath = itemImagePath + slug + GlobalConstant.PATH_SEPARATOR;
                 File dir = new File(dirPath);
                 if (!dir.exists()) dir.mkdirs();
