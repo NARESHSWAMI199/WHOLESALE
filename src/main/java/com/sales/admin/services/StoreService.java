@@ -385,7 +385,12 @@ public class StoreService {
         Sort sort = searchFilters.getOrder().equals("asc") ?
                 Sort.by(searchFilters.getOrderBy()).ascending() :
                 Sort.by(searchFilters.getOrderBy()).descending();
-        List<CategoryDto> result = storeCategoryRepository.findAll(sort).stream().map(categoryMapper::toDto).toList();
+        List<CategoryDto> result = storeCategoryRepository.findAll(sort).stream().
+                sorted((a,b) ->{
+                    if (a.getCategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getCategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getCategory().compareToIgnoreCase(b.getCategory());
+                }).map(categoryMapper::toDto).toList();
         logger.debug("Exiting getAllStoreCategory");
         return result;
     }
@@ -397,7 +402,12 @@ public class StoreService {
         Utils.checkRequiredFields(searchFilters, List.of("categoryId"));
         Sort sort = Sort.by(searchFilters.getOrderBy());
         sort = searchFilters.getOrder().equals("asc") ? sort.ascending() : sort.descending();
-        List<SubcategoryDto> result = storeSubCategoryRepository.getSubCategories(searchFilters.getCategoryId(), sort).stream().map(subcategoryMapper::toDto).toList();
+        List<SubcategoryDto> result = storeSubCategoryRepository.getSubCategories(searchFilters.getCategoryId(), sort).stream().
+            sorted((a,b) ->{
+                if (a.getSubcategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                if (b.getSubcategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                return a.getSubcategory().compareToIgnoreCase(b.getSubcategory());
+            }).map(subcategoryMapper::toDto).toList();
         logger.debug("Exiting getAllStoreSubCategories");
         return result;
     }

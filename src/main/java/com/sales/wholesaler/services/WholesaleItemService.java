@@ -420,7 +420,12 @@ public class WholesaleItemService {
     public List<WholesaleCategoryDto> getAllCategory() {
         logger.debug("Starting getAllCategory method");
         Sort sort = Sort.by("category").ascending();
-        List<WholesaleCategoryDto> categories = wholesaleItemCategoryRepository.findAll(sort).stream().map(wholesaleCategoryMapper::toDto).toList();
+        List<WholesaleCategoryDto> categories = wholesaleItemCategoryRepository.findAll(sort)
+                .stream().sorted((a,b) ->{
+                    if (a.getCategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getCategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getCategory().compareToIgnoreCase(b.getCategory());
+                }).map(wholesaleCategoryMapper::toDto).toList();
         logger.debug("Completed getAllCategory method");
         return categories;
     }
@@ -429,7 +434,12 @@ public class WholesaleItemService {
     @Transactional
     public List<WholesaleSubcategoryDto> getAllItemsSubCategories(int categoryId) {
         logger.debug("Starting getAllItemsSubCategories method with categoryId: {}", categoryId);
-        List<WholesaleSubcategoryDto> subCategories = wholesaleItemSubCategoryRepository.getSubCategories(categoryId).stream().map(wholesaleSubcategoryMapper::toDto).toList();
+        List<WholesaleSubcategoryDto> subCategories = wholesaleItemSubCategoryRepository.getSubCategories(categoryId).stream().
+                sorted((a,b) ->{
+                    if (a.getSubcategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getSubcategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getSubcategory().compareToIgnoreCase(b.getSubcategory());
+                }).map(wholesaleSubcategoryMapper::toDto).toList();
         logger.debug("Completed getAllItemsSubCategories method");
         return subCategories;
     }

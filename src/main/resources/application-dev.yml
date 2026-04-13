@@ -5,21 +5,21 @@ server:
 spring:
   application:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   flyway:
-    enabled: true
+    enabled: {FLYWAY_ENABLED:true}
     baseline-on-migrate: true
     locations: classpath:db/migration
 
   datasource:
-    url: jdbc:mysql://localhost:3306/test1
-    username: root
-    password: password
-    #    url: jdbc:mysql://db:3306/sales #docker
-    #    username: root
-    #    password: password
+    url: ${DATASOURCE_URL:jdbc:mysql://localhost:3306/test1}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:password}
+#    url: jdbc:mysql://localhost:3307/sales #docker
+#    username: root
+#    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -83,7 +83,7 @@ cashfree:
   mid: TEST10390991bf0adc9155492e36f12619909301
   env: TEST
   mobile: 9999999999
-  callback_uri: https://ac82-45-249-85-171.ngrok-free.app/cashfree/callback/
+  callback_uri: https://7323-49-36-240-159.ngrok-free.app/cashfree/callback/
   redirect_uri: http://localhost:3000
 
 # ------------------ start public folder path

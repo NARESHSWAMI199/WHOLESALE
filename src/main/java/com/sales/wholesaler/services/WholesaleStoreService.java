@@ -304,7 +304,13 @@ public class WholesaleStoreService {
     public List<WholesaleCategoryDto> getAllStoreCategory() {
         logger.debug("Starting getAllStoreCategory method");
         Sort sort = Sort.by("category").ascending();
-        List<WholesaleCategoryDto> categories = wholesaleCategoryRepository.findAll(sort).stream().map(wholesaleCategoryMapper::toDto).toList();
+        List<WholesaleCategoryDto> categories = wholesaleCategoryRepository.findAll(sort).stream()
+                .sorted((a,b) -> {
+                    if (a.getCategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getCategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getCategory().compareToIgnoreCase(b.getCategory());
+                })
+                .map(wholesaleCategoryMapper::toDto).toList();
         logger.debug("Completed getAllStoreCategory method");
         return categories;
     }
@@ -312,7 +318,12 @@ public class WholesaleStoreService {
     @Transactional
     public List<WholesaleSubcategoryDto> getAllStoreSubCategories(int categoryId) {
         logger.debug("Starting getAllStoreSubCategories method with categoryId: {}", categoryId);
-        List<WholesaleSubcategoryDto> subCategories = wholesaleSubCategoryRepository.getSubCategories(categoryId).stream().map(wholesaleSubCategoryMapper::toDto).toList();
+        List<WholesaleSubcategoryDto> subCategories = wholesaleSubCategoryRepository.getSubCategories(categoryId).stream().
+                sorted((a,b) ->{
+                    if (a.getSubcategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getSubcategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getSubcategory().compareToIgnoreCase(b.getSubcategory());
+                }).map(wholesaleSubCategoryMapper::toDto).toList();
         logger.debug("Completed getAllStoreSubCategories method");
         return subCategories;
     }
