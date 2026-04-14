@@ -23,4 +23,6 @@ public interface AuthUser {
     String getEmail();
 
     boolean isEnabled();
+
+    String getAvatar();
 }

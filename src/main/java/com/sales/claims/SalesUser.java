@@ -61,4 +61,11 @@ public class SalesUser implements AuthUser {
     public boolean isEnabled() {
         return user.getStatus().equals("A");
     }
+
+    @Override
+    public String getAvatar() {
+        return user.getAvatar();
+    }
+
+
 }
