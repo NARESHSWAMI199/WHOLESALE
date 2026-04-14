@@ -158,7 +158,7 @@ public class WholesaleStoreController {
     public ResponseEntity<Map<String, Object>> addNewStore(HttpServletRequest request, @ModelAttribute StoreCreationRequest storeCreationRequest) throws IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Starting addNewStore method");
         Map<String, Object> result = new HashMap<>();
-        AuthUser loggedUser = (SalesUser) Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+        AuthUser loggedUser = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
         Store isInserted = wholesaleStoreService.createStore(storeCreationRequest, loggedUser);
         if (isInserted.getId() > 0) {
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_CREATED_SUCCESSFULLY_WELCOME_IN_SWAMI_SALES);

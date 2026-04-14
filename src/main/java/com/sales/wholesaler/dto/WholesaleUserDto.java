@@ -16,7 +16,8 @@ public record WholesaleUserDto(
         String userType,
         String status,
         Integer activePlan,
-        Long lastSeen
+        Long lastSeen,
+        Long updatedAt
 ) {
 
 }

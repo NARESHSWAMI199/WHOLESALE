@@ -224,14 +224,14 @@ public class WholesaleUserController {
     public ResponseEntity<Map<String, Object>> getDetailUser(@PathVariable(required = false) String slug, HttpServletRequest request) {
         logger.debug("Starting getDetailUser method");
         Map<String, Object> responseObj = new HashMap<>();
-        AuthUser user = null;
+        WholesaleUserDto user = null;
         if (slug == null) {
-            user = Utils.getUserFromRequest(request, jwtToken, wholesaleUserService);
+            user =  wholesaleUserService.convertUserToDto(Utils.getUserFromRequest(request, jwtToken, wholesaleUserService));
         } else {
-            user = new SalesUser(wholesaleUserService.findUserBySlug(slug));
+            user = wholesaleUserService.convertUserToDto(wholesaleUserService.findUserBySlug(slug));
         }
         if (slug == null) {
-            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.getSlug());
+            WholesaleStoreDto store = wholesaleStoreService.getStoreDtoByUserSlug(user.slug());
             responseObj.put(ConstantResponseKeys.STORE, store);
         }
         responseObj.put(ConstantResponseKeys.USER, user);

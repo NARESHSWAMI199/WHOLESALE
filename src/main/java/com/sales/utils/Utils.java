@@ -140,7 +140,7 @@ public class Utils {
     }
 
 
-    public static AuthUser getUserFromRequest(HttpServletRequest request, JwtToken jwtToken, WholesaleUserService userService) {
+    public static User getUserFromRequest(HttpServletRequest request, JwtToken jwtToken, WholesaleUserService userService) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         // Token from swagger because swagger not sends Authorization header in request.
         token = token == null ? request.getHeader("authToken") : token;
@@ -151,11 +151,10 @@ public class Utils {
                 String slug = jwtToken.getSlugFromToken(token);
                 /* get user by slug. */
                 User user = userService.findUserBySlug(slug);
-                AuthUser loggedUser = new SalesUser(user);
-                if (!loggedUser.isEnabled()) {
+                if (!user.isEnabled()) {
                     throw new UserException(ResponseMessages.USER_NOT_ACTIVE);
                 }
-                return loggedUser;
+                return user;
             }
             throw new UserException(ResponseMessages.INVALID_AUTHORIZATION);
         } catch (Exception e) {

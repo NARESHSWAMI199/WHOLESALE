@@ -96,6 +96,11 @@ class UtilsTest {
             public boolean isEnabled() {
                 return true;
             }
+
+            @Override
+            public String getAvatar() {
+                return "";
+            }
         };
         // should throw because userType S and different slug
         assertThrows(org.springframework.dao.PermissionDeniedDataAccessException.class, () -> Utils.canUpdateAStaff("slug", "S", authUser));
@@ -145,6 +150,11 @@ class UtilsTest {
             @Override
             public boolean isEnabled() {
                 return true;
+            }
+
+            @Override
+            public String getAvatar() {
+                return "";
             }
         };
         assertThrows(org.springframework.dao.PermissionDeniedDataAccessException.class, () -> Utils.canUpdateAStaffStatus("slug", "S", authUser2));
