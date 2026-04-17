@@ -23,7 +23,7 @@ public class ChatUser implements Serializable {
     @Column(name = "user_id")
     Integer userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_user_id")
     User chatUser;
 

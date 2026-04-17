@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ChatUserDto {
+public class ChatUserRequest {
 
     String receiverSlug;
     String status;

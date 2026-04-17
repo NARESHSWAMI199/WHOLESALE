@@ -1,15 +1,16 @@
 package com.sales.chats.controllers;
 
 
+import com.sales.chats.dto.ChatUserDto;
+import com.sales.chats.dto.UserDto;
 import com.sales.chats.services.ChatUserService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
-import com.sales.entities.ChatUser;
 import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.ResponseMessages;
-import com.sales.request.ChatUserDto;
-import com.sales.request.ContactDto;
+import com.sales.request.ChatUserRequest;
+import com.sales.request.ContactRequest;
 import com.sales.utils.Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,10 +39,10 @@ public class ChatUserController {
 
     @GetMapping("all")
     @Operation(summary = "Get all chat users", description = "Retrieves all users available for chat with the authenticated user")
-    public ResponseEntity<List<User>> getAllChatUsers(Authentication authentication, HttpServletRequest request) {
+    public ResponseEntity<List<UserDto>> getAllChatUsers(Authentication authentication, HttpServletRequest request) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Fetching all chat users for logged user: {}", loggedUser.getId());
-        List<User> allContactsByUserId = chatUserService.getAllChatUsers(loggedUser, request);
+        List<UserDto> allContactsByUserId = chatUserService.getAllChatUsers(loggedUser, request);
         return new ResponseEntity<>(allContactsByUserId, HttpStatus.valueOf(200));
     }
 
@@ -57,11 +58,11 @@ public class ChatUserController {
 
 
     @PostMapping("add")
-    public ResponseEntity<Map<String, Object>> addNewChatUser(Authentication authentication, @RequestBody ContactDto contactDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> addNewChatUser(Authentication authentication, @RequestBody ContactRequest contactRequest, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Adding new chat user for logged user: {}", loggedUser.getId());
-        ChatUser chatUser = chatUserService.addNewChatUser(loggedUser, contactDto.getContactSlug(), "A");
+        ChatUserDto chatUser = chatUserService.addNewChatUser(loggedUser, contactRequest.getContactSlug(), "A");
         if (chatUser != null) {
             logger.debug("Chat user added successfully for user: {}", loggedUser.getId());
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_INSERTED);
@@ -76,11 +77,11 @@ public class ChatUserController {
 
 
     @PostMapping("remove")
-    public ResponseEntity<Map<String, Object>> removeChatUserAndHisChat(Authentication authentication, @RequestBody ContactDto contactDto, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> removeChatUserAndHisChat(Authentication authentication, @RequestBody ContactRequest contactRequest, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>();
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Removing Chat user for logged user: {}", loggedUser.getId());
-        int contact = chatUserService.removeChatUser(loggedUser, contactDto.getContactSlug(), contactDto.getDeleteChats());
+        int contact = chatUserService.removeChatUser(loggedUser, contactRequest.getContactSlug(), contactRequest.getDeleteChats());
         if (contact > 0) {
             logger.debug("Chat user removed successfully for user: {}", loggedUser.getId());
             result.put(ConstantResponseKeys.MESSAGE, ResponseMessages.YOUR_CHAT_USER_HAS_BEEN_SUCCESSFULLY_REMOVED);
@@ -95,14 +96,14 @@ public class ChatUserController {
 
 
     @PostMapping("/accept")
-    public ResponseEntity<Map<String, Object>> updateChatAcceptStatus(Authentication authentication, HttpServletRequest request, @RequestBody ChatUserDto chatUserDto) {
+    public ResponseEntity<Map<String, Object>> updateChatAcceptStatus(Authentication authentication, HttpServletRequest request, @RequestBody ChatUserRequest chatUserRequest) {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         logger.debug("Updating chat accept status for user: {}", loggedUser.getId());
         Map<String, Object> result = new HashMap<>();
 
-        boolean accepted = chatUserService.updateAcceptStatus(loggedUser.getId(), chatUserDto.getReceiverSlug(), chatUserDto.getStatus());
+        boolean accepted = chatUserService.updateAcceptStatus(loggedUser.getId(), chatUserRequest.getReceiverSlug(), chatUserRequest.getStatus());
         String status = "accepted";
-        if (!Utils.isEmpty(chatUserDto.getReceiverSlug()) && chatUserDto.getReceiverSlug().equals("R")) {
+        if (!Utils.isEmpty(chatUserRequest.getReceiverSlug()) && chatUserRequest.getReceiverSlug().equals("R")) {
             status = "declined";
         }
         if (accepted) {

@@ -10,13 +10,9 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ContactDto {
-
-
+public class ContactRequest {
     Integer id;
     Integer userId;
     String contactSlug;
     Boolean deleteChats;
-
-
 }

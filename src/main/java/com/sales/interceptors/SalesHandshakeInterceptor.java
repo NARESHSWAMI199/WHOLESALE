@@ -1,6 +1,7 @@
 package com.sales.interceptors;
 
 import com.sales.wholesaler.services.WholesaleUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -9,6 +10,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
 
+@Slf4j
 public class SalesHandshakeInterceptor implements HandshakeInterceptor {
 
     WholesaleUserService wholesaleUserService = null;
@@ -25,6 +27,7 @@ public class SalesHandshakeInterceptor implements HandshakeInterceptor {
         // Extract username from request (e.g., from a custom header)
 //        String username = extractUsernameFromRequest(request);
         String userSlug = request.getURI().getQuery();
+        System.err.println("The user slug beforeHandshake : "+userSlug);
         // Store username in session attributes
         if (userSlug != null) {
             attributes.put("username", userSlug);
@@ -40,6 +43,7 @@ public class SalesHandshakeInterceptor implements HandshakeInterceptor {
                                @NotNull WebSocketHandler wsHandler,
                                Exception exception) {
         // Optional: Perform actions after the handshake is complete
+        log.info("The user slug afterHandshake");
     }
 
     private String extractUsernameFromRequest(ServerHttpRequest request) {

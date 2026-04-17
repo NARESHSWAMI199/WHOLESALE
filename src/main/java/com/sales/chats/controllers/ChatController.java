@@ -1,5 +1,7 @@
 package com.sales.chats.controllers;
 
+import com.sales.chats.dto.UserDto;
+import com.sales.chats.mapper.UserMapperForChat;
 import com.sales.chats.services.ChatService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
@@ -25,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
@@ -42,6 +45,8 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatService chatService;
     private final WholesaleUserService wholesaleUserService;
+    private final UserMapperForChat userMapper;
+
     @Value("${chat.get}")
     String filePath;
 
@@ -108,11 +113,26 @@ public class ChatController {
         return new ResponseEntity<>(result, HttpStatus.valueOf(200));
     }
 
+    @Transactional
     @GetMapping("/chat/status/{slug}")
-    public ResponseEntity<User> getUserStatus(@PathVariable String slug) {
+    public ResponseEntity<UserDto> getUserStatus(@PathVariable String slug) {
         logger.debug("Getting user status for slug: {}", slug);
         User user = GlobalConstant.onlineUsers.getOrDefault(slug, new User());
-        return new ResponseEntity<>(user, HttpStatus.valueOf(200));
+        UserDto userDto = UserDto.builder()
+                .slug(user.getSlug())
+                .avatar(user.getAvatar())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .contact(user.getContact())
+                .userType(user.getUserType())
+                .status(user.getStatus())
+                .activePlan(user.getActivePlan())
+                .lastSeen(user.getLastSeen())
+                .updatedAt(user.getUpdatedAt())
+                .createdAt(user.getCreatedAt())
+                .build();
+
+        return new ResponseEntity<>(userDto, HttpStatus.valueOf(200));
     }
 
     @PostMapping("/chat/seen")

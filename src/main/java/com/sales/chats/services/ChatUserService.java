@@ -1,5 +1,9 @@
 package com.sales.chats.services;
 
+import com.sales.chats.dto.ChatUserDto;
+import com.sales.chats.dto.UserDto;
+import com.sales.chats.mapper.ChatUserMapper;
+import com.sales.chats.mapper.UserMapperForChat;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
 import com.sales.chats.repositories.ChatUserHbRepository;
@@ -33,8 +37,11 @@ public class ChatUserService {
     private final WholesaleUserRepository wholesaleUserRepository;
     private final ChatUserHbRepository chatUserHbRepository;
     private final BlockListService blockListService;
+    private final ChatUserMapper chatUserMapper;
+    private final UserMapperForChat userMapperForChat;
 
-    public List<User> getAllChatUsers(AuthUser loggedUser, HttpServletRequest request) {
+    @Transactional
+    public List<UserDto> getAllChatUsers(AuthUser loggedUser, HttpServletRequest request) {
         logger.debug("Starting getAllChatUsers method and the user id : {}", loggedUser.getId());
         List<ChatUser> chatUserList = chatUserRepository.getChatUserByUserId(loggedUser.getId()).stream().filter(chatUser -> chatUser.getChatUser() != null).toList();
         List<User> userList = chatUserList.stream().map(ChatUser::getChatUser).toList();
@@ -48,7 +55,7 @@ public class ChatUserService {
             }
         }
         logger.debug("Completed getAllChatUsers method");
-        return userList;
+        return userList.stream().map(userMapperForChat::toDto).toList();
     }
 
     public ChatUser addNewChatUser(AuthUser sender, AuthUser receiver, String status) {
@@ -68,7 +75,8 @@ public class ChatUserService {
         return savedChatUser;
     }
 
-    public ChatUser addNewChatUser(AuthUser sender, String receiverSlug, String status) {
+     @Transactional
+    public ChatUserDto addNewChatUser(AuthUser sender, String receiverSlug, String status) {
         logger.debug("Starting addNewChatUser method with receiverSlug");
         User receiver = wholesaleUserRepository.findUserBySlug(receiverSlug);
         if (receiver == null) {
@@ -78,7 +86,7 @@ public class ChatUserService {
         ChatUser userFound = chatUserRepository.findByUserIdAndChatUser(sender.getId(), receiver);
         if (userFound != null) {
             logger.debug("ChatUser already exists, returning existing user");
-            return userFound;
+            return chatUserMapper.toDto(userFound);
         }
 
         ChatUser chatUser = ChatUser.builder()
@@ -88,7 +96,7 @@ public class ChatUserService {
                 .build();
         ChatUser savedChatUser = chatUserRepository.save(chatUser); // Create operation
         logger.debug("Completed addNewChatUser method with receiverSlug");
-        return savedChatUser;
+        return chatUserMapper.toDto(savedChatUser);
     }
 
     public boolean updateAcceptStatus(Integer userId, String receiverSlug, String status) {

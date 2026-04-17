@@ -54,6 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain)
             throws ServletException, IOException {
+        log.info("The request url : {}",request.getRequestURL() + request.getQueryString());
         String authHeader = request.getHeader(GlobalConstant.AUTHORIZATION);
         log.info("The request token : {}", authHeader);
         if (authHeader != null && authHeader.startsWith(GlobalConstant.AUTH_TOKEN_PREFIX)) {

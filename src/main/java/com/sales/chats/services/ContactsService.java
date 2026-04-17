@@ -1,5 +1,9 @@
 package com.sales.chats.services;
 
+import com.sales.chats.dto.ContactDto;
+import com.sales.chats.dto.UserDto;
+import com.sales.chats.mapper.ContactMapper;
+import com.sales.chats.mapper.UserMapperForChat;
 import com.sales.chats.repositories.ChatHbRepository;
 import com.sales.chats.repositories.ChatRepository;
 import com.sales.chats.repositories.ContactRepository;
@@ -31,8 +35,12 @@ public class ContactsService {
     private final ChatRepository chatRepository;
     private final WholesaleUserRepository wholesaleUserRepository;
     private final ChatHbRepository chatHbRepository;
+    private final ContactMapper contactMapper;
+    private final UserMapperForChat userMapper;
 
-    public List<User> getAllContactsByUserId(AuthUser loggedUser, HttpServletRequest request) {
+
+    @Transactional
+    public List<UserDto> getAllContactsByUserId(AuthUser loggedUser, HttpServletRequest request) {
         logger.debug("Starting getAllContactsByUserId method");
         List<User> userList = contactRepository.getContactByUserId(loggedUser.getId()).stream().filter(Objects::nonNull).toList();
         for (User user : userList) {
@@ -45,10 +53,12 @@ public class ContactsService {
             //user.setAccepted(chatUserRepository.getSenderAcceptStatus(loggedUser.getId(),user));
         }
         logger.debug("Completed getAllContactsByUserId method");
-        return userList;
+        return userList.stream().map(userMapper::toDto).toList();
     }
 
-    public Contact addNewContact(AuthUser loggedUser, String contactSlug) {
+
+    @Transactional
+    public ContactDto addNewContact(AuthUser loggedUser, String contactSlug) {
         logger.debug("Starting addNewContact method loggedUser slug : {} and contactSlug : {}", loggedUser.getSlug(), contactSlug);
         // TODO : check if user already in contact list not chat list
 //        Integer userFound = chatRepository.isUserExistsInChatList(loggedUser.getSlug(), contactSlug);
@@ -67,7 +77,7 @@ public class ContactsService {
                 .build();
         Contact savedContact = contactRepository.save(contacts); // Create operation
         logger.debug("Completed addNewContact method");
-        return savedContact;
+        return contactMapper.toDto(savedContact);
     }
 
     @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
