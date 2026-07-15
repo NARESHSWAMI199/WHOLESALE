@@ -24,8 +24,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,5 +218,21 @@ public class Utils {
         if (input == null) return "null";
         return input.replaceAll("[^a-zA-Z0-9-]", "_");
     }
+
+    public static int convertToFullYear(int shortYear) {
+        // Standard rule: 00-29 is 2000s, 30-99 is 1900s
+        return (shortYear < 30) ? (2000 + shortYear) : (1900 + shortYear);
+    }
+
+    public static String getMonthName(int month) {
+        logger.debug("Entering getMonthName with month: {}", month);
+        if (month <= 0 || month > 12) {
+            return null;
+        }
+        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, new Locale("eng"));
+        logger.debug("Exiting getMonthName");
+        return monthName;
+    }
+
 
 }

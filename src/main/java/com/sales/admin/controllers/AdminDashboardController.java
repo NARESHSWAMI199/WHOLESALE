@@ -1,5 +1,6 @@
 package com.sales.admin.controllers;
 
+import com.sales.admin.services.ServicePlanService;
 import com.sales.admin.services.StoreService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
@@ -28,6 +29,7 @@ public class AdminDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
     private final UserService userService;
     private final StoreService storeService;
+    private final ServicePlanService servicePlanService;
 
     @GetMapping("/counts")
     @PreAuthorize("hasAuthority('dashboard.count')")
@@ -54,6 +56,18 @@ public class AdminDashboardController {
         Map<String, Object> responseObj = new HashMap<>();
         responseObj.put(ConstantResponseKeys.RES, storeService.getStoreCountByMonths(graphRequest));
         responseObj.put(ConstantResponseKeys.STATUS, 200);
+        return new ResponseEntity<>(responseObj, HttpStatus.OK);
+    }
+
+
+    @GetMapping("sales/performance/{year}")
+    @Operation(summary = "Fetch current month revenue", description = "Get revenue by months and years")
+    public ResponseEntity<Map<String,Object>> getReportByShortYear(@PathVariable Integer year) {
+        logger.info("Started the getReportByShortYear");
+        Map<String, Object> responseObj = new HashMap<>();
+        responseObj.put(ConstantResponseKeys.RES, servicePlanService.getReportByShortYear(year));
+        responseObj.put(ConstantResponseKeys.STATUS, 200);
+        logger.info("Ended the getReportByShortYear");
         return new ResponseEntity<>(responseObj, HttpStatus.OK);
     }
 }

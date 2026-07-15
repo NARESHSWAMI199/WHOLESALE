@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -110,6 +111,28 @@ public class ServicePlanController {
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String, Object> result = servicePlanService.deletedServicePlan(deleteRequest, loggedUser);
         return new ResponseEntity<>(result, HttpStatus.valueOf((Integer) result.get(ConstantResponseKeys.STATUS)));
+    }
+
+
+
+    @PreAuthorize("hasAuthority('service-plans.sold')")
+    @GetMapping("/most-sold")
+    @Operation(summary = "Fetch most sold service plan", description = "Get all service plans with sold numbers.")
+    public ResponseEntity<List<Map<String, Object>>> mostSoldPlans(){
+        logger.info("Started the mostSoldPlans");
+        List<Map<String, Object>> mostSold = servicePlanService.mostSoldServicePlans();
+        logger.info("Ended the mostSoldPlans");
+        return new ResponseEntity<>(mostSold,HttpStatus.OK);
+    }
+
+
+    @GetMapping("/current-month-revenue")
+    @Operation(summary = "Fetch current month revenue", description = "Get revenue by months and years")
+    public ResponseEntity<Long> getCurrentMonthRevenue(){
+        logger.info("Started the getCurrentMonthRevenue");
+        Long totalRevenue = servicePlanService.getCurrentMonthRevenue();
+        logger.info("Ended the getCurrentMonthRevenue");
+        return new ResponseEntity<>(totalRevenue,HttpStatus.OK);
     }
 
 }

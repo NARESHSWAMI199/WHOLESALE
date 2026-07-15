@@ -1,6 +1,7 @@
 package com.sales.admin.services;
 
 
+import com.sales.admin.dto.MonthlyRevenueProjection;
 import com.sales.admin.dto.PlanDto;
 import com.sales.admin.dto.ServicePlanDto;
 import com.sales.admin.mapper.PlanMapper;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
@@ -183,6 +186,35 @@ public class ServicePlanService {
             result.put(ConstantResponseKeys.STATUS, 404);
         }
         logger.debug("Exiting deletedServicePlan with result: {}", result);
+        return result;
+    }
+
+
+    public List<Map<String, Object>> mostSoldServicePlans() {
+        return wholesalerPlansRepository.getMostSoldPlans();
+    }
+
+    public Long getCurrentMonthRevenue() {
+        long firstOfMonthLong = LocalDate.now()
+                .withDayOfMonth(1)
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
+        return wholesalerPlansRepository.currentMonthRevenue(firstOfMonthLong);
+    }
+
+
+    public LinkedHashMap<String, Object> getReportByShortYear(int shortYear) {
+        int fullYear = (shortYear < 100) ? Utils.convertToFullYear(shortYear) : shortYear;
+        int[] months = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12};
+        List<MonthlyRevenueProjection> yearlyRevenueAccordingMonth = wholesalerPlansRepository.getYearlyRevenueByMonth(fullYear);
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>();
+        for (int month : months) {
+            result.put(Utils.getMonthName(month), 0);
+        }
+        for (MonthlyRevenueProjection mrp : yearlyRevenueAccordingMonth) {
+            result.put(Utils.getMonthName(mrp.getMonth()), mrp.getTotalRevenue());
+        }
         return result;
     }
 

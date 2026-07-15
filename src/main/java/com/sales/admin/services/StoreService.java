@@ -115,21 +115,13 @@ public class StoreService {
         Integer year = graphRequest.getYear();
         Map<String, Object> monthsObj = new LinkedHashMap<>();
         for (Integer month : months) {
-            monthsObj.put(getMonthName(month), storeRepository.totalStoreViaMonth(month, year));
+            monthsObj.put(Utils.getMonthName(month), storeRepository.totalStoreViaMonth(month, year));
         }
         logger.debug("Exiting getStoreCountByMonths");
         return monthsObj;
     }
 
-    public String getMonthName(int month) {
-        logger.debug("Entering getMonthName with month: {}", month);
-        if (month <= 0 || month > 12) {
-            return null;
-        }
-        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, new Locale("eng"));
-        logger.debug("Exiting getMonthName");
-        return monthName;
-    }
+
 
     public void validateRequiredFieldsForStore(StoreCreationRequest storeCreationRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Entering validateRequiredFieldsForStore with storeCreationRequest: {}", storeCreationRequest);

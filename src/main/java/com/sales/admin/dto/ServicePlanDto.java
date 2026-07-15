@@ -12,6 +12,7 @@ public record ServicePlanDto(
         String status,
         String icon,
         Integer months,
-        String description
+        String description,
+        Long createdAt
 ) {
 }
