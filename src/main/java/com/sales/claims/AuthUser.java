@@ -2,6 +2,7 @@ package com.sales.claims;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 public interface AuthUser {

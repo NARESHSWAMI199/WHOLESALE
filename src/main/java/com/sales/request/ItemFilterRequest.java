@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @ToString
-public class ItemFilterRequest extends SearchFilters {
+public class ItemFilterRequest extends SearchFilters implements Serializable {
     private String slug;
     private String status;
     private String storeSlug;

@@ -1,6 +1,8 @@
 package com.sales.admin.services;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sales.admin.dto.CategoryDto;
@@ -28,6 +30,14 @@ import com.sales.utils.WriteExcelUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
@@ -63,6 +73,7 @@ public class ItemService {
     private final ItemMapper itemMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
+    private final JobLauncher jobLauncher;
     @Value("${item.absolute}")
     String itemImagePath;
 
@@ -627,4 +638,34 @@ public class ItemService {
         logger.debug("Exiting getAllMeasurementUnit with result: {}", result);
         return result;
     }
+
+    public List<ItemDto>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
+        logger.info("Entering fetchDataForExcelSheet with searchFilters: {}", searchFilters);
+        Integer storeId = !Utils.isEmpty(wholesaleSlug) ? storeRepository.getStoreIdByStoreSlug(wholesaleSlug) : null;
+        Specification<Item> specification = Specification.allOf(
+                containsName(searchFilters.getSearchKey().trim())
+                        .and(isWholesale(storeId, loggedUser.getUserType()))
+                        .and(isStatus(searchFilters.getStatus()))
+                        .and(inStock(searchFilters.getInStock()))
+                        .and(greaterThanOrEqualFromDate(searchFilters.getFromDate()))
+                        .and(lessThanOrEqualToToDate(searchFilters.getToDate()))
+        );
+        logger.info("Ended fetchDataForExcelSheet");
+        Pageable pageable = PageRequest.of(searchFilters.getPageNumber(), searchFilters.getSize());
+        return itemRepository.findAll(specification,pageable).stream().map(itemMapper::toDto).toList();
+    }
+
+    public void writeAnExcelFileUsingSpringBatch(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser,Job exportExcelJob) throws JsonProcessingException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        String filtersJson = objectMapper.writeValueAsString(searchFilters);
+            String loggedUserJson = objectMapper.writeValueAsString(loggedUser);
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addString("wholesaleSlug", (wholesaleSlug != null) ?  wholesaleSlug : "")
+                    .addString("searchFiltersJson", filtersJson)
+                    .addString("loggedUserJson", loggedUserJson)
+                    .toJobParameters();
+            jobLauncher.run(exportExcelJob, jobParameters);
+    }
+
+
 }

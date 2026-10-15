@@ -3,8 +3,7 @@ package com.sales.utils;
 import com.sales.admin.repositories.ItemHbRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +36,7 @@ public class WriteExcelUtil {
             List<String> headers,
             String folderName) throws IOException {
 
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(100)) {
             Sheet sheet = workbook.createSheet("Items");
             applyDefaultColumnWidths(sheet);
 
@@ -55,7 +54,7 @@ public class WriteExcelUtil {
 
     public String writeNotUpdatedItemsExcel(List<ItemHbRepository.ItemUpdateError> data, List<String> headers, String folderName) throws IOException {
 
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(100)) {
             Sheet sheet = workbook.createSheet("Items");
             applyDefaultColumnWidths(sheet);
 
@@ -76,12 +75,12 @@ public class WriteExcelUtil {
         sheet.setColumnWidth(1, 4000);
     }
 
-    private CellStyle createHeaderStyle(XSSFWorkbook workbook) {
+    private CellStyle createHeaderStyle(SXSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        XSSFFont font = workbook.createFont();
+        Font font = workbook.createFont();
         font.setFontName("Arial");
         font.setColor(IndexedColors.WHITE.getIndex());
         font.setFontHeightInPoints((short) 10);
@@ -91,7 +90,7 @@ public class WriteExcelUtil {
         return style;
     }
 
-    private CellStyle createDataStyle(XSSFWorkbook workbook) {
+    private CellStyle createDataStyle(SXSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
         style.setWrapText(true);
         return style;
@@ -203,7 +202,7 @@ public class WriteExcelUtil {
         }
     }
 
-    private String saveWorkbook(XSSFWorkbook workbook, String folderName) throws IOException {
+    private String saveWorkbook(SXSSFWorkbook workbook, String folderName) throws IOException {
         Path basePath = Paths.get(excelExportAbsolutePath);
         Path targetDir = basePath.resolve(folderName).normalize();
 
@@ -225,7 +224,7 @@ public class WriteExcelUtil {
     }
 
 
-    private String saveWorkbookForNotUpdated(XSSFWorkbook workbook, String folderName) throws IOException {
+    private String saveWorkbookForNotUpdated(SXSSFWorkbook workbook, String folderName) throws IOException {
         File directory = new File(getExcelNotUpdateItemsFolderPath + folderName);
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
@@ -245,6 +244,5 @@ public class WriteExcelUtil {
 
         return fileName;
     }
-
 
 }

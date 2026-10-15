@@ -28,6 +28,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -60,6 +62,8 @@ public class ItemController {
     private final ReadExcel readExcel;
     private final ItemReportService itemReportService;
     private final ItemReviewService itemReviewService;
+    private final Job exportExcelJob;
+
     @Value("${item.get}")
     String filePath;
     @Value("${excel.update.template}")
@@ -434,6 +438,41 @@ public class ItemController {
         Page<ItemReviewDto> itemReviewDtoPage = itemReviewService.getAllItemReview(itemReviewsFilterRequest);
         return new ResponseEntity<>(itemReviewDtoPage, HttpStatus.OK);
     }
+
+
+    @PostMapping(value = {"/exportExcelBatch/{wholesaleSlug}", "exportExcelBatch"})
+    @PreAuthorize("hasAuthority('item.export')")
+    @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
+    public ResponseEntity<Object> exportItemsUsingSpringBatch(Authentication authentication, @PathVariable(required = false) String wholesaleSlug, @RequestBody ItemFilterRequest searchFilters, HttpServletRequest request) {
+        logger.debug("Exporting items to Excel for wholesaleSlug: {}", wholesaleSlug);
+        AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
+        Map<String, Object> responseObj = new HashMap<>();
+        try {
+            Store wholesale = storeService.getStoreDetails(wholesaleSlug);
+            if (wholesale != null || loggedUser.getUserType().equals(USER_TYPES.SUPER_ADMIN.getType()) || loggedUser.getUserType().equals(USER_TYPES.STAFF.getType())) {
+                if (wholesale != null) {
+                    searchFilters.setStoreSlug(wholesaleSlug);
+                } else {
+                    logger.debug("Wholesale is not found and wholesaleSlug : {} so that's why we using logged user slug : {} instead wholesale slug ", wholesaleSlug, loggedUser.getSlug());
+                }
+                itemService.writeAnExcelFileUsingSpringBatch(searchFilters,wholesaleSlug,loggedUser,exportExcelJob);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_SUCCESSFULLY_DOWNLOADED);
+                responseObj.put(ConstantResponseKeys.STATUS, 202);
+            } else {
+                logger.debug("wholeSlug : {}", wholesaleSlug);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_NOT_EXIST);
+                responseObj.put(ConstantResponseKeys.STATUS, 500);
+            }
+        } catch (Exception e) {
+            responseObj.put(ConstantResponseKeys.MESSAGE, e.getMessage());
+            responseObj.put(ConstantResponseKeys.STATUS, 500);
+            logger.error("Exception during export excel : {}", e.getMessage(), e);
+        }
+        logger.debug("ENDED exportItemsFromExcel.");
+        return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
+    }
+
+
 
 
 }
