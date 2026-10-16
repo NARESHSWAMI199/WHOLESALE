@@ -3,6 +3,10 @@ server:
 
 
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+
   application:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -38,11 +42,22 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  # Producer configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer : org.springframework.kafka.support.serializer.JsonSerializer
+
+
+
 default:
   password: saleispower
 
 jwt:
   secret: saleispower
+
+
 
 
 aes:

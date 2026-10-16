@@ -7,13 +7,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sales.admin.dto.CategoryDto;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.dto.StoreNotificationDto;
 import com.sales.admin.dto.SubcategoryDto;
-import com.sales.admin.mapper.CategoryMapper;
-import com.sales.admin.mapper.ItemMapper;
-import com.sales.admin.mapper.SubcategoryMapper;
+import com.sales.admin.mapper.*;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
 import com.sales.entities.*;
+import com.sales.events.event.EventType;
+import com.sales.events.event.NotificationEvent;
+import com.sales.events.publisher.NotificationPublisher;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
@@ -30,20 +32,16 @@ import com.sales.utils.WriteExcelUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
 import org.springframework.dao.PermissionDeniedDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,9 +71,13 @@ public class ItemService {
     private final ItemMapper itemMapper;
     private final CategoryMapper categoryMapper;
     private final SubcategoryMapper subcategoryMapper;
-    private final JobLauncher jobLauncher;
+    private final StoreNotificationMapper storeNotificationMapper;
+    private final JobLauncher asyncJobLauncher;
+    private final NotificationPublisher notificationPublisher;
+    private final Job exportExcelJob;
     @Value("${item.absolute}")
     String itemImagePath;
+
 
 
     @Transactional
@@ -321,6 +323,7 @@ public class ItemService {
         storeNotifications.setWholesaleId(storeId);
         storeNotifications.setCreatedBy(User.builder().id(loggedUser.getId()).build());
         storeHbRepository.insertStoreNotifications(storeNotifications);
+        triggerNotification(storeNotificationMapper.toDto(storeNotifications));
         logger.debug("Exiting sendNotification");
     }
 
@@ -639,7 +642,7 @@ public class ItemService {
         return result;
     }
 
-    public List<ItemDto>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
+    public Page<ItemDto>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
         logger.info("Entering fetchDataForExcelSheet with searchFilters: {}", searchFilters);
         Integer storeId = !Utils.isEmpty(wholesaleSlug) ? storeRepository.getStoreIdByStoreSlug(wholesaleSlug) : null;
         Specification<Item> specification = Specification.allOf(
@@ -652,10 +655,13 @@ public class ItemService {
         );
         logger.info("Ended fetchDataForExcelSheet");
         Pageable pageable = PageRequest.of(searchFilters.getPageNumber(), searchFilters.getSize());
-        return itemRepository.findAll(specification,pageable).stream().map(itemMapper::toDto).toList();
+        Page<Item> itemPage = itemRepository.findAll(specification, pageable);
+        List<ItemDto> list = itemPage.stream().map(itemMapper::toDto).toList();
+        return new PageImpl<>(list, pageable, itemPage.getTotalElements());
+
     }
 
-    public void writeAnExcelFileUsingSpringBatch(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser,Job exportExcelJob) throws JsonProcessingException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public Long writeAnExcelFileUsingSpringBatch(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) throws JsonProcessingException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         final ObjectMapper objectMapper = new ObjectMapper();
         String filtersJson = objectMapper.writeValueAsString(searchFilters);
             String loggedUserJson = objectMapper.writeValueAsString(loggedUser);
@@ -664,7 +670,20 @@ public class ItemService {
                     .addString("searchFiltersJson", filtersJson)
                     .addString("loggedUserJson", loggedUserJson)
                     .toJobParameters();
-            jobLauncher.run(exportExcelJob, jobParameters);
+        JobExecution run = asyncJobLauncher.run(exportExcelJob, jobParameters);
+        if (run.getStatus() == BatchStatus.COMPLETED) {
+            logger.info("Export Excel Job has been completed successfully");
+            Integer storeId = storeRepository.getStoreIdByStoreSlug(wholesaleSlug);
+            sendNotification("File export is completed.", "File is ready to download.",storeId,loggedUser);
+        }
+        return run.getId();
+    }
+    private void triggerNotification(StoreNotificationDto storeNotification){
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .eventType(EventType.NOTIFICATION)
+                .notification(storeNotification)
+                .build();
+        notificationPublisher.sendNotification(notificationEvent);
     }
 
 

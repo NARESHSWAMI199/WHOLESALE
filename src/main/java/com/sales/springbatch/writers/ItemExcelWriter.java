@@ -1,9 +1,10 @@
-package com.sales.writers;
+package com.sales.springbatch.writers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sales.admin.dto.ItemDto;
 import com.sales.admin.repositories.ItemHbRepository;
+import com.sales.admin.services.ExcelSheetProgressService;
 import com.sales.claims.AuthUser;
 import com.sales.global.GlobalConstant;
 import com.sales.utils.Utils;
@@ -38,8 +39,6 @@ public class ItemExcelWriter implements ItemStreamWriter<ItemDto> {
     private final List<String> headers = GlobalConstant.HEADERS_FOR_ITEMS;
     private final String wholesaleSlug;
     private final AuthUser loggedUser;
-
-
 
     private SXSSFWorkbook workbook;
     private Sheet sheet;
@@ -120,7 +119,7 @@ public class ItemExcelWriter implements ItemStreamWriter<ItemDto> {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
-                try { workbook.close(); } catch (IOException ignored) {}
+                try {workbook.close();} catch (IOException ex) {logger.warn("Error closing Excel File : {}", filePath , ex);}
             }
             logger.info("Workbook closed.");
         }

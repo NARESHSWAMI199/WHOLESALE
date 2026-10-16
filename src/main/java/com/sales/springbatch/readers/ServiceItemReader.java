@@ -1,4 +1,4 @@
-package com.sales.readers;
+package com.sales.springbatch.readers;
 
 import com.sales.admin.dto.ItemDto;
 import com.sales.admin.repositories.ItemRepository;
@@ -7,10 +7,12 @@ import com.sales.claims.AuthUser;
 import com.sales.entities.Item;
 import com.sales.request.ItemFilterRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.data.domain.Page;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,18 +27,23 @@ public class ServiceItemReader implements ItemReader<ItemDto> {
      */
     private Iterator<ItemDto> itemChunksIterator;
 
-
     private final ItemService itemService;
     private final ItemFilterRequest searchFilters;
     private final String wholesaleSlug;
     private final AuthUser loggedUser;
+    private final StepExecution stepExecution;
 
     @Override
     public ItemDto read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         if (itemChunksIterator == null || !itemChunksIterator.hasNext()) {
             searchFilters.setPageNumber(pageNo);
             searchFilters.setSize(100);
-            List<ItemDto> items = itemService.fetchDataForExcelSheet(searchFilters, wholesaleSlug, loggedUser);
+            Page<ItemDto> itemPage = itemService.fetchDataForExcelSheet(searchFilters, wholesaleSlug, loggedUser);
+            List<ItemDto> items = itemPage.getContent();
+            if(pageNo == 0){
+                long totalElements = itemPage.getTotalElements();
+                stepExecution.getJobExecution().getExecutionContext().putLong("totalItems", totalElements);
+            }
             if (items.isEmpty()) {
                 return null;
             }

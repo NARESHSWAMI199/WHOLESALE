@@ -2,10 +2,7 @@ package com.sales.admin.controllers;
 
 import com.sales.admin.dto.*;
 import com.sales.admin.repositories.ItemHbRepository;
-import com.sales.admin.services.ItemReportService;
-import com.sales.admin.services.ItemReviewService;
-import com.sales.admin.services.ItemService;
-import com.sales.admin.services.StoreService;
+import com.sales.admin.services.*;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
 import com.sales.entities.MeasurementUnit;
@@ -39,6 +36,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -62,7 +60,7 @@ public class ItemController {
     private final ReadExcel readExcel;
     private final ItemReportService itemReportService;
     private final ItemReviewService itemReviewService;
-    private final Job exportExcelJob;
+    private final ExcelSheetProgressService excelSheetProgressService;
 
     @Value("${item.get}")
     String filePath;
@@ -440,6 +438,15 @@ public class ItemController {
     }
 
 
+    @GetMapping(value = "/progress/{jobId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamProgress(@PathVariable Long jobId) {
+        logger.debug("Fetching progress for jobId: {}", jobId);
+        SseEmitter emitter = new SseEmitter(0L);
+        excelSheetProgressService.registerSse(jobId, emitter);
+        return emitter;
+    }
+
+
     @PostMapping(value = {"/exportExcelBatch/{wholesaleSlug}", "exportExcelBatch"})
     @PreAuthorize("hasAuthority('item.export')")
     @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
@@ -455,8 +462,9 @@ public class ItemController {
                 } else {
                     logger.debug("Wholesale is not found and wholesaleSlug : {} so that's why we using logged user slug : {} instead wholesale slug ", wholesaleSlug, loggedUser.getSlug());
                 }
-                itemService.writeAnExcelFileUsingSpringBatch(searchFilters,wholesaleSlug,loggedUser,exportExcelJob);
-                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_SUCCESSFULLY_DOWNLOADED);
+                Long jobId = itemService.writeAnExcelFileUsingSpringBatch(searchFilters,wholesaleSlug,loggedUser);
+                responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_IN_PROGRESS);
+                responseObj.put("jobId",jobId);
                 responseObj.put(ConstantResponseKeys.STATUS, 202);
             } else {
                 logger.debug("wholeSlug : {}", wholesaleSlug);

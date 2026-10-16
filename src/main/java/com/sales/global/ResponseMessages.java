@@ -8,6 +8,7 @@ public class ResponseMessages {
     public static final String CHAT = "Chat";
     public static final String CHAT_ROOM_UPDATED_SUCCESSFULLY = "Chat room updated successfully";
     public static final String FILE_SUCCESSFULLY_DOWNLOADED = "File successfully downloaded.";
+    public static final String FILE_IN_PROGRESS= "File creation in progress.";
     public static final String FUTURE_PLAN_ACTIVATED_SUCCESSFULLY = "Future plan activated successfully.";
     public static final String INEFFICIENT_AMOUNT_IN_WALLET = "Inefficient amount in wallet.";
     public static final String ITEM_NOT_FOUND = "Item Not Found";

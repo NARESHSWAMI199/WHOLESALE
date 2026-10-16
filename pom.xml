@@ -49,6 +49,13 @@
             <artifactId>spring-boot-starter-batch</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
+
         <!-- Very important - add this! -->
         <dependency>
             <groupId>org.flywaydb</groupId>

@@ -1,6 +1,7 @@
 package com.sales.config.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sales.exceptions.MyException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
