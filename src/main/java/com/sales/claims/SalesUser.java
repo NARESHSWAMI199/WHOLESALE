@@ -67,5 +67,7 @@ public class SalesUser implements AuthUser {
         return user.getAvatar();
     }
 
+    @Override
+    public String getFcmToken(){return user.getFcmToken();}
 
 }

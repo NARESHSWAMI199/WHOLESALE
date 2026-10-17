@@ -589,4 +589,11 @@ public class UserService {
         }
     }
 
+    public void insertOrUpdateUserFCMToken(String fcmToken, AuthUser loginUser) {
+        User cacheUser = userCacheService.getCacheUser(loginUser.getSlug());
+        cacheUser.setFcmToken(fcmToken);
+        userCacheService.saveCacheUser(cacheUser);
+        userRepository.save(cacheUser);
+    }
+
 }

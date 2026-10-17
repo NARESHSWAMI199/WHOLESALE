@@ -26,4 +26,7 @@ public interface AuthUser {
     boolean isEnabled();
 
     String getAvatar();
+    default String fcmToken(){return null;}
+
+    String getFcmToken();
 }

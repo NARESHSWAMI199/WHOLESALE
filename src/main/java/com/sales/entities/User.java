@@ -77,6 +77,8 @@ public class User implements AuthUser, Serializable {
     private Integer activePlan;
     @Column(name = "last_seen")
     private Long lastSeen;
+    @Column(name = "fcm_token")
+    private String fcmToken;
     @ManyToMany
     @JoinTable(
             name = "user_groups",

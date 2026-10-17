@@ -3,7 +3,7 @@ package com.sales.admin.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record StoreNotificationDto(
         long id,

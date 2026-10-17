@@ -18,7 +18,8 @@ public record UserDto(
         String status,
         Integer activePlan,
         Long lastSeen,
-        Long createdAt
+        Long createdAt,
+        String fcmToken
 ) {
 
 }

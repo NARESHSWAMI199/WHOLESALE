@@ -1,5 +1,7 @@
 package com.sales.events.event;
 
 public enum EventType {
-    NOTIFICATION
+    EMAIL,
+    PUSH_NOTIFICATION,
+    SMS
 }

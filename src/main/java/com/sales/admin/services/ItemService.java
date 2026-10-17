@@ -75,6 +75,8 @@ public class ItemService {
     private final JobLauncher asyncJobLauncher;
     private final NotificationPublisher notificationPublisher;
     private final Job exportExcelJob;
+    private final UserMapper userMapper;
+
     @Value("${item.absolute}")
     String itemImagePath;
 
@@ -315,7 +317,7 @@ public class ItemService {
     }
 
 
-    public void sendNotification(String title, String messageBody, int storeId, AuthUser loggedUser) {
+    public void sendNotification(String title, String messageBody, Integer storeId, AuthUser loggedUser) {
         logger.debug("Entering sendNotification with title: {}, messageBody: {}, storeId: {}, loggedUser: {}", title, messageBody, storeId, loggedUser);
         StoreNotifications storeNotifications = new StoreNotifications();
         storeNotifications.setTitle(title);
@@ -323,7 +325,7 @@ public class ItemService {
         storeNotifications.setWholesaleId(storeId);
         storeNotifications.setCreatedBy(User.builder().id(loggedUser.getId()).build());
         storeHbRepository.insertStoreNotifications(storeNotifications);
-        triggerNotification(storeNotificationMapper.toDto(storeNotifications));
+        triggerNotification(storeNotificationMapper.toDto(storeNotifications),loggedUser);
         logger.debug("Exiting sendNotification");
     }
 
@@ -671,17 +673,13 @@ public class ItemService {
                     .addString("loggedUserJson", loggedUserJson)
                     .toJobParameters();
         JobExecution run = asyncJobLauncher.run(exportExcelJob, jobParameters);
-        if (run.getStatus() == BatchStatus.COMPLETED) {
-            logger.info("Export Excel Job has been completed successfully");
-            Integer storeId = storeRepository.getStoreIdByStoreSlug(wholesaleSlug);
-            sendNotification("File export is completed.", "File is ready to download.",storeId,loggedUser);
-        }
         return run.getId();
     }
-    private void triggerNotification(StoreNotificationDto storeNotification){
+    private void triggerNotification(StoreNotificationDto storeNotification,AuthUser loggedUser){
+        StoreNotificationDto build = storeNotification.toBuilder().createdBy(userMapper.toDto(loggedUser)).build();
         NotificationEvent notificationEvent = NotificationEvent.builder()
-                .eventType(EventType.NOTIFICATION)
-                .notification(storeNotification)
+                .eventType(EventType.PUSH_NOTIFICATION)
+                .notification(build)
                 .build();
         notificationPublisher.sendNotification(notificationEvent);
     }

@@ -101,6 +101,16 @@ class UtilsTest {
             public String getAvatar() {
                 return "";
             }
+
+            @Override
+            public String fcmToken() {
+                return AuthUser.super.fcmToken();
+            }
+
+            @Override
+            public String getFcmToken() {
+                return "";
+            }
         };
         // should throw because userType S and different slug
         assertThrows(org.springframework.dao.PermissionDeniedDataAccessException.class, () -> Utils.canUpdateAStaff("slug", "S", authUser));
@@ -154,6 +164,16 @@ class UtilsTest {
 
             @Override
             public String getAvatar() {
+                return "";
+            }
+
+            @Override
+            public String fcmToken() {
+                return AuthUser.super.fcmToken();
+            }
+
+            @Override
+            public String getFcmToken() {
                 return "";
             }
         };

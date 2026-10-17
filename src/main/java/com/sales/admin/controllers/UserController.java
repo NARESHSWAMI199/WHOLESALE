@@ -314,7 +314,6 @@ public class UserController {
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
-
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = @Content(schema = @Schema(example = """
                     {
@@ -331,6 +330,16 @@ public class UserController {
         logger.debug("Updating permissions for wholesaler with slug: {}", userRequest.getSlug());
         Map<String, Object> response = userService.updateWholesalerPermissions(userRequest);
         return new ResponseEntity<>(response, HttpStatus.valueOf((Integer) response.get(ConstantResponseKeys.STATUS)));
+    }
+
+
+    @PostMapping("fcmToken/register")
+    public ResponseEntity<Map<String, Object>> registerFCMToken(Authentication authentication,@RequestBody Map<String,String> data) {
+        logger.debug("Registering FCM token for user: {}", data.get("fcmToken"));
+        AuthUser loggedUser = (SalesUser)  authentication.getPrincipal();
+        String fcmToken = data.get("fcmToken");
+        userService.insertOrUpdateUserFCMToken(fcmToken,loggedUser);
+        return ResponseEntity.ok(Map.of(ConstantResponseKeys.STATUS, 202));
     }
 
 

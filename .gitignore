@@ -28,6 +28,8 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+/**/src/main/resources/firebase-service-account.json
+/**/src/main/resources/firebase-token-genrate.js
 
 ### VS Code ###
 .vscode/

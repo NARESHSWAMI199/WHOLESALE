@@ -19,7 +19,8 @@ public record UserDto(
         Long updatedAt,
         Long createdAt,
         Integer chatNotification,
-        String avatarUrl
+        String avatarUrl,
+        String fcmToken
 ) {
 
 }

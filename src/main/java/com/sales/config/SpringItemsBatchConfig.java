@@ -1,8 +1,10 @@
 package com.sales.config;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.repositories.StoreRepository;
 import com.sales.admin.services.ExcelSheetProgressService;
 import com.sales.admin.services.ItemService;
 import com.sales.claims.AuthUser;
@@ -56,8 +58,15 @@ public class SpringItemsBatchConfig {
 
     @Bean
     @JobScope
-    public ExcelJobCompleteListener excelJobCompleteListener(ExcelSheetProgressService registry) {
-        return new ExcelJobCompleteListener(registry);
+    public ExcelJobCompleteListener excelJobCompleteListener(
+            @Value("#{jobParameters['wholesaleSlug']}") String wholesaleSlug,
+            @Value("#{jobParameters['loggedUserJson']}") String loggedUserJson,
+            ExcelSheetProgressService registry,
+            StoreRepository storeRepository,
+            ItemService itemService
+    ) throws JsonProcessingException {
+        AuthUser loggedUser = objectMapper.readValue(loggedUserJson, User.class);
+        return new ExcelJobCompleteListener(registry,storeRepository,itemService,wholesaleSlug,loggedUser);
     }
 
 

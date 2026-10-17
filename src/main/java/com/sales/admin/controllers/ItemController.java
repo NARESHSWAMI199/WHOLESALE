@@ -25,8 +25,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -61,7 +61,7 @@ public class ItemController {
     private final ItemReportService itemReportService;
     private final ItemReviewService itemReviewService;
     private final ExcelSheetProgressService excelSheetProgressService;
-
+    private final JobExplorer jobExplorer;
     @Value("${item.get}")
     String filePath;
     @Value("${excel.update.template}")
@@ -439,11 +439,19 @@ public class ItemController {
 
 
     @GetMapping(value = "/progress/{jobId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter streamProgress(@PathVariable Long jobId) {
+    public ResponseEntity<SseEmitter> streamProgress(@PathVariable Long jobId) {
         logger.debug("Fetching progress for jobId: {}", jobId);
+
+        JobExecution execution = jobExplorer.getJobExecution(jobId);
+        if (execution == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if (!execution.isRunning()) {
+            return ResponseEntity.status(HttpStatus.GONE).body(null);
+        }
         SseEmitter emitter = new SseEmitter(0L);
         excelSheetProgressService.registerSse(jobId, emitter);
-        return emitter;
+        return ResponseEntity.ok(emitter);
     }
 
 
