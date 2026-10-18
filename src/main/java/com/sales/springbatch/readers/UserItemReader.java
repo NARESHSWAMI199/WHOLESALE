@@ -1,11 +1,13 @@
 package com.sales.springbatch.readers;
 
 import com.sales.admin.dto.ItemDto;
-import com.sales.admin.repositories.ItemRepository;
-import com.sales.admin.services.ItemService;
+import com.sales.admin.dto.UserDto;
+import com.sales.admin.mapper.UserMapper;
+import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
-import com.sales.entities.Item;
+import com.sales.entities.User;
 import com.sales.request.ItemFilterRequest;
+import com.sales.request.UserSearchFilters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemReader;
@@ -19,27 +21,27 @@ import java.util.List;
 
 
 @RequiredArgsConstructor
-public class ServiceItemReader implements ItemReader<ItemDto> {
+public class UserItemReader implements ItemReader<UserDto> {
 
     private int pageNo = 0;
     /** this will help to get 1 item at a time.
      because when itemReader call read method call its CHUNKS_NUMBER and only one item at once
      */
-    private Iterator<ItemDto> itemChunksIterator;
+    private Iterator<UserDto> itemChunksIterator;
 
-    private final ItemService itemService;
-    private final ItemFilterRequest searchFilters;
-    private final String wholesaleSlug;
+    private final UserService userService;
+    private final UserSearchFilters searchFilters;
     private final AuthUser loggedUser;
     private final StepExecution stepExecution;
+    private final UserMapper userMapper;
 
     @Override
-    public ItemDto read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public UserDto read() {
         if (itemChunksIterator == null || !itemChunksIterator.hasNext()) {
             searchFilters.setPageNumber(pageNo);
             searchFilters.setSize(100);
-            Page<ItemDto> itemPage = itemService.fetchDataForExcelSheet(searchFilters, wholesaleSlug, loggedUser);
-            List<ItemDto> items = itemPage.getContent();
+            Page<User> itemPage = userService.fetchDataForExcelSheet(searchFilters, loggedUser);
+            List<UserDto> items = itemPage.getContent().stream().map(userMapper::toDto).toList();
             if(pageNo == 0){
                 long totalElements = itemPage.getTotalElements();
                 stepExecution.getJobExecution().getExecutionContext().putLong("totalItems", totalElements);

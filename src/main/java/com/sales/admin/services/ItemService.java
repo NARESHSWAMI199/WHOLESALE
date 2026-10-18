@@ -37,11 +37,12 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
 import org.springframework.dao.PermissionDeniedDataAccessException;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +75,7 @@ public class ItemService {
     private final StoreNotificationMapper storeNotificationMapper;
     private final JobLauncher asyncJobLauncher;
     private final NotificationPublisher notificationPublisher;
-    private final Job exportExcelJob;
+    private final Map<String,Job> jobMap;
     private final UserMapper userMapper;
 
     @Value("${item.absolute}")
@@ -644,7 +645,7 @@ public class ItemService {
         return result;
     }
 
-    public Page<ItemDto>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
+    public Page<Item>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
         logger.info("Entering fetchDataForExcelSheet with searchFilters: {}", searchFilters);
         Integer storeId = !Utils.isEmpty(wholesaleSlug) ? storeRepository.getStoreIdByStoreSlug(wholesaleSlug) : null;
         Specification<Item> specification = Specification.allOf(
@@ -657,10 +658,7 @@ public class ItemService {
         );
         logger.info("Ended fetchDataForExcelSheet");
         Pageable pageable = PageRequest.of(searchFilters.getPageNumber(), searchFilters.getSize());
-        Page<Item> itemPage = itemRepository.findAll(specification, pageable);
-        List<ItemDto> list = itemPage.stream().map(itemMapper::toDto).toList();
-        return new PageImpl<>(list, pageable, itemPage.getTotalElements());
-
+        return itemRepository.findAll(specification, pageable);
     }
 
     public Long writeAnExcelFileUsingSpringBatch(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) throws JsonProcessingException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
@@ -672,7 +670,7 @@ public class ItemService {
                     .addString("searchFiltersJson", filtersJson)
                     .addString("loggedUserJson", loggedUserJson)
                     .toJobParameters();
-        JobExecution run = asyncJobLauncher.run(exportExcelJob, jobParameters);
+        JobExecution run = asyncJobLauncher.run(jobMap.get("exportProductExcelJob"), jobParameters);
         return run.getId();
     }
     private void triggerNotification(StoreNotificationDto storeNotification,AuthUser loggedUser){

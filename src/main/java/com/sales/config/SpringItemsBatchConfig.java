@@ -4,15 +4,25 @@ package com.sales.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sales.admin.dto.ItemDto;
+import com.sales.admin.dto.StoreDto;
+import com.sales.admin.mapper.ItemMapper;
+import com.sales.admin.mapper.StoreMapper;
+import com.sales.admin.mapper.UserMapper;
 import com.sales.admin.repositories.StoreRepository;
 import com.sales.admin.services.ExcelSheetProgressService;
 import com.sales.admin.services.ItemService;
+import com.sales.admin.services.StoreService;
+import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
 import com.sales.entities.User;
+import com.sales.request.ItemFilterRequest;
+import com.sales.request.StoreFilterRequest;
+import com.sales.request.UserSearchFilters;
 import com.sales.springbatch.listener.ExcelChunkProgressListener;
 import com.sales.springbatch.listener.ExcelJobCompleteListener;
-import com.sales.springbatch.readers.ServiceItemReader;
-import com.sales.request.ItemFilterRequest;
+import com.sales.springbatch.readers.ProductItemReader;
+import com.sales.springbatch.readers.StoreItemReader;
+import com.sales.springbatch.readers.UserItemReader;
 import com.sales.springbatch.writers.ItemExcelWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -25,12 +35,15 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -39,23 +52,42 @@ public class SpringItemsBatchConfig {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
+
     @Bean
-    public JobLauncher asyncJobLauncher(JobRepository jobRepository) throws Exception {
+    public TaskExecutor batchJobTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("batch-async-job-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+        return executor;
+    }
+
+
+    @Bean
+    public JobLauncher asyncJobLauncher(JobRepository jobRepository,TaskExecutor batchJobTaskExecutor) throws Exception {
         TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
         jobLauncher.setJobRepository(jobRepository);
-        // Yeh line batch job ko background thread par shift kar degi
-        jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        jobLauncher.setTaskExecutor(batchJobTaskExecutor);
         jobLauncher.afterPropertiesSet();
         return jobLauncher;
     }
 
 
+
+    // IT'S USING FOR SSE WHERE WE RETURNING THE FILE COMPLETION PROGRESS
     @Bean
     @JobScope
-    public ExcelChunkProgressListener progressListener(ExcelSheetProgressService registry) {
+    public ExcelChunkProgressListener chunkListener(ExcelSheetProgressService registry) {
         return new ExcelChunkProgressListener(registry);
     }
 
+
+    // IT'S USING FOR JOB COMPLETION STATUS WITH SSE EVENT
     @Bean
     @JobScope
     public ExcelJobCompleteListener excelJobCompleteListener(
@@ -70,12 +102,14 @@ public class SpringItemsBatchConfig {
     }
 
 
+
+    // WRITER WILL COMMON FOR ALL EXCEL SHEETS
     /**
      * Stop to call close method my spring framework because it will call close method auto during GC.
      *  but we close method called by batch, so I don't want spring framework call it before spring batch. */
     @Bean(destroyMethod = "")
     @StepScope
-    public ItemExcelWriter itemExcelWriter(
+    public ItemExcelWriter excelWriter(
             @Value("#{jobParameters['wholesaleSlug']}") String wholesaleSlug,
             @Value("#{jobParameters['loggedUserJson']}") String loggedUserJson) {
         try {
@@ -86,50 +120,172 @@ public class SpringItemsBatchConfig {
         }
     }
 
+
+    // READER FOR ITEMS
     @Bean
     @StepScope  // It will create or destroy itemReader in each batch.
-    public ServiceItemReader itemReader(
+    public ProductItemReader itemReader(
             @Value("#{jobParameters['wholesaleSlug']}") String wholesaleSlug,
             @Value("#{jobParameters['searchFiltersJson']}") String searchFiltersJson,
             @Value("#{jobParameters['loggedUserJson']}") String loggedUserJson,
             @Value("#{stepExecution}") StepExecution stepExecution,
-            ItemService itemService
+            ItemService itemService,
+            ItemMapper itemMapper
             ) {
             // take only string or long don't we object so.
         try {
             ItemFilterRequest filters = objectMapper.readValue(searchFiltersJson, ItemFilterRequest.class);
             AuthUser loggedUser = objectMapper.readValue(loggedUserJson, User.class);
 
-            return new ServiceItemReader(itemService, filters, wholesaleSlug, loggedUser,stepExecution);
+            return new ProductItemReader(itemService, filters, wholesaleSlug, loggedUser,stepExecution,itemMapper);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize Batch Reader parameters", e);
         }
     }
+
+
+
+    // READER FOR STORES
     @Bean
-    public Step exportExcelStep(JobRepository jobRepository,
-                                PlatformTransactionManager transactionManager,
-                                ItemReader<ItemDto> reader,
-                                ItemExcelWriter itemExcelWriter,
-                                ExcelChunkProgressListener progressListener
-                                ) {
-        return new StepBuilder("exportExcelStep",jobRepository)
+    @StepScope  // It will create or destroy itemReader in each batch.
+    public StoreItemReader storeReader(
+            @Value("#{jobParameters['wholesaleSlug']}") String wholesaleSlug,
+            @Value("#{jobParameters['searchFiltersJson']}") String searchFiltersJson,
+            @Value("#{jobParameters['loggedUserJson']}") String loggedUserJson,
+            @Value("#{stepExecution}") StepExecution stepExecution,
+            StoreService storeService,
+            StoreMapper storeMapper
+    ) {
+        // take only string or long don't we object so.
+        try {
+            StoreFilterRequest filters = objectMapper.readValue(searchFiltersJson, StoreFilterRequest.class);
+            return new StoreItemReader(storeService, filters,stepExecution,storeMapper);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize Batch Reader parameters", e);
+        }
+    }
+
+
+    // READER FOR USERS
+    @Bean
+    @StepScope  // It will create or destroy itemReader in each batch.
+    public UserItemReader userReader(
+            @Value("#{jobParameters['wholesaleSlug']}") String wholesaleSlug,
+            @Value("#{jobParameters['searchFiltersJson']}") String searchFiltersJson,
+            @Value("#{jobParameters['loggedUserJson']}") String loggedUserJson,
+            @Value("#{stepExecution}") StepExecution stepExecution,
+            UserService userService,
+            UserMapper userMapper
+    ) {
+        // take only string or long don't we object so.
+        try {
+            UserSearchFilters filters = objectMapper.readValue(searchFiltersJson, UserSearchFilters.class);
+            AuthUser loggedUser = objectMapper.readValue(loggedUserJson, User.class);
+
+            return new UserItemReader(userService, filters, loggedUser,stepExecution,userMapper);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize Batch Reader parameters", e);
+        }
+    }
+
+
+
+
+    /// /////////////////////////////////////////-----STEPS STEPS --------//////////////////////////////////////////
+
+    // JOB STEP FOR ITEMS
+    @Primary
+    @Bean("itemExcelStep")
+    public Step itemExportStep(JobRepository jobRepository,
+                               PlatformTransactionManager transactionManager,
+                               ProductItemReader reader,
+                               ItemExcelWriter excelWriter,
+                               ExcelChunkProgressListener chunkListener
+    ) {
+        return new StepBuilder("itemExcelStep",jobRepository)
                 .<ItemDto,ItemDto>chunk(1,transactionManager)
                 .reader(reader)
-                .writer(itemExcelWriter)
-                .listener(progressListener)
+                .writer(excelWriter)
+                .listener(chunkListener)
                 .build();
     }
 
-    @Bean
-    public Job exportExcelJob(JobRepository jobRepository,
-                             Step exportExcelStep,
+
+    // JOB STEP FOR STORE
+    @Bean("storeExcelStep")
+    public Step storeExportStep(JobRepository jobRepository,
+                               PlatformTransactionManager transactionManager,
+                               StoreItemReader reader,
+                               ItemExcelWriter excelWriter,
+                               ExcelChunkProgressListener chunkListener
+    ) {
+        return new StepBuilder("storeExcelStep",jobRepository)
+                .<StoreDto,StoreDto>chunk(1,transactionManager)
+                .reader(reader)
+                .writer(excelWriter)
+                .listener(chunkListener)
+                .build();
+    }
+
+
+    // JOB STEP FOR USERS
+    @Bean("userExcelStep")
+    public Step userExportStep(JobRepository jobRepository,
+                                PlatformTransactionManager transactionManager,
+                                UserItemReader reader,
+                                ItemExcelWriter excelWriter,
+                                ExcelChunkProgressListener chunkListener
+    ) {
+        return new StepBuilder("userExcelStep",jobRepository)
+                .chunk(1,transactionManager)
+                .reader(reader)
+                .writer(excelWriter)
+                .listener(chunkListener)
+                .build();
+    }
+
+
+
+    /// ///////////////////////////////------------ JOB STARTED FROM HERE -----------////////////////////////
+
+
+    // JOB FOR ITEMS
+    @Bean("exportProductExcelJob")
+    public Job exportProductExcelJob(JobRepository jobRepository,
+                             Step itemExportStep,
                               ExcelJobCompleteListener jobCompleteListener) {
-        return new JobBuilder("exportExcelJob",jobRepository)
-                .start(exportExcelStep)
+        return new JobBuilder("exportProductExcelJob",jobRepository)
+                .start(itemExportStep)
                 .listener(jobCompleteListener)
                 .build();
 
     }
+
+
+    // JOB FOR STORES
+    @Bean("exportStoreExcelJob")
+    public Job exportStoreExcelJob(JobRepository jobRepository,
+                                     Step storeExportStep,
+                                     ExcelJobCompleteListener jobCompleteListener) {
+        return new JobBuilder("exportStoreExcelJob",jobRepository)
+                .start(storeExportStep)
+                .listener(jobCompleteListener)
+                .build();
+
+    }
+
+    // JOB FOR USERS
+    @Bean("exportUserExcelJob")
+    public Job exportUserExcelJob(JobRepository jobRepository,
+                                     Step userExportStep,
+                                     ExcelJobCompleteListener jobCompleteListener) {
+        return new JobBuilder("exportUserExcelJob",jobRepository)
+                .start(userExportStep)
+                .listener(jobCompleteListener)
+                .build();
+
+    }
+
 
 
 

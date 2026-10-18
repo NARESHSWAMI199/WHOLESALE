@@ -31,9 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
 @RequiredArgsConstructor
-public class ItemExcelWriter implements ItemStreamWriter<ItemDto> {
+public class ItemExcelWriter implements ItemStreamWriter<Object> {
 
     private final Logger logger = LoggerFactory.getLogger(ItemExcelWriter.class);
     private final List<String> headers = GlobalConstant.HEADERS_FOR_ITEMS;
@@ -68,9 +67,9 @@ public class ItemExcelWriter implements ItemStreamWriter<ItemDto> {
     }
 
     @Override
-    public void write(Chunk<? extends ItemDto> chunk) throws Exception {
+    public void write(Chunk<? extends Object> chunk) throws Exception {
         Map<String, List<Object>> result = new HashMap<>();
-        for (ItemDto item : chunk.getItems()) {
+        for (Object item : chunk.getItems()) {
             Gson itemsGson = new GsonBuilder().serializeNulls().create();
             String items = itemsGson.toJson(item);
             Map<String, Object> itemMap = new Gson().fromJson(items, Map.class);

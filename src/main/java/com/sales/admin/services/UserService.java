@@ -596,4 +596,20 @@ public class UserService {
         userRepository.save(cacheUser);
     }
 
+    public Page<User> fetchDataForExcelSheet(UserSearchFilters filters, AuthUser loggedUser) {
+        Specification<User> specification = Specification.allOf(
+                (containsName(filters.getSearchKey()).or(containsEmail(filters.getSearchKey())))
+                        .and(greaterThanOrEqualFromDate(filters.getFromDate()))
+                        .and(lessThanOrEqualToToDate(filters.getToDate()))
+                        .and(isStatus(filters.getStatus()))
+                        .and(hasSlug(filters.getSlug()))
+                        .and(notSuperAdmin())
+                        .and(notSelf(loggedUser.getId()))
+                        .and(hasUserType(filters.getUserType()))
+                        .and(hasNotUserType(loggedUser.getId() == GlobalConstant.suId ? null : USER_TYPES.SUPER_ADMIN.getType()))
+        );
+        Pageable pageable = getPageable(logger, filters);
+        return userRepository.findAll(specification, pageable);
+    }
+
 }

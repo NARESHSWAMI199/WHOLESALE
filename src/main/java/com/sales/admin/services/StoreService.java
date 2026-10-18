@@ -34,8 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Month;
-import java.time.format.TextStyle;
 import java.util.*;
 
 import static com.sales.helpers.PaginationHelper.getPageable;
@@ -475,6 +473,22 @@ public class StoreService {
         int result = storeHbRepository.deleteStoreSubCategory(slug);
         logger.debug("Exiting deleteStoreSubCategory");
         return result;
+    }
+
+
+
+
+    public Page<Store> fetchDataForExcelSheet(StoreFilterRequest filters) {
+        logger.debug("Entering fetchDataForExcelSheet");
+        Specification<Store> specification = Specification.allOf(
+                (containsName(filters.getSearchKey()).or(containsEmail(filters.getSearchKey())))
+                        .and(greaterThanOrEqualFromDate(filters.getFromDate()))
+                        .and(lessThanOrEqualToToDate(filters.getToDate()))
+                        .and(isStatus(filters.getStatus()))
+                        .and(hasSlug(filters.getSlug()))
+        );
+        Pageable pageable = getPageable(logger, filters);
+        return storeRepository.findAll(specification, pageable);
     }
 
 
