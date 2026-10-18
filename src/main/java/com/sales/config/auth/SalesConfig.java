@@ -44,7 +44,7 @@ public class SalesConfig {
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        return builder.dataSource(dataSource).properties(properties).packages("com.sales.entities").persistenceUnit("Sales").build();
+        return builder.dataSource(dataSource).properties(properties).packages("com.sales.entity").persistenceUnit("Sales").build();
     }
 
 

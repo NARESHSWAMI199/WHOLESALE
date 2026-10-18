@@ -676,7 +676,7 @@ public class ItemService {
     private void triggerNotification(StoreNotificationDto storeNotification,AuthUser loggedUser){
         StoreNotificationDto build = storeNotification.toBuilder().createdBy(userMapper.toDto(loggedUser)).build();
         NotificationEvent notificationEvent = NotificationEvent.builder()
-                .eventType(EventType.PUSH_NOTIFICATION)
+                .eventType(List.of(EventType.PUSH_NOTIFICATION))
                 .notification(build)
                 .build();
         notificationPublisher.sendNotification(notificationEvent);

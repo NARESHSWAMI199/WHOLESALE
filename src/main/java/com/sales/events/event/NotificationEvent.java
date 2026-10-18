@@ -6,6 +6,7 @@ import com.sales.entities.StoreNotifications;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -13,7 +14,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class NotificationEvent implements Serializable {
-    private EventType eventType;
+    private List<EventType> eventType;
     private String userSlug;
     private StoreNotificationDto notification;
 }
