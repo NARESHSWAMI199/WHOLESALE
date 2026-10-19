@@ -2,10 +2,12 @@ package com.sales.admin.controllers;
 
 
 import com.sales.admin.dto.UserDto;
+import com.sales.admin.mapper.UserMapper;
 import com.sales.admin.services.PaginationService;
 import com.sales.admin.services.UserService;
 import com.sales.claims.AuthUser;
 import com.sales.claims.SalesUser;
+import com.sales.entities.User;
 import com.sales.global.ConstantResponseKeys;
 import com.sales.global.GlobalConstant;
 import com.sales.global.ResponseMessages;
@@ -53,6 +55,7 @@ public class UserController {
     private final UserService userService;
     private final PaginationService paginationService;
     private final JwtToken jwtToken;
+    private final UserMapper userMapper;
     @Value("${profile.get}")
     String filePath;
 
@@ -97,7 +100,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> findUserByOtp(@RequestBody LoginRequest loginRequest) {
         logger.debug("Admin OTP login attempt with email: {}", loginRequest.getEmail());
         Map<String, Object> responseObj = new HashMap<>();
-        AuthUser user = userService.findUserByOtpAndEmail(loginRequest.getEmail(), loginRequest.getPassword());
+        User user = userService.findUserByOtpAndEmail(loginRequest.getEmail(), loginRequest.getPassword());
         if (user == null) {
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WRONG_OTP_PASSWORD);
             responseObj.put(ConstantResponseKeys.STATUS, 401);
@@ -105,7 +108,7 @@ public class UserController {
             Map<String, Object> paginations = paginationService.findUserPaginationsByUserId(user);
             responseObj.put(ConstantResponseKeys.TOKEN, jwtToken.generateToken(user.getSlug()));
             responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.SUCCESSFULLY_LOGGED_IN);
-            responseObj.put("user", user);
+            responseObj.put("user", new SalesUser(user));
             responseObj.put(ConstantResponseKeys.PAGINATIONS, paginations);
             responseObj.put(ConstantResponseKeys.STATUS, 200);
             userService.resetOtp(user.getUsername());
@@ -329,11 +332,11 @@ public class UserController {
 
 
     @PostMapping("fcmToken/register")
-    public ResponseEntity<Map<String, Object>> registerFCMToken(Authentication authentication,@RequestBody Map<String,String> data) {
+    public ResponseEntity<Map<String, Object>> registerFCMToken(Authentication authentication, @RequestBody Map<String, String> data) {
         logger.debug("Registering FCM token for user: {}", data.get("fcmToken"));
-        AuthUser loggedUser = (SalesUser)  authentication.getPrincipal();
+        AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         String fcmToken = data.get("fcmToken");
-        userService.insertOrUpdateUserFCMToken(fcmToken,loggedUser);
+        userService.insertOrUpdateUserFCMToken(fcmToken, loggedUser);
         return ResponseEntity.ok(Map.of(ConstantResponseKeys.STATUS, 202));
     }
 

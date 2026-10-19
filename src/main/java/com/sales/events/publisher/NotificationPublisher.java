@@ -36,6 +36,7 @@ public class NotificationPublisher {
             };
             return notificationEventBuilder
                     .channel(eventType)
+                    .placeholders(notificationRequest.placeHolders())
                     .idempotencyKey(UUID.randomUUID().toString())
                     .userSlug(notificationRequest.userSlug())
                     .build();

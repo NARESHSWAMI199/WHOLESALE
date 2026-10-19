@@ -47,6 +47,10 @@ public class SalesUser implements AuthUser {
         return user.getPassword();
     }
 
+    public String getContact() {
+        return user.getContact();
+    }
+
     @Override
     public String getUsername() {
         return user.getUsername();
@@ -67,7 +71,10 @@ public class SalesUser implements AuthUser {
         return user.getAvatar();
     }
 
+    @JsonIgnore
     @Override
-    public String getFcmToken(){return user.getFcmToken();}
+    public String getFcmToken() {
+        return user.getFcmToken();
+    }
 
 }

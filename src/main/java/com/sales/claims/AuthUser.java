@@ -1,5 +1,6 @@
 package com.sales.claims;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ public interface AuthUser {
 
     Collection<? extends GrantedAuthority> getAuthorities();
 
+    @JsonIgnore
     String getPassword();
 
     String getUsername();
@@ -28,5 +30,6 @@ public interface AuthUser {
     String getAvatar();
     default String fcmToken(){return null;}
 
+    @JsonIgnore
     String getFcmToken();
 }

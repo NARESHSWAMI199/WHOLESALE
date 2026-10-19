@@ -45,6 +45,7 @@ public class User implements AuthUser, Serializable {
     private int id;
     @Column(name = "slug")
     private String slug;
+    @JsonIgnore
     @Column(name = "otp")
     private String otp;
     @Column(name = "avtar")
@@ -77,6 +78,7 @@ public class User implements AuthUser, Serializable {
     private Integer activePlan;
     @Column(name = "last_seen")
     private Long lastSeen;
+    @JsonIgnore
     @Column(name = "fcm_token")
     private String fcmToken;
     @ManyToMany

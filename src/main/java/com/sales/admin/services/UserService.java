@@ -59,7 +59,8 @@ public class UserService {
     private final PaginationService paginationService;
     private final UserMapper userMapper;
     private final NotificationPublisher notificationPublisher;
-
+    @Value("${support.email}")
+    private String SUPPORT_EMAIL;
     @Value("${profile.absolute}")
     private String profilePath;
 
@@ -75,9 +76,9 @@ public class UserService {
         return userRepository.findByEmailAndPassword(email, password).orElseThrow(() -> new UsernameNotFoundException("User not fond."));
     }
 
+    @Transactional(readOnly = true)
     public User findUserByOtpAndEmail(String email, String password) {
         logger.debug("Finding user by OTP and email: {}", email);
-        // Here password key has otp
         return userRepository.findUserByOtpAndEmail(email, password);
     }
 
@@ -102,7 +103,8 @@ public class UserService {
 
         Map<String,String> placeHolders = new HashMap<>();
         placeHolders.put("otp",otp);
-        placeHolders.get(user.getUsername());
+        placeHolders.put("username",user.getUsername());
+        placeHolders.put("supportEmail",SUPPORT_EMAIL);
         NotificationRequest notificationRequest = NotificationRequest.builder()
                 .email(user.getEmail())
                 .fcmToken(user.getFcmToken())

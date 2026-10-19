@@ -2,6 +2,7 @@ package com.sales.admin.repositories;
 
 
 import com.sales.entities.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +27,10 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
 
     @Query(value = "from User where email=:email and otp=:otp and (userType='S' or userType='SA') ")
     User findUserByOtpAndEmail(@Param("email") String email, @Param("otp") String otp);
+
+    @Query(value = "from User where email=:email and otp=:otp and (userType='S' or userType='SA') and status='A'")
+    User findUserByOtpAndEmailAndActive(@Param("email") String email, @Param("otp") String otp);
+
 
     @Query(value = "from User where email=:email and (userType='S' or userType='SA')   ")
     Optional<User> findUserByEmail(@Param("email") String email);
@@ -73,5 +78,6 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
     Set<String> findAllPermissionsByUserId(@Param("userId") Integer userId);
 
     Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndStatus(String email, String status);
 
 }
