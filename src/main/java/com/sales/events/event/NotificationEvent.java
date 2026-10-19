@@ -1,22 +1,25 @@
 package com.sales.events.event;
 
 
-import com.sales.admin.dto.StoreNotificationDto;
-import com.sales.entities.StoreNotifications;
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
-import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-public class NotificationEvent implements Serializable {
-    private List<EventType> eventType;
-    private String userSlug;
-    private StoreNotificationDto notification;
-}
+@Builder(toBuilder = true)
+public record NotificationEvent (
+        @NotNull
+        String recipient,
+        String idempotencyKey,
+        String userSlug,
+        EventType channel,
+        @NotNull
+        String templateKey,
+        Map<String, String> placeholders,
 
+        String emailOverride,
+        String smsMobileOverride,
+        String firebaseTokenOverride
+    ) {}
 

@@ -25,10 +25,12 @@ import com.sales.global.USER_TYPES;
 import com.sales.request.*;
 import com.sales.request.enums.ITEM_LABEL;
 import com.sales.request.enums.ITEM_STOCK;
+import com.sales.request.enums.NOTIFICATION_EVENT_FOR;
 import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
+import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -675,11 +677,13 @@ public class ItemService {
     }
     private void triggerNotification(StoreNotificationDto storeNotification,AuthUser loggedUser){
         StoreNotificationDto build = storeNotification.toBuilder().createdBy(userMapper.toDto(loggedUser)).build();
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .eventType(List.of(EventType.PUSH_NOTIFICATION))
-                .notification(build)
+        List<EventType> eventTypes = List.of(EventType.PUSH_NOTIFICATION);
+        NotificationRequest notificationRequest = NotificationRequest.builder()
+                .fcmToken(loggedUser.getFcmToken())
+                .eventTypeList(eventTypes)
+                .notificationEventFor(NOTIFICATION_EVENT_FOR.FILE_EXPORT_COMPLETE)
                 .build();
-        notificationPublisher.sendNotification(notificationEvent);
+        notificationPublisher.sendNotification(notificationRequest);
     }
 
 

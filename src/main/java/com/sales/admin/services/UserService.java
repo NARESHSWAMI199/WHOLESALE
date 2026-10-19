@@ -8,8 +8,8 @@ import com.sales.cachemanager.services.UserCacheService;
 import com.sales.claims.AuthUser;
 import com.sales.entities.Store;
 import com.sales.entities.StorePermissions;
-import com.sales.entities.SupportEmail;
 import com.sales.entities.User;
+import com.sales.events.publisher.NotificationPublisher;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
 import com.sales.global.ConstantResponseKeys;
@@ -26,20 +26,19 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static com.sales.events.event.EventType.*;
 import static com.sales.helpers.PaginationHelper.getPageable;
 import static com.sales.specifications.UserSpecifications.*;
 
@@ -58,6 +57,7 @@ public class UserService {
     private final StoreService storeService;
     private final PaginationService paginationService;
     private final UserMapper userMapper;
+    private final NotificationPublisher notificationPublisher;
 
     @Value("${profile.absolute}")
     private String profilePath;
@@ -92,62 +92,27 @@ public class UserService {
     }
 
 
-    public boolean sendOtp(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public void sendOtp(UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Sending OTP to email: {}", userRequest.getEmail());
         // if there is any required field null then this will throw IllegalArgumentException
         Utils.checkRequiredFields(userRequest, List.of("email"));
-
-        boolean sent = false;
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com"); // Replace with your mail server
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-
         User user = userRepository.findUserByEmail(userRequest.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        String recipient = user.getEmail();
-        SupportEmail supportEmail = supportEmailsRepository.findSupportEmailBySupportType("SUPPORT");
-        if (Objects.isNull(supportEmail)) {
-            throw new InternalError("Support email is not found. please contact administrator.");
-        }
-        String sender = supportEmail.getEmail();
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(sender, supportEmail.getPasswordKey());
-            }
-        });
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(sender));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-            String otp = String.valueOf(Utils.generateOTP(6));
-            String subject = "Subject: Otp-in to Receive Updates from Swami Sales";
-            message.setSubject(subject);
-            String body = "Dear " + user.getUsername() + ",<br/>" +
-                    "<br/>" +
-                    "You recently requested a login otp for your Swami Sales account. <br/>" +
-                    "<br/>" +
-                    "Your one-time password (OTP) is: <b>" + otp + "</b><br/>" +
-                    "<br/>" +
-                    "Please use this OTP to verify your identity and complete the password reset process. <br/>" +
-                    "<br/>" +
-                    "<b>Important:</b><br/>" +
-                    "<br/>" +
-                    "* Do not share this OTP with anyone.<br/>" +
-                    "* If you did not request this OTP, please ignore this email.<br/>" +
-                    "<br/>" +
-                    "If you have any issues or require further assistance, please contact our customer support team at support@swamisales.com.\n" +
-                    "<br/>" +
-                    "Thank you,<br/>" +
-                    "The Swami Sales Team<br/>";
-            message.setContent(body, "text/html; charset=utf-8");
-            Transport.send(message);
-            userHbRepository.updateOtp(user.getEmail(), otp);
-            sent = true;
-        } catch (MessagingException mex) {
-            logger.error("Fetching Exception : {} ", mex.getMessage());
-        }
-        return sent;
+        String otp = String.valueOf(Utils.generateOTP(6));
+
+        Map<String,String> placeHolders = new HashMap<>();
+        placeHolders.put("otp",otp);
+        placeHolders.get(user.getUsername());
+        NotificationRequest notificationRequest = NotificationRequest.builder()
+                .email(user.getEmail())
+                .fcmToken(user.getFcmToken())
+                .mobileNo(user.getContact())
+                .userSlug(user.getSlug())
+                .eventTypeList(List.of(EMAIL,SMS,PUSH_NOTIFICATION))
+                .userSlug(user.getSlug())
+                .placeHolders(placeHolders)
+                .build();
+        notificationPublisher.sendNotification(notificationRequest);
+        userHbRepository.updateOtp(user.getEmail(), otp);
     }
 
 

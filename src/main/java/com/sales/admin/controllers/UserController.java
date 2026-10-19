@@ -127,14 +127,9 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> sendOtp(@RequestBody UserRequest userRequest) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         logger.debug("Sending OTP to email: {}", userRequest.getEmail());
         Map<String, Object> responseObj = new HashMap<>();
-        boolean sendOtp = userService.sendOtp(userRequest);
-        if (sendOtp) {
-            responseObj.put(ConstantResponseKeys.STATUS, 200);
-            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.OTP_SENT_SUCCESSFULLY);
-        } else {
-            responseObj.put(ConstantResponseKeys.STATUS, 400);
-            responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.WE_FACING_SOME_ISSUE_TO_SEND_OTP_TO_THIS_MAIL + userRequest.getEmail());
-        }
+        userService.sendOtp(userRequest);
+        responseObj.put(ConstantResponseKeys.STATUS, 200);
+        responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.OTP_SENT_SUCCESSFULLY);
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
