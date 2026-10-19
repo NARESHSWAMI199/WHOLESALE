@@ -17,6 +17,7 @@ import com.sales.global.GlobalConstant;
 import com.sales.global.ResponseMessages;
 import com.sales.global.USER_TYPES;
 import com.sales.request.*;
+import com.sales.request.enums.NOTIFICATION_EVENT_FOR;
 import com.sales.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -107,8 +108,9 @@ public class UserService {
                 .fcmToken(user.getFcmToken())
                 .mobileNo(user.getContact())
                 .userSlug(user.getSlug())
-                .eventTypeList(List.of(EMAIL,SMS,PUSH_NOTIFICATION))
+                .eventTypeList(List.of(EMAIL,SMS,IN_APP))
                 .userSlug(user.getSlug())
+                .notificationEventFor(NOTIFICATION_EVENT_FOR.LOGIN_OTP)
                 .placeHolders(placeHolders)
                 .build();
         notificationPublisher.sendNotification(notificationRequest);

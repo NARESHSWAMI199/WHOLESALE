@@ -7,14 +7,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sales.admin.dto.CategoryDto;
 import com.sales.admin.dto.ItemDto;
-import com.sales.admin.dto.StoreNotificationDto;
 import com.sales.admin.dto.SubcategoryDto;
 import com.sales.admin.mapper.*;
 import com.sales.admin.repositories.*;
 import com.sales.claims.AuthUser;
 import com.sales.entities.*;
 import com.sales.events.event.EventType;
-import com.sales.events.event.NotificationEvent;
 import com.sales.events.publisher.NotificationPublisher;
 import com.sales.exceptions.MyException;
 import com.sales.exceptions.NotFoundException;
@@ -30,7 +28,6 @@ import com.sales.requests.ItemRequest;
 import com.sales.utils.UploadImageValidator;
 import com.sales.utils.Utils;
 import com.sales.utils.WriteExcelUtil;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,12 +74,11 @@ public class ItemService {
     private final StoreNotificationMapper storeNotificationMapper;
     private final JobLauncher asyncJobLauncher;
     private final NotificationPublisher notificationPublisher;
-    private final Map<String,Job> jobMap;
+    private final Map<String, Job> jobMap;
     private final UserMapper userMapper;
 
     @Value("${item.absolute}")
     String itemImagePath;
-
 
 
     @Transactional
@@ -328,7 +324,7 @@ public class ItemService {
         storeNotifications.setWholesaleId(storeId);
         storeNotifications.setCreatedBy(User.builder().id(loggedUser.getId()).build());
         storeHbRepository.insertStoreNotifications(storeNotifications);
-        triggerNotification(storeNotificationMapper.toDto(storeNotifications),loggedUser);
+        triggerNotification(loggedUser);
         logger.debug("Exiting sendNotification");
     }
 
@@ -534,11 +530,11 @@ public class ItemService {
         Sort sort = searchFilters.getOrder().equals("asc") ? Sort.by(searchFilters.getOrderBy()).ascending() : Sort.by(searchFilters.getOrderBy()).descending();
         List<ItemCategory> result = itemCategoryRepository.findAll(sort);
         logger.debug("Exiting getAllCategory with result: {}", result);
-        return result.stream().sorted((a,b) ->{
-                if (a.getCategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
-                if (b.getCategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
-                return a.getCategory().compareToIgnoreCase(b.getCategory());
-            }).map(categoryMapper::toDto).toList();
+        return result.stream().sorted((a, b) -> {
+            if (a.getCategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+            if (b.getCategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+            return a.getCategory().compareToIgnoreCase(b.getCategory());
+        }).map(categoryMapper::toDto).toList();
     }
 
 
@@ -596,11 +592,11 @@ public class ItemService {
         Sort sort = Sort.by(searchFilters.getOrderBy());
         sort = searchFilters.getOrder().equals("asc") ? sort.ascending() : sort.descending();
         List<SubcategoryDto> result = itemSubCategoryRepository.getSubCategories(searchFilters.getCategoryId(), sort).stream().
-            sorted((a,b) ->{
-                if (a.getSubcategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
-                if (b.getSubcategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
-                return a.getSubcategory().compareToIgnoreCase(b.getSubcategory());
-            }).map(subcategoryMapper::toDto).toList();
+                sorted((a, b) -> {
+                    if (a.getSubcategory().equalsIgnoreCase("Other")) return 1;  // Move 'a' to the end
+                    if (b.getSubcategory().equalsIgnoreCase("Other")) return -1; // Move 'b' to the end
+                    return a.getSubcategory().compareToIgnoreCase(b.getSubcategory());
+                }).map(subcategoryMapper::toDto).toList();
         logger.debug("Exiting getAllItemsSubCategories with result: {}", result);
         return result;
     }
@@ -647,7 +643,7 @@ public class ItemService {
         return result;
     }
 
-    public Page<Item>fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser){
+    public Page<Item> fetchDataForExcelSheet(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) {
         logger.info("Entering fetchDataForExcelSheet with searchFilters: {}", searchFilters);
         Integer storeId = !Utils.isEmpty(wholesaleSlug) ? storeRepository.getStoreIdByStoreSlug(wholesaleSlug) : null;
         Specification<Item> specification = Specification.allOf(
@@ -666,18 +662,18 @@ public class ItemService {
     public Long writeAnExcelFileUsingSpringBatch(ItemFilterRequest searchFilters, String wholesaleSlug, AuthUser loggedUser) throws JsonProcessingException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         final ObjectMapper objectMapper = new ObjectMapper();
         String filtersJson = objectMapper.writeValueAsString(searchFilters);
-            String loggedUserJson = objectMapper.writeValueAsString(loggedUser);
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addString("wholesaleSlug", (wholesaleSlug != null) ?  wholesaleSlug : "")
-                    .addString("searchFiltersJson", filtersJson)
-                    .addString("loggedUserJson", loggedUserJson)
-                    .toJobParameters();
+        String loggedUserJson = objectMapper.writeValueAsString(loggedUser);
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("wholesaleSlug", (wholesaleSlug != null) ? wholesaleSlug : "")
+                .addString("searchFiltersJson", filtersJson)
+                .addString("loggedUserJson", loggedUserJson)
+                .toJobParameters();
         JobExecution run = asyncJobLauncher.run(jobMap.get("exportProductExcelJob"), jobParameters);
         return run.getId();
     }
-    private void triggerNotification(StoreNotificationDto storeNotification,AuthUser loggedUser){
-        StoreNotificationDto build = storeNotification.toBuilder().createdBy(userMapper.toDto(loggedUser)).build();
-        List<EventType> eventTypes = List.of(EventType.PUSH_NOTIFICATION);
+
+    private void triggerNotification(AuthUser loggedUser) {
+        List<EventType> eventTypes = List.of(EventType.IN_APP);
         NotificationRequest notificationRequest = NotificationRequest.builder()
                 .fcmToken(loggedUser.getFcmToken())
                 .eventTypeList(eventTypes)

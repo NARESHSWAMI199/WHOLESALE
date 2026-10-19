@@ -29,14 +29,14 @@ public class NotificationPublisher {
                         .recipient(notificationRequest.email());
                 case SMS -> NotificationEvent.builder().templateKey(notificationRequest.notificationEventFor().getSms())
                         .recipient(notificationRequest.mobileNo());
-                case PUSH_NOTIFICATION ->
+                case IN_APP ->
                         NotificationEvent.builder().templateKey(notificationRequest.notificationEventFor().getPush())
                                 .recipient(notificationRequest.fcmToken());
                 default -> throw new IllegalStateException("Unexpected value: " + eventType);
             };
             return notificationEventBuilder
-                    .idempotencyKey(UUID.randomUUID().toString())
                     .channel(eventType)
+                    .idempotencyKey(UUID.randomUUID().toString())
                     .userSlug(notificationRequest.userSlug())
                     .build();
         }).toList();
