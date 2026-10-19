@@ -30,6 +30,5 @@ public interface AuthUser {
     String getAvatar();
     default String fcmToken(){return null;}
 
-    @JsonIgnore
     String getFcmToken();
 }

@@ -78,7 +78,6 @@ public class User implements AuthUser, Serializable {
     private Integer activePlan;
     @Column(name = "last_seen")
     private Long lastSeen;
-    @JsonIgnore
     @Column(name = "fcm_token")
     private String fcmToken;
     @ManyToMany
