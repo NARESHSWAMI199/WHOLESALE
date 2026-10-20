@@ -20,6 +20,8 @@ import com.sales.request.StoreFilterRequest;
 import com.sales.request.UserSearchFilters;
 import com.sales.springbatch.listener.ExcelChunkProgressListener;
 import com.sales.springbatch.listener.ExcelJobCompleteListener;
+import com.sales.springbatch.listener.ItemSkipListener;
+import com.sales.springbatch.policy.GenericSkipPolicy;
 import com.sales.springbatch.readers.ProductItemReader;
 import com.sales.springbatch.readers.StoreItemReader;
 import com.sales.springbatch.readers.UserItemReader;
@@ -203,10 +205,14 @@ public class SpringItemsBatchConfig {
                                ExcelChunkProgressListener chunkListener
     ) {
         return new StepBuilder("itemExcelStep",jobRepository)
-                .<ItemDto,ItemDto>chunk(1,transactionManager)
+                .<ItemDto,ItemDto>chunk(100,transactionManager)
                 .reader(reader)
                 .writer(excelWriter)
                 .listener(chunkListener)
+                .listener(new ItemSkipListener())
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipPolicy(new GenericSkipPolicy())
                 .build();
     }
 
@@ -220,10 +226,13 @@ public class SpringItemsBatchConfig {
                                ExcelChunkProgressListener chunkListener
     ) {
         return new StepBuilder("storeExcelStep",jobRepository)
-                .<StoreDto,StoreDto>chunk(1,transactionManager)
+                .<StoreDto,StoreDto>chunk(100,transactionManager)
                 .reader(reader)
                 .writer(excelWriter)
                 .listener(chunkListener)
+                .listener(new ItemSkipListener())
+                .faultTolerant()
+                .skipPolicy(new GenericSkipPolicy())
                 .build();
     }
 
@@ -237,10 +246,13 @@ public class SpringItemsBatchConfig {
                                 ExcelChunkProgressListener chunkListener
     ) {
         return new StepBuilder("userExcelStep",jobRepository)
-                .chunk(1,transactionManager)
+                .chunk(100,transactionManager)
                 .reader(reader)
                 .writer(excelWriter)
                 .listener(chunkListener)
+                .listener(new ItemSkipListener())
+                .faultTolerant()
+                .skipPolicy(new GenericSkipPolicy())
                 .build();
     }
 

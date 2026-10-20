@@ -19,4 +19,5 @@ public class ExcelChunkProgressListener implements ChunkListener {
         StepExecution stepExecution = context.getStepContext().getStepExecution();
         excelSheetProgressService.sendProgress(stepExecution.getJobExecution(), stepExecution.getWriteCount(), "WRITING");
     }
+
 }
