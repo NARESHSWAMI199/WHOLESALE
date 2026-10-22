@@ -139,5 +139,14 @@ excel:
   notUpdated:
     absolute: ${public_folder.absolute}/items_excels/not_updated_items/
 
+
+##################################### -------- SUPPORT EMAIL -----------################
 support:
   email: support@sales.com
+
+##################################### -------- UPLOAD PATHS -----------################
+
+chunk:
+  files:
+    upload: ${public_folder.absolute}/uploads/completed
+    temp: ${public_folder.absolute}/uploads/temp/

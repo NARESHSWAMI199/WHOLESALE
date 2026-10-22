@@ -1,10 +1,23 @@
 package com.sales.admin.services;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sales.admin.dto.UploadInitDto;
+import com.sales.async.AsyncProcess;
+import com.sales.cachemanager.services.UploadInitCacheService;
+import com.sales.claims.AuthUser;
 import com.sales.requests.records.UploadInitRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,18 +34,22 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChunkUploadService {
 
-    private static final String UPLOAD_DIR = "./uploads/completed/";
-    private static final String TEMP_DIR = "./uploads/temp/";
 
-    // Memory cache for active uploads. In clustered multi-node environments, replace this with Redis.
-    private final Map<String, UploadInitRequest> uploadMetaMap = new ConcurrentHashMap<>();
+    private final UploadInitCacheService uploadInitCacheService;
+    @Value("${chunk.files.upload}")
+    private String UPLOAD_DIR;
+    @Value("${chunk.files.temp}")
+    private String TEMP_DIR;
+    private final JobLauncher asyncJobLauncher;
+    private final Map<String, Job> jobs;
+    private final AsyncProcess asyncProcess;
+    private final StoreService storeService;
 
     public UploadInitDto initiateUpload(UploadInitRequest request) {
         Path finalPath = Paths.get(UPLOAD_DIR, request.fileHash() + "_" + request.fileName());
@@ -44,7 +61,7 @@ public class ChunkUploadService {
         }
 
         String uploadId = UUID.randomUUID().toString();
-        uploadMetaMap.put(uploadId, request);
+        uploadInitCacheService.updateUploadInitRequest(uploadId, request);
 
         new File(TEMP_DIR + uploadId).mkdirs();
         return UploadInitDto.builder()
@@ -68,9 +85,8 @@ public class ChunkUploadService {
         log.info("Chunk saved to {}", chunkPath.getParent().toString());
     }
 
-    public String mergeChunks(String uploadId) throws IOException {
-        log.info("Start merge chunks :{} : {} ", uploadMetaMap,  uploadId);
-        UploadInitRequest request = uploadMetaMap.get(uploadId);
+    public String mergeChunks(String uploadId, String wholesaleSlug, AuthUser loggedUser) throws IOException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        UploadInitRequest request = uploadInitCacheService.getCacheUploadInitRequest(uploadId);
         if (request == null) throw new IllegalArgumentException("Upload session not found.");
         Path sourceDir = Paths.get(TEMP_DIR, uploadId);
         new File(UPLOAD_DIR).mkdirs();
@@ -89,19 +105,18 @@ public class ChunkUploadService {
                 }
             }
         }
-        // Async or immediate cleanup of chunk data
-
-        // TODO :// handle this task on separate threadpool
-        cleanupDirectory(sourceDir);
-        uploadMetaMap.remove(uploadId);
-
+        asyncProcess.cleanupDirectory(sourceDir);
+        uploadInitCacheService.deletingUploadInitRequest(uploadId);
+        final ObjectMapper objectMapper = new ObjectMapper();
+        String loggedUserJson = objectMapper.writeValueAsString(loggedUser);
+        Integer storeId = storeService.getStoreIdByStoreSlug(wholesaleSlug);
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("loggedUserJson", loggedUserJson)
+                .addString("db", String.valueOf(storeId))
+                .addString("filePath", targetFile.toAbsolutePath().toString())
+                .toJobParameters();
+        asyncJobLauncher.run(jobs.get("readItemsExcelStreamJob"), jobParameters);
         return targetFile.toAbsolutePath().toString();
     }
 
-    private void cleanupDirectory(Path path) throws IOException {
-        Files.walk(path)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-    }
 }

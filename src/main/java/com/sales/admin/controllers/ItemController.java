@@ -459,7 +459,7 @@ public class ItemController {
     @PreAuthorize("hasAuthority('item.export')")
     @Operation(summary = "Export items to Excel", description = "Exports items to an Excel sheet based on search filters for a specific wholesale or all")
     public ResponseEntity<Object> exportItemsUsingSpringBatch(Authentication authentication, @PathVariable(required = false) String wholesaleSlug, @RequestBody ItemFilterRequest searchFilters, HttpServletRequest request) {
-        logger.debug("Exporting items to Excel for wholesaleSlug: {}", wholesaleSlug);
+        logger.debug("Exporting items to Excel using spring batch for wholesaleSlug: {}", wholesaleSlug);
         AuthUser loggedUser = (SalesUser) authentication.getPrincipal();
         Map<String, Object> responseObj = new HashMap<>();
         try {
@@ -468,14 +468,14 @@ public class ItemController {
                 if (wholesale != null) {
                     searchFilters.setStoreSlug(wholesaleSlug);
                 } else {
-                    logger.debug("Wholesale is not found and wholesaleSlug : {} so that's why we using logged user slug : {} instead wholesale slug ", wholesaleSlug, loggedUser.getSlug());
+                    logger.debug("Wholesale is not found and wholesaleSlug : {} so that's why we using logged user slug : {} instead wholesale slug during batch process ", wholesaleSlug, loggedUser.getSlug());
                 }
                 Long jobId = itemService.writeAnExcelFileUsingSpringBatch(searchFilters,wholesaleSlug,loggedUser);
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.FILE_IN_PROGRESS);
                 responseObj.put("jobId",jobId);
                 responseObj.put(ConstantResponseKeys.STATUS, 202);
             } else {
-                logger.debug("wholeSlug : {}", wholesaleSlug);
+                logger.debug("wholesaleSlug : {}", wholesaleSlug);
                 responseObj.put(ConstantResponseKeys.MESSAGE, ResponseMessages.STORE_NOT_EXIST);
                 responseObj.put(ConstantResponseKeys.STATUS, 500);
             }
@@ -484,7 +484,7 @@ public class ItemController {
             responseObj.put(ConstantResponseKeys.STATUS, 500);
             logger.error("Exception during export excel : {}", e.getMessage(), e);
         }
-        logger.debug("ENDED exportItemsFromExcel.");
+        logger.debug("ENDED exportItemsUsingSpringBatch.");
         return new ResponseEntity<>(responseObj, HttpStatus.valueOf((Integer) responseObj.get(ConstantResponseKeys.STATUS)));
     }
 
